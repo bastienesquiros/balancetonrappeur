@@ -2,9 +2,10 @@ package org.balancetonrappeur.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.balancetonrappeur.entity.*;
+import org.balancetonrappeur.exception.NoChangeDetectedException;
 import org.balancetonrappeur.service.RapperService;
 import org.balancetonrappeur.service.SubmissionService;
-import org.balancetonrappeur.exception.NoChangeDetectedException;
+import org.balancetonrappeur.util.SourceJsonSerializer;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,7 +25,7 @@ public class SubmissionController {
     private final SubmissionService submissionService;
     private final RapperService rapperService;
 
-    // ─── Rappeur non indexé (vient du not-found) ───────────────────────────
+    // Rappeur non indexé (vient du not-found)
     @GetMapping("/rappers/suggest")
     public String suggestForm(@RequestParam(required = false) String name, Model model) {
         model.addAttribute("unknownRapperName", name);
@@ -60,7 +61,7 @@ public class SubmissionController {
         return "redirect:/rappers/suggest";
     }
 
-    // ─── Rappeur indexé (add ou edit) ──────────────────────────────────────
+    // Rappeur indexé (add ou edit)
     @GetMapping("/rappers/{rapperId}/submit")
     public String form(@PathVariable Long rapperId,
                        @RequestParam(defaultValue = "ADD_ACCUSATION") SubmissionType type,
@@ -77,24 +78,10 @@ public class SubmissionController {
         model.addAttribute("sourceTypes", SourceType.values());
 
         if (type == SubmissionType.EDIT_ACCUSATION && accusationId != null) {
-            rapper.getAccusations().stream()
-                    .filter(a -> a.getId().equals(accusationId))
-                    .findFirst()
-                    .ifPresent(a -> {
-                        model.addAttribute("prefillAccusation", a);
-                        // JSON des sources pour Alpine.js
-                        var json = new StringBuilder("[");
-                        var sources = a.getSources();
-                        int i = 0;
-                        for (var s : sources) {
-                            if (i++ > 0) json.append(",");
-                            json.append("{\"type\":\"").append(s.getType().name()).append("\"")
-                                .append(",\"title\":\"").append(escape(s.getTitle())).append("\"")
-                                .append(",\"url\":\"").append(escape(s.getUrl())).append("\"}");
-                        }
-                        json.append("]");
-                        model.addAttribute("prefillSourcesJson", json.toString());
-                    });
+            rapperService.findAccusationOnRapper(rapperId, accusationId).ifPresent(a -> {
+                model.addAttribute("prefillAccusation", a);
+                model.addAttribute("prefillSourcesJson", SourceJsonSerializer.toJson(a.getSources()));
+            });
         }
 
         return "rappers/submit";
@@ -131,8 +118,4 @@ public class SubmissionController {
                 + (accusationId != null ? "&accusationId=" + accusationId : "");
     }
 
-    private String escape(String s) {
-        if (s == null) return "";
-        return s.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", " ").replace("\r", "");
-    }
 }

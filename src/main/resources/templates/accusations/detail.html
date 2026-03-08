@@ -1,15 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title th:text="${accusation.title} + ' · Balance Ton Rappeur'">Affaire</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] } } } }</script>
-    <link rel="preconnect" href="https://fonts.googleapis.com"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-</head>
+<head th:replace="~{layout :: head(${accusation.title}, null, null, null, null)}"></head>
 <body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col antialiased">
 
 <header th:replace="~{layout :: nav}"></header>
@@ -100,10 +91,7 @@
                         <p class="text-white text-sm font-medium truncate group-hover:underline underline-offset-2"
                            th:text="${source.title}">Titre source</p>
                         <div class="flex items-center gap-2 mt-0.5">
-                            <span class="text-zinc-600 text-xs"
-                                  th:text="${source.type.name() == 'JUDICIAL'} ? 'Judiciaire' :
-                                            (${source.type.name() == 'PRESS'} ? 'Presse' :
-                                            (${source.type.name() == 'SOCIAL_MEDIA'} ? 'Réseau social' : 'Autre'))">Type</span>
+                            <span class="text-zinc-600 text-xs" th:text="${source.type.label()}">Type</span>
                             <span th:if="${source.sourceDate}" class="text-zinc-700 text-xs">·</span>
                             <span th:if="${source.sourceDate}"
                                   class="text-zinc-600 text-xs"

@@ -2,18 +2,18 @@ package org.balancetonrappeur.service;
 
 import lombok.RequiredArgsConstructor;
 import org.balancetonrappeur.entity.*;
+import org.balancetonrappeur.exception.NoChangeDetectedException;
 import org.balancetonrappeur.repository.AccusationRepository;
 import org.balancetonrappeur.repository.RapperRepository;
 import org.balancetonrappeur.repository.SubmissionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import org.balancetonrappeur.exception.NoChangeDetectedException;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
-import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,10 +27,8 @@ public class SubmissionService {
     public void submitUnknownRapper(String rapperName, AccusationCategory category, String title,
                                     AccusationStatus status, LocalDate factDate,
                                     List<SourceType> types, List<String> titles, List<String> urls) {
-        var submission = buildBase(category, title, status, factDate);
-        submission.setType(SubmissionType.ADD_ACCUSATION);
+        var submission = buildAddSubmission(category, title, status, factDate, types, titles, urls);
         submission.setUnknownRapperName(rapperName);
-        attachSources(submission, types, titles, urls);
         submissionRepository.save(submission);
     }
 
@@ -40,11 +38,18 @@ public class SubmissionService {
                           List<SourceType> types, List<String> titles, List<String> urls) {
         var rapper = rapperRepository.findById(rapperId)
                 .orElseThrow(() -> new IllegalArgumentException("Rappeur introuvable"));
+        var submission = buildAddSubmission(category, title, status, factDate, types, titles, urls);
+        submission.setRapper(rapper);
+        submissionRepository.save(submission);
+    }
+
+    private Submission buildAddSubmission(AccusationCategory category, String title,
+                                          AccusationStatus status, LocalDate factDate,
+                                          List<SourceType> types, List<String> titles, List<String> urls) {
         var submission = buildBase(category, title, status, factDate);
         submission.setType(SubmissionType.ADD_ACCUSATION);
-        submission.setRapper(rapper);
         attachSources(submission, types, titles, urls);
-        submissionRepository.save(submission);
+        return submission;
     }
 
     @Transactional
@@ -64,10 +69,10 @@ public class SubmissionService {
 
         // Vérifier si les sources ont changé (URLs proposées vs existantes)
         var existingUrls = accusation.getSources().stream()
-                .map(Source::getUrl).collect(java.util.stream.Collectors.toSet());
+                .map(Source::getUrl).collect(Collectors.toSet());
         var proposedUrls = urls.stream()
                 .filter(u -> u != null && !u.isBlank())
-                .collect(java.util.stream.Collectors.toSet());
+                .collect(Collectors.toSet());
         boolean sourcesChanged = !existingUrls.equals(proposedUrls);
 
         if (!fieldsChanged && !sourcesChanged) {
@@ -82,7 +87,8 @@ public class SubmissionService {
         submissionRepository.save(submission);
     }
 
-    // ── helpers ────────────────────────────────────────────────────────────
+
+    // Helpers
 
     private Submission buildBase(AccusationCategory category, String title,
                                   AccusationStatus status, LocalDate factDate) {

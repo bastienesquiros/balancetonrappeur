@@ -30,9 +30,7 @@ public class RapperController {
             Model model) {
 
         var pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("name").ascending());
-        var result = status != null
-                ? rapperService.findByStatus(status, pageable)
-                : rapperService.findAll(pageable);
+        var result = rapperService.findFiltered(status, pageable);
 
         model.addAttribute("rappers", result.getContent());
         model.addAttribute("currentPage", page);
@@ -61,22 +59,13 @@ public class RapperController {
         var rapper = rapperService.findByIdWithAccusations(id)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND));
 
-        var statusLabel = switch (rapper.getStatus()) {
-            case CONVICTED -> "Condamné";
-            case ACCUSED   -> "Accusé";
-            default        -> "Polémique";
-        };
-
-        var similar = rapperService.findByStatus(rapper.getStatus()).stream()
-                .filter(r -> !r.getId().equals(id))
-                .limit(6)
-                .toList();
+        var similar = rapperService.findSimilar(id, rapper.getStatus());
 
         model.addAttribute("rapper", rapper);
         model.addAttribute("similarRappers", similar);
         model.addAttribute("pageTitle", rapper.getName());
         model.addAttribute("pageDescription",
-                rapper.getName() + " · " + statusLabel + " · " +
+                rapper.getName() + " · " + rapper.getStatus().label() + " · " +
                 rapper.getAccusations().size() + " affaire(s) documentée(s) sur Balance Ton Rappeur.");
         model.addAttribute("canonicalUrl", "https://balancetonrappeur.fr/rappers/" + id);
         model.addAttribute("ogType", "profile");

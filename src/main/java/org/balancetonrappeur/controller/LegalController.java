@@ -2,7 +2,6 @@ package org.balancetonrappeur.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.balancetonrappeur.entity.WithdrawalReason;
-import org.balancetonrappeur.entity.WithdrawalRequest;
 import org.balancetonrappeur.service.AccusationService;
 import org.balancetonrappeur.service.WithdrawalRequestService;
 import org.springframework.stereotype.Controller;
@@ -55,16 +54,7 @@ public class LegalController {
             @RequestParam(required = false) String email,
             RedirectAttributes redirectAttributes
     ) {
-        var request = new WithdrawalRequest();
-        request.setAccusationId(accusationId);
-        request.setAccusationTitle(accusationTitle);
-        request.setRapperName(rapperName);
-        request.setReason(reason);
-        request.setMessage(message);
-        request.setEmail(email != null && !email.isBlank() ? email : null);
-
-        withdrawalRequestService.save(request);
-
+        withdrawalRequestService.submit(accusationId, accusationTitle, rapperName, reason, message, email);
         redirectAttributes.addFlashAttribute("success", true);
         return "redirect:/legal#retrait";
     }

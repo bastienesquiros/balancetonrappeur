@@ -1,0 +1,29 @@
+# DataSource
+spring.datasource.url=jdbc:postgresql://localhost:5432/balancetonrappeur
+spring.datasource.username=postgres
+spring.datasource.password=changeme
+
+# JPA
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+# Mail
+spring.mail.host=localhost
+spring.mail.port=1025
+spring.mail.username=dev@balancetonrappeur.fr
+spring.mail.password=unused
+spring.mail.properties.mail.smtp.auth=false
+spring.mail.properties.mail.smtp.starttls.enable=false
+
+# Digest
+btr.mail.from=dev@balancetonrappeur.fr
+btr.mail.digest-to=dev@balancetonrappeur.fr
+
+# Admin dashboard
+btr.admin.password=admin
+
+# Spotify
+spotify.client-id=
+spotify.client-secret=
+spotify.redirect-uri=
+

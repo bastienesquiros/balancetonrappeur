@@ -2,10 +2,13 @@ package org.balancetonrappeur.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.balancetonrappeur.dto.AdminDashboardDto;
 import org.balancetonrappeur.entity.*;
 import org.balancetonrappeur.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -17,7 +20,22 @@ public class AdminService {
     private final RapperRepository rapperRepository;
     private final AccusationRepository accusationRepository;
 
-    // ── Submissions ───────────────────────────────────────────────────────
+    // Dashboard
+
+    public AdminDashboardDto getDashboard() {
+        return new AdminDashboardDto(
+            rapperRepository.count(),
+            accusationRepository.count(),
+            submissionRepository.countBySubmissionStatus(SubmissionStatus.PENDING),
+            withdrawalRequestRepository.countByStatus(WithdrawalStatus.PENDING),
+            rapperRepository.countBySpotifyImageUrlIsNull(),
+            submissionRepository.findBySubmissionStatusOrderByCreatedAtAsc(SubmissionStatus.PENDING),
+            withdrawalRequestRepository.findByStatusOrderByCreatedAtAsc(WithdrawalStatus.PENDING),
+            rapperRepository.findBySpotifyImageUrlIsNull()
+        );
+    }
+
+    // Submissions
 
     @Transactional
     public Rapper acceptSubmission(Long submissionId) {
@@ -25,7 +43,7 @@ public class AdminService {
                 .orElseThrow(() -> new IllegalArgumentException("Submission #" + submissionId + " introuvable"));
 
         return switch (submission.getType()) {
-            case ADD_ACCUSATION  -> acceptAddAccusation(submission);
+            case ADD_ACCUSATION -> acceptAddAccusation(submission);
             case EDIT_ACCUSATION -> acceptEditAccusation(submission);
         };
     }
@@ -49,7 +67,6 @@ public class AdminService {
         accusation.setTitle(submission.getTitle());
         accusation.setStatus(submission.getStatus());
         accusation.setFactDate(submission.getFactDate());
-        accusationRepository.save(accusation);
 
         for (var ss : submission.getSources()) {
             var source = new Source();
@@ -101,17 +118,20 @@ public class AdminService {
 
     @Transactional
     public void rejectSubmission(Long submissionId) {
-        submissionRepository.findById(submissionId).ifPresent(s -> {
-            s.setSubmissionStatus(SubmissionStatus.REJECTED);
-            submissionRepository.save(s);
-            log.info("[Admin] Submission #{} rejetée", submissionId);
-        });
+        var submission = submissionRepository.findById(submissionId)
+                .orElseThrow(() -> new IllegalArgumentException("Submission #" + submissionId + " introuvable"));
+        submission.setSubmissionStatus(SubmissionStatus.REJECTED);
+        submissionRepository.save(submission);
+        log.info("[Admin] Submission #{} rejetée", submissionId);
     }
 
-    // ── Withdrawals ───────────────────────────────────────────────────────
+    // Withdrawals
 
+    /**
+     * Accepte et retourne optionnellement un message de reminder mail.
+     */
     @Transactional
-    public void acceptWithdrawal(Long withdrawalId) {
+    public Optional<String> acceptWithdrawal(Long withdrawalId) {
         var wr = withdrawalRequestRepository.findById(withdrawalId)
                 .orElseThrow(() -> new IllegalArgumentException("Withdrawal #" + withdrawalId + " introuvable"));
 
@@ -122,32 +142,45 @@ public class AdminService {
         wr.setStatus(WithdrawalStatus.PROCESSED);
         withdrawalRequestRepository.save(wr);
         log.info("[Admin] Withdrawal #{} accepté — accusation #{} supprimée", withdrawalId, wr.getAccusationId());
+
+        return buildMailReminder(wr, "acceptée");
     }
 
+    /**
+     * Rejette et retourne optionnellement un message de reminder mail.
+     */
     @Transactional
-    public void rejectWithdrawal(Long withdrawalId) {
-        withdrawalRequestRepository.findById(withdrawalId).ifPresent(w -> {
-            w.setStatus(WithdrawalStatus.REJECTED);
-            withdrawalRequestRepository.save(w);
-            log.info("[Admin] Withdrawal #{} rejeté", withdrawalId);
-        });
+    public Optional<String> rejectWithdrawal(Long withdrawalId) {
+        var wr = withdrawalRequestRepository.findById(withdrawalId)
+                .orElseThrow(() -> new IllegalArgumentException("Withdrawal #" + withdrawalId + " introuvable"));
+        wr.setStatus(WithdrawalStatus.REJECTED);
+        withdrawalRequestRepository.save(wr);
+        log.info("[Admin] Withdrawal #{} rejeté", withdrawalId);
+        return buildMailReminder(wr, "rejetée");
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────
+    // Helpers
+
+    private Optional<String> buildMailReminder(WithdrawalRequest wr, String action) {
+        if (wr.getEmail() == null || wr.getEmail().isBlank()) return Optional.empty();
+        return Optional.of("Envoyer un mail à " + wr.getEmail()
+                + " pour l'informer que la demande de retrait concernant "
+                + wr.getRapperName() + " a été " + action + ".");
+    }
 
     private RapperStatus deriveRapperStatus(AccusationStatus accusationStatus) {
         if (accusationStatus == null) return RapperStatus.CONTROVERSY;
         return switch (accusationStatus) {
-            case CONVICTED  -> RapperStatus.CONVICTED;
-            case ONGOING    -> RapperStatus.ACCUSED;
-            default         -> RapperStatus.CONTROVERSY;
+            case CONVICTED -> RapperStatus.CONVICTED;
+            case ONGOING -> RapperStatus.ACCUSED;
+            default -> RapperStatus.CONTROVERSY;
         };
     }
 
     private void recalculateRapperStatus(Rapper rapper) {
         var accusations = accusationRepository.findByRapperId(rapper.getId());
         boolean hasConvicted = accusations.stream().anyMatch(a -> a.getStatus() == AccusationStatus.CONVICTED);
-        boolean hasOngoing   = accusations.stream().anyMatch(a -> a.getStatus() == AccusationStatus.ONGOING);
+        boolean hasOngoing = accusations.stream().anyMatch(a -> a.getStatus() == AccusationStatus.ONGOING);
 
         RapperStatus newStatus = hasConvicted ? RapperStatus.CONVICTED
                 : hasOngoing ? RapperStatus.ACCUSED

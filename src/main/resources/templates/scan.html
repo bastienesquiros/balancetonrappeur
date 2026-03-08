@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Scanner ma bibliothèque', 'Analysez vos playlists Spotify et découvrez si vous écoutez des rappeurs cancels.', null, null, null)}"></head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col antialiased">
+
+<header th:replace="~{layout :: nav}"></header>
+
+<main class="flex-1">
+    <div class="max-w-2xl mx-auto px-4 py-16">
+
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <p class="text-4xl mb-4">🎧</p>
+            <h1 class="text-3xl font-extrabold text-white mb-3">Scanner ma bibliothèque</h1>
+            <p class="text-zinc-400 text-base leading-relaxed">
+                Connecte ton compte Spotify pour analyser tes sons likés et playlists.<br/>
+                On te dit si tu écoutes des rappeurs documentés sur ce site — et tu peux retirer les sons directement.
+            </p>
+        </div>
+
+        <!-- Flash erreur -->
+        <div th:if="${scanError}"
+             class="bg-red-950 border border-red-900 rounded-xl px-5 py-4 flex items-center gap-3 mb-8">
+            <span class="text-red-400 text-lg">⚠️</span>
+            <p class="text-red-400 text-sm" th:text="${scanError}"></p>
+        </div>
+
+        <!-- Flash succès retrait -->
+        <div th:if="${removeSuccess}"
+             class="bg-green-950 border border-green-900 rounded-xl px-5 py-4 flex items-center gap-3 mb-8">
+            <span class="text-green-400">✅</span>
+            <p class="text-green-400 text-sm" th:text="${removeSuccess}"></p>
+        </div>
+
+        <!-- Non configuré -->
+        <div th:if="${!configured}"
+             class="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 text-center">
+            <p class="text-zinc-500 text-sm">Le scanner Spotify n'est pas configuré sur cette instance.</p>
+        </div>
+
+        <!-- Connexion -->
+        <div th:if="${configured}"
+             class="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 text-center space-y-6">
+
+            <!-- Ce qu'on va faire -->
+            <div class="space-y-3 text-left">
+                <p class="text-zinc-400 text-xs uppercase tracking-widest font-semibold mb-4">Ce que l'on analyse</p>
+                <div class="flex items-center gap-3 text-sm text-zinc-400">
+                    <span class="text-lg">❤️</span>
+                    <span>Tes <strong class="text-white">sons likés</strong></span>
+                </div>
+                <div class="flex items-center gap-3 text-sm text-zinc-400">
+                    <span class="text-lg">📂</span>
+                    <span>Toutes tes <strong class="text-white">playlists</strong></span>
+                </div>
+                <div class="flex items-center gap-3 text-sm text-zinc-400">
+                    <span class="text-lg">🗑️</span>
+                    <span>Possibilité de <strong class="text-white">retirer les sons</strong> directement</span>
+                </div>
+            </div>
+
+            <a href="/scan/connect"
+               class="inline-flex items-center gap-3 bg-[#1DB954] hover:bg-[#1ed760] text-black font-bold text-sm px-6 py-3.5 rounded-xl transition-colors">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+                </svg>
+                Se connecter avec Spotify
+            </a>
+
+            <p class="text-zinc-700 text-xs">
+                On ne stocke pas ton token. Il reste uniquement en session le temps du scan.
+            </p>
+        </div>
+
+        <!-- Disclaimer -->
+        <p class="text-zinc-700 text-xs text-center mt-8 leading-relaxed">
+            Cette fonctionnalité accède à ta bibliothèque Spotify en lecture seule (sauf si tu choisis de retirer des sons).
+            Aucune donnée n'est stockée sur nos serveurs.
+        </p>
+
+    </div>
+</main>
+
+<footer th:replace="~{layout :: footer}"></footer>
+
+</body>
+</html>
+

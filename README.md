@@ -1,9 +1,9 @@
 # 🎤 Balance Ton Rappeur
 
-Base de données collaborative des affaires, accusations et condamnations dans le monde du rap — documentées, sourcées, sans jugement.
+Base de données collaborative recensant des affaires, accusations et condamnations liées au monde du rap, documentées et sourcées.
 
-> Ce site compile des informations issues de sources publiques (presse, décisions de justice). Il ne constitue ni une accusation, ni un jugement.
-
+> Les informations présentées proviennent de sources publiques (presse, décisions de justice, réseaux sociaux).  
+> Ce site a une vocation documentaire et ne formule aucune accusation.
 ---
 
 ## Stack
@@ -26,8 +26,7 @@ Base de données collaborative des affaires, accusations et condamnations dans l
 - Demande de retrait / correction
 - Page statistiques
 - Timeline globale des affaires
-- Dashboard admin (authentification par secret)
-- SEO : meta og, sitemap, robots.txt
+- Scan de playlist
 
 ---
 
@@ -85,6 +84,7 @@ L'app tourne sur `btr_app:8080`, sans port exposé publiquement — à proxifier
 | `BTR_ADMIN_PASSWORD` | Mot de passe dashboard `/admin` |
 | `SPOTIFY_CLIENT_ID` | Client ID Spotify (optionnel) |
 | `SPOTIFY_CLIENT_SECRET` | Client Secret Spotify (optionnel) |
+| `SPOTIFY_REDIRECT_URI` | URI de redirection OAuth Spotify (optionnel) |
 
 ---
 
@@ -92,7 +92,7 @@ L'app tourne sur `btr_app:8080`, sans port exposé publiquement — à proxifier
 
 ```
 src/main/java/org/balancetonrappeur/
-├── client/        # Spotify API client
+├── spotify/        # Spotify API client
 ├── config/        # Filtres (auth admin)
 ├── controller/    # Controllers MVC + API REST
 ├── dto/           # DTOs

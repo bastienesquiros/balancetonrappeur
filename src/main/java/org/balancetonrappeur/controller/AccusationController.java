@@ -32,20 +32,16 @@ public class AccusationController {
             Model model
     ) {
         var pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("factDate").descending());
-        var result = category != null
-                ? accusationService.findByCategory(category, pageable)
-                : status != null
-                        ? accusationService.findByStatus(status, pageable)
-                        : accusationService.findAll(pageable);
+        var result = accusationService.findFiltered(category, status, pageable);
 
-        model.addAttribute("accusations", result.getContent());
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", result.getTotalPages());
-        model.addAttribute("totalElements", result.getTotalElements());
-        model.addAttribute("categories", AccusationCategory.values());
-        model.addAttribute("statuses", AccusationStatus.values());
-        model.addAttribute("selectedCategory", category);
-        model.addAttribute("selectedStatus", status);
+        model.addAttribute("accusations",       result.getContent());
+        model.addAttribute("currentPage",       page);
+        model.addAttribute("totalPages",        result.getTotalPages());
+        model.addAttribute("totalElements",     result.getTotalElements());
+        model.addAttribute("categories",        AccusationCategory.values());
+        model.addAttribute("statuses",          AccusationStatus.values());
+        model.addAttribute("selectedCategory",  category);
+        model.addAttribute("selectedStatus",    status);
         return "accusations/list";
     }
 

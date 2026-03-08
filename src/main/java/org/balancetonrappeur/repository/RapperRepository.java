@@ -15,13 +15,14 @@ public interface RapperRepository extends JpaRepository<Rapper, Long> {
 
     List<Rapper> findByStatus(RapperStatus status);
     Page<Rapper> findByStatus(RapperStatus status, Pageable pageable);
+    long countByStatus(RapperStatus status);
 
-    // Recherche pour la page /search (résultats complets)
     Optional<Rapper> findByNameIgnoreCase(String name);
 
+    // Recherche full-text (résultats complets)
     List<Rapper> findByNameContainingIgnoreCase(String name);
 
-    // Recherche pour l'autocomplete — limité à N résultats côté SQL
+    // Autocomplete — limité à N résultats côté SQL
     List<Rapper> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
     @Query("""

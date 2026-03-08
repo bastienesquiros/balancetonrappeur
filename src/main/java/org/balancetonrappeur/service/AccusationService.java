@@ -10,7 +10,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -20,13 +23,13 @@ public class AccusationService {
 
     private final AccusationRepository accusationRepository;
 
-    public List<Accusation> findAll() {
-        return accusationRepository.findAllWithRapper();
-    }
 
-    public Page<Accusation> findAll(Pageable pageable) {
+    public Page<Accusation> findFiltered(AccusationCategory category, AccusationStatus status, Pageable pageable) {
+        if (category != null) return accusationRepository.findByCategoryWithRapper(category, pageable);
+        if (status != null) return accusationRepository.findByStatusWithRapper(status, pageable);
         return accusationRepository.findAllWithRapper(pageable);
     }
+
 
     public Optional<Accusation> findById(Long id) {
         return accusationRepository.findByIdWithSources(id);
@@ -36,19 +39,13 @@ public class AccusationService {
         return accusationRepository.findByRapperId(rapperId);
     }
 
-    public List<Accusation> findByCategory(AccusationCategory category) {
-        return accusationRepository.findByCategoryWithRapper(category);
+    public Map<Integer, List<Accusation>> findGroupedByYear() {
+        Map<Integer, List<Accusation>> byYear = new LinkedHashMap<>();
+        for (Accusation a : accusationRepository.findAllForTimeline()) {
+            byYear.computeIfAbsent(a.getFactDate().getYear(), k -> new ArrayList<>()).add(a);
+        }
+        return byYear;
     }
 
-    public Page<Accusation> findByCategory(AccusationCategory category, Pageable pageable) {
-        return accusationRepository.findByCategoryWithRapper(category, pageable);
-    }
 
-    public List<Accusation> findByStatus(AccusationStatus status) {
-        return accusationRepository.findByStatusWithRapper(status);
-    }
-
-    public Page<Accusation> findByStatus(AccusationStatus status, Pageable pageable) {
-        return accusationRepository.findByStatusWithRapper(status, pageable);
-    }
 }

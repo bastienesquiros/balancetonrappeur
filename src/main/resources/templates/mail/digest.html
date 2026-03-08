@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8"/>
+</head>
+<body style="font-family: system-ui, sans-serif; background:#0f0f0f; color:#e4e4e7; padding:32px; max-width:640px; margin:0 auto;">
+
+    <h2 style="color:#fff; font-size:20px; margin-bottom:4px;">📋 Balance Ton Rappeur — Digest quotidien</h2>
+    <p style="color:#71717a; font-size:13px; margin-bottom:32px;">
+        <strong style="color:#a1a1aa;" th:text="${submissions.size()}">0</strong> soumission(s) en attente ·
+        <strong style="color:#a1a1aa;" th:text="${withdrawals.size()}">0</strong> retrait(s) en attente
+    </p>
+
+    <!-- Soumissions -->
+    <th:block th:if="${!submissions.isEmpty()}">
+        <h3 style="color:#fff; font-size:15px; border-bottom:1px solid #27272a; padding-bottom:8px; margin-bottom:16px;">
+            🆕 Nouvelles soumissions (<span th:text="${submissions.size()}">0</span>)
+        </h3>
+
+        <div th:each="s : ${submissions}"
+             style="background:#18181b; border:1px solid #27272a; border-radius:10px; padding:14px 16px; margin-bottom:10px;">
+            <p style="margin:0 0 6px; font-size:13px; color:#a1a1aa;">
+                <span th:text="${s.type.name() == 'ADD_ACCUSATION' ? 'Ajout' : 'Modification'}">Ajout</span>
+                · <span th:text="${#temporals.format(s.createdAt, 'dd/MM/yyyy HH:mm')}">date</span>
+            </p>
+            <p style="margin:0 0 4px; font-size:15px; font-weight:600; color:#fff;" th:text="${s.title}">Titre</p>
+            <p style="margin:0; font-size:13px; color:#71717a;">
+                Rappeur :
+                <span th:text="${s.rapper != null ? s.rapper.name : (s.unknownRapperName != null ? s.unknownRapperName : '?')}">Nom</span>
+            </p>
+        </div>
+    </th:block>
+
+    <!-- Retraits -->
+    <th:block th:if="${!withdrawals.isEmpty()}">
+        <h3 style="color:#fff; font-size:15px; border-bottom:1px solid #27272a; padding-bottom:8px; margin-bottom:16px; margin-top:28px;">
+            ⚠️ Demandes de retrait (<span th:text="${withdrawals.size()}">0</span>)
+        </h3>
+
+        <div th:each="w : ${withdrawals}"
+             style="background:#18181b; border:1px solid #3f1a1a; border-radius:10px; padding:14px 16px; margin-bottom:10px;">
+            <p style="margin:0 0 6px; font-size:13px; color:#a1a1aa;">
+                <span th:text="${#temporals.format(w.createdAt, 'dd/MM/yyyy HH:mm')}">date</span>
+                · <span th:text="${w.reason.label()}">raison</span>
+            </p>
+            <p style="margin:0 0 4px; font-size:15px; font-weight:600; color:#fff;"
+               th:text="${w.rapperName != null ? w.rapperName : '—'}">Rappeur</p>
+            <p th:if="${w.accusationTitle != null}"
+               style="margin:0 0 4px; font-size:13px; color:#71717a;">
+                Affaire : <span th:text="${w.accusationTitle}">titre</span>
+            </p>
+            <p style="margin:4px 0 0; font-size:13px; color:#a1a1aa; font-style:italic;"
+               th:text="${w.message}">message</p>
+            <p th:if="${w.email != null}"
+               style="margin:4px 0 0; font-size:12px; color:#52525b;">
+                Contact : <span th:text="${w.email}">email</span>
+            </p>
+        </div>
+    </th:block>
+
+    <p style="color:#3f3f46; font-size:11px; margin-top:32px;">Balance Ton Rappeur · digest automatique quotidien</p>
+
+</body>
+</html>
+

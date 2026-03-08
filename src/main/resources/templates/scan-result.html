@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Résultats du scan', null, null, null, null)}"></head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col antialiased">
+
+<header th:replace="~{layout :: nav}"></header>
+
+<main class="flex-1">
+    <div class="max-w-3xl mx-auto px-4 py-10">
+
+        <!-- Retour -->
+        <a href="/scan"
+           class="inline-flex items-center gap-2 text-zinc-500 text-sm hover:text-white transition-colors mb-8 group">
+            <svg class="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+            Nouveau scan
+        </a>
+
+        <!-- Flash retrait -->
+        <div th:if="${removeSuccess}"
+             class="bg-green-950 border border-green-900 rounded-xl px-5 py-3 flex items-center gap-3 mb-6">
+            <span class="text-green-400">✅</span>
+            <p class="text-green-400 text-sm" th:text="${removeSuccess}"></p>
+        </div>
+
+        <!-- Flash erreur -->
+        <div th:if="${scanError}"
+             class="bg-red-950 border border-red-900 rounded-xl px-5 py-3 flex items-center gap-3 mb-6">
+            <span class="text-red-400">⚠️</span>
+            <p class="text-red-400 text-sm" th:text="${scanError}"></p>
+        </div>
+
+        <!-- Playlists indisponibles -->
+        <div th:if="${playlistsUnavailable}"
+             class="bg-amber-950 border border-amber-900 rounded-xl px-5 py-3 flex items-center gap-3 mb-6">
+            <span class="text-amber-400">⚠️</span>
+            <p class="text-amber-400 text-sm">
+                Les playlists n'ont pas pu être analysées (quota Spotify atteint).
+                Les résultats ci-dessous sont basés sur tes <strong>sons likés uniquement</strong>.
+            </p>
+        </div>
+
+        <!-- Header -->
+        <div class="mb-10">
+            <h1 class="text-2xl font-extrabold text-white mb-2">Résultats du scan</h1>
+            <p class="text-zinc-500 text-sm">Rappeurs documentés sur ce site trouvés dans ta bibliothèque Spotify.</p>
+        </div>
+
+        <!-- Aucun résultat — bibliothèque clean -->
+        <div th:if="${clean}"
+             class="bg-zinc-900 border border-zinc-800 rounded-2xl p-12 text-center">
+            <p class="text-4xl mb-4">✅</p>
+            <h2 class="text-xl font-bold text-white mb-2">Bibliothèque clean !</h2>
+            <p class="text-zinc-500 text-sm">Aucun rappeur documenté sur ce site dans tes sons likés ou playlists.</p>
+        </div>
+
+        <!-- Résultats -->
+        <div th:if="${!clean}" class="space-y-6">
+
+            <p class="text-zinc-500 text-sm">
+                <span class="text-white font-semibold" th:text="${#lists.size(results)}">0</span>
+                rappeur(s) documenté(s) trouvé(s).
+            </p>
+
+            <div th:each="result : ${results}"
+                 class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+
+                <!-- Header rappeur -->
+                <div class="flex items-center gap-4 p-5 border-b border-zinc-800">
+                    <div class="flex-shrink-0 w-12 h-12 rounded-xl overflow-hidden bg-zinc-800">
+                        <img th:if="${result.rapperImageUrl != null}"
+                             th:src="${result.rapperImageUrl}"
+                             th:alt="${result.rapperName}"
+                             class="w-full h-full object-cover"/>
+                        <span th:if="${result.rapperImageUrl == null}"
+                              class="w-full h-full flex items-center justify-center text-xl">🎤</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <a th:href="@{/rappers/{id}(id=${result.rapperId})}"
+                           class="text-white font-bold hover:underline"
+                           th:text="${result.rapperName}">Rappeur</a>
+                        <div class="flex flex-wrap items-center gap-2 mt-1">
+                            <span th:if="${result.rapperStatus.name() == 'CONVICTED'}" class="text-xs px-2 py-0.5 rounded-full bg-red-950 text-red-400 border border-red-900">⛔ Condamné</span>
+                            <span th:if="${result.rapperStatus.name() == 'ACCUSED'}" class="text-xs px-2 py-0.5 rounded-full bg-amber-950 text-amber-400 border border-amber-900">🚨 Accusé</span>
+                            <span th:if="${result.rapperStatus.name() == 'CONTROVERSY'}" class="text-xs px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700">⚠️ Polémique</span>
+                            <span class="text-xs text-zinc-600"
+                                  th:text="${#lists.size(result.tracks)} + ' titre(s) concerné(s)'"></span>
+                        </div>
+                    </div>
+                    <a th:href="@{/rappers/{id}(id=${result.rapperId})}"
+                       class="text-xs text-zinc-500 hover:text-white transition-colors flex-shrink-0">
+                        Voir la fiche →
+                    </a>
+                </div>
+
+                <!-- Affaires documentées (résumé) -->
+                <div th:if="${!#lists.isEmpty(result.accusations)}"
+                     class="px-5 py-3 border-b border-zinc-800 bg-zinc-900/50">
+                    <p class="text-zinc-600 text-xs uppercase tracking-wider mb-2">Affaires documentées</p>
+                    <div class="space-y-1">
+                        <div th:each="acc : ${result.accusations}"
+                             class="flex items-center gap-2 text-xs text-zinc-400">
+                            <span th:if="${acc.category == 'SEXUAL_ASSAULT' or acc.category == 'PEDOPHILIA'}">🔴</span>
+                            <span th:if="${acc.category == 'PHYSICAL_VIOLENCE'}">🟠</span>
+                            <span th:if="${acc.category != 'SEXUAL_ASSAULT' and acc.category != 'PEDOPHILIA' and acc.category != 'PHYSICAL_VIOLENCE'}">🟡</span>
+                            <span th:text="${acc.title}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Titres concernés -->
+                <div class="divide-y divide-zinc-800/60">
+                    <div th:each="track : ${result.tracks}"
+                         class="flex items-center gap-4 px-5 py-3.5">
+
+                        <div class="flex-1 min-w-0">
+                            <p class="text-white text-sm font-medium truncate" th:text="${track.trackName}">Titre</p>
+                            <p class="text-zinc-600 text-xs mt-0.5">
+                                <span th:if="${track.playlistId == null}">❤️ Sons likés</span>
+                                <span th:unless="${track.playlistId == null}">
+                                    📂 <span th:text="${track.playlistName}">Playlist</span>
+                                </span>
+                            </p>
+                        </div>
+
+                        <!-- Bouton retrait -->
+                        <form action="/scan/remove" method="post" class="flex-shrink-0">
+                            <input type="hidden" name="trackUri"   th:value="${track.trackUri}"/>
+                            <input type="hidden" name="playlistId" th:value="${track.playlistId}"/>
+                            <button type="submit"
+                                    class="text-xs px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-400 border border-zinc-700
+                                           hover:bg-red-950 hover:text-red-400 hover:border-red-900 transition-colors"
+                                    th:title="${track.playlistId == null ? 'Retirer des sons likés' : 'Retirer de la playlist'}">
+                                🗑️ Retirer
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Nouveau scan -->
+        <div class="mt-10 flex flex-col sm:flex-row items-center gap-3">
+            <form action="/scan/disconnect" method="post">
+                <button class="text-sm px-5 py-2.5 rounded-xl bg-zinc-800 border border-zinc-700 text-zinc-300
+                               hover:text-white hover:bg-zinc-700 transition-colors">
+                    Nouveau scan
+                </button>
+            </form>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="mt-10 bg-zinc-900/50 border border-zinc-800 rounded-xl px-5 py-4 flex gap-3 items-start">
+            <span class="text-zinc-600 flex-shrink-0 mt-0.5">⚖️</span>
+            <p class="text-zinc-500 text-xs leading-relaxed">
+                Les informations présentées sont issues de sources publiques. Elles ne constituent ni une accusation, ni un jugement personnel.
+                Seules les décisions de justice définitives font foi.
+                <a href="/legal#retrait" class="text-zinc-400 underline underline-offset-2 hover:text-zinc-200 transition-colors">Demande de retrait</a>.
+            </p>
+        </div>
+
+    </div>
+</main>
+
+<footer th:replace="~{layout :: footer}"></footer>
+
+</body>
+</html>
+
