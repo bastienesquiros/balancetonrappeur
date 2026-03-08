@@ -35,4 +35,4 @@ build/
 ### Misc ###
 application-dev.properties
 .env
-/nginx
+/letsencrypt

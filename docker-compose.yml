@@ -1,11 +1,31 @@
 services:
 
+  traefik:
+    image: traefik:latest
+    container_name: btr_traefik
+    restart: unless-stopped
+    command:
+      - "--api.insecure=false"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.btrresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.btrresolver.acme.email=udshoft@gmail.com"
+      - "--certificatesresolvers.btrresolver.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./letsencrypt:/letsencrypt"
+    networks:
+      - proxy
+
   nginx:
     image: nginx:alpine
     container_name: btr_nginx
     restart: unless-stopped
-    ports:
-      - "443:443"
     volumes:
       - ./nginx/conf:/etc/nginx/conf.d
       - ./nginx/ssl:/etc/nginx/ssl:ro
@@ -13,6 +33,11 @@ services:
       - app
     networks:
       - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.btr-nginx.rule=Host(`balancetonrappeur.fr`)
+      - traefik.http.routers.btr-nginx.entrypoints=websecure
+      - traefik.http.routers.btr-nginx.tls.certresolver=btrresolver
 
   app:
     build: .
@@ -62,6 +87,7 @@ volumes:
 
 networks:
   internal:
+    name: btr_internal
     internal: true
   proxy:
     external: true
