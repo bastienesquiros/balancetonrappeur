@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${accusation.title} + ' · Balance Ton Rappeur'">Affaire</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] } } } }</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col antialiased">
+
+<header th:replace="~{layout :: nav}"></header>
+
+<main class="flex-1">
+    <div class="max-w-3xl mx-auto px-4 py-10">
+
+        <!-- Retour -->
+        <a th:href="@{/rappers/{id}(id=${accusation.rapper.id})}"
+           class="inline-flex items-center gap-2 text-zinc-500 text-sm hover:text-white transition-colors mb-8 group">
+            <svg class="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+            <span th:text="${accusation.rapper.name}">Rappeur</span>
+        </a>
+
+        <!-- ═══════════════════════════════════════
+             HEADER AFFAIRE
+        ════════════════════════════════════════ -->
+        <div class="mb-8">
+
+            <!-- Badges cliquables -->
+            <div class="flex flex-wrap gap-2 mb-4">
+                <th:block th:switch="${accusation.category.name()}">
+                    <a th:case="'SEXUAL_ASSAULT'" href="/accusations?category=SEXUAL_ASSAULT" class="text-xs px-2.5 py-1 rounded-full bg-red-950 text-red-400 border border-red-900 font-medium hover:bg-red-900 transition-colors">Agression sexuelle / Viol</a>
+                    <a th:case="'PEDOPHILIA'" href="/accusations?category=PEDOPHILIA" class="text-xs px-2.5 py-1 rounded-full bg-red-950 text-red-400 border border-red-900 font-medium hover:bg-red-900 transition-colors">Pédophilie</a>
+                    <a th:case="'PHYSICAL_VIOLENCE'" href="/accusations?category=PHYSICAL_VIOLENCE" class="text-xs px-2.5 py-1 rounded-full bg-orange-950 text-orange-400 border border-orange-900 font-medium hover:bg-orange-900 transition-colors">Violence physique</a>
+                    <a th:case="*" href="/accusations?category=CONTROVERSY" class="text-xs px-2.5 py-1 rounded-full bg-yellow-950 text-yellow-400 border border-yellow-900 font-medium hover:bg-yellow-900 transition-colors">Polémique</a>
+                </th:block>
+                <th:block th:switch="${accusation.status.name()}">
+                    <a th:case="'CONVICTED'" href="/accusations?status=CONVICTED" class="text-xs px-2.5 py-1 rounded-full bg-red-950 text-red-400 border border-red-900 font-medium hover:bg-red-900 transition-colors">⛔ Condamné</a>
+                    <a th:case="'ONGOING'" href="/accusations?status=ONGOING" class="text-xs px-2.5 py-1 rounded-full bg-amber-950 text-amber-400 border border-amber-900 font-medium hover:bg-amber-900 transition-colors">🚨 En cours</a>
+                    <a th:case="'ACQUITTED'" href="/accusations?status=ACQUITTED" class="text-xs px-2.5 py-1 rounded-full bg-green-950 text-green-400 border border-green-900 font-medium hover:bg-green-900 transition-colors">✅ Acquitté</a>
+                    <a th:case="*" th:if="${accusation.category.name() != 'CONTROVERSY'}" href="/accusations?status=CONTROVERSY"
+                       class="text-xs px-2.5 py-1 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700 font-medium hover:bg-zinc-700 transition-colors">⚠️ Polémique</a>
+                </th:block>
+            </div>
+
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-white leading-snug mb-3"
+                th:text="${accusation.title}">Titre</h1>
+
+            <!-- Méta : rappeur + date -->
+            <div class="flex items-center gap-3 text-sm text-zinc-500">
+                <a th:href="@{/rappers/{id}(id=${accusation.rapper.id})}"
+                   class="hover:text-zinc-300 transition-colors font-medium"
+                   th:text="${accusation.rapper.name}">Rappeur</a>
+                <span class="text-zinc-700">·</span>
+                <span th:if="${accusation.factDate}"
+                      th:text="${#temporals.format(accusation.factDate, 'dd MMMM yyyy')}">01 janvier 2020</span>
+                <span th:unless="${accusation.factDate}" class="text-zinc-600">Date inconnue</span>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════
+             SOURCES
+        ════════════════════════════════════════ -->
+        <div th:if="${not #sets.isEmpty(accusation.sources)}"
+             class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden mb-8">
+
+            <div class="px-5 py-3 border-b border-zinc-800 flex items-center justify-between">
+                <p class="text-zinc-400 text-xs uppercase tracking-wider font-medium">Sources</p>
+                <span class="text-zinc-600 text-xs"
+                      th:text="${#sets.size(accusation.sources)} + ' source(s)'">0</span>
+            </div>
+
+            <div class="divide-y divide-zinc-800">
+                <a th:each="source : ${accusation.sources}"
+                   th:href="${source.url}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="flex items-center gap-4 px-5 py-4 hover:bg-zinc-800/60 transition-colors group">
+
+                    <!-- Icône type -->
+                    <div class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-base"
+                         th:classappend="${source.type.name() == 'JUDICIAL'} ? 'bg-blue-950 border border-blue-900' :
+                                          (${source.type.name() == 'PRESS'} ? 'bg-zinc-800 border border-zinc-700' :
+                                          (${source.type.name() == 'SOCIAL_MEDIA'} ? 'bg-purple-950 border border-purple-900' :
+                                          'bg-zinc-800 border border-zinc-700'))">
+                        <span th:switch="${source.type.name()}">
+                            <span th:case="'JUDICIAL'">⚖️</span>
+                            <span th:case="'PRESS'">📰</span>
+                            <span th:case="'SOCIAL_MEDIA'">📱</span>
+                            <span th:case="*">📄</span>
+                        </span>
+                    </div>
+
+                    <div class="flex-1 min-w-0">
+                        <p class="text-white text-sm font-medium truncate group-hover:underline underline-offset-2"
+                           th:text="${source.title}">Titre source</p>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <span class="text-zinc-600 text-xs"
+                                  th:text="${source.type.name() == 'JUDICIAL'} ? 'Judiciaire' :
+                                            (${source.type.name() == 'PRESS'} ? 'Presse' :
+                                            (${source.type.name() == 'SOCIAL_MEDIA'} ? 'Réseau social' : 'Autre'))">Type</span>
+                            <span th:if="${source.sourceDate}" class="text-zinc-700 text-xs">·</span>
+                            <span th:if="${source.sourceDate}"
+                                  class="text-zinc-600 text-xs"
+                                  th:text="${#temporals.format(source.sourceDate, 'dd/MM/yyyy')}">01/01/2020</span>
+                        </div>
+                    </div>
+
+                    <svg class="w-4 h-4 text-zinc-700 group-hover:text-zinc-400 flex-shrink-0 transition-colors"
+                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+
+        <!-- Aucune source -->
+        <div th:if="${#sets.isEmpty(accusation.sources)}"
+             class="bg-zinc-900 border border-zinc-800 rounded-xl px-5 py-6 text-center text-zinc-600 text-sm mb-8">
+            Aucune source documentée pour cette affaire.
+        </div>
+
+        <!-- ═══════════════════════════════════════
+             DISCLAIMER
+        ════════════════════════════════════════ -->
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-xl px-5 py-4 flex gap-3 items-start">
+            <span class="text-zinc-600 flex-shrink-0 mt-0.5">⚖️</span>
+            <p class="text-zinc-500 text-xs leading-relaxed">
+                Les informations présentées sont issues de sources publiques (presse, décisions de justice).
+                Elles ne constituent ni une accusation, ni un jugement personnel.
+                Seules les décisions de justice définitives font foi.
+                <a th:href="@{/legal(accusationId=${accusation.id})} + '#retrait'" class="text-zinc-400 underline underline-offset-2 hover:text-zinc-200 transition-colors">Demander une correction ou un retrait</a>.
+            </p>
+        </div>
+
+    </div>
+</main>
+
+<footer th:replace="~{layout :: footer}"></footer>
+
+</body>
+</html>
+

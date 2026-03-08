@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Balance Ton Rappeur — Les faits du rap, sourcés.</title>
+    <meta name="description" content="Affaires, accusations et condamnations du monde du rap, documentées et sourcées."/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] } } } }</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet"/>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col antialiased">
+
+<header th:replace="~{layout :: nav}"></header>
+
+<main class="flex-1">
+
+    <!-- HERO -->
+    <section class="relative max-w-5xl mx-auto px-4 pt-24 pb-20">
+        <!-- Glow subtil derrière le titre -->
+        <div class="absolute inset-0 -top-10 flex items-start justify-center pointer-events-none overflow-hidden">
+            <div class="w-96 h-48 bg-red-950/20 rounded-full blur-3xl"></div>
+        </div>
+
+        <div class="relative text-center max-w-2xl mx-auto">
+            <p class="inline-flex items-center gap-2 text-zinc-500 text-xs font-medium uppercase tracking-widest mb-6 bg-zinc-900 border border-zinc-800 px-3 py-1.5 rounded-full">
+                <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse inline-block"></span>
+                Base de données collaborative · FR
+            </p>
+            <h1 class="text-5xl sm:text-6xl font-black text-white leading-[1.05] tracking-tight mb-5">
+                Les faits.<br/>
+                <span class="text-zinc-500">Rien que les faits.</span>
+            </h1>
+            <p class="text-zinc-400 text-base sm:text-lg mb-10 leading-relaxed">
+                Affaires, accusations et condamnations dans le rap —<br class="hidden sm:block"/>
+                documentées, sourcées, sans jugement.
+            </p>
+
+            <!-- Search -->
+            <div class="relative max-w-xl mx-auto"
+                 x-data="{
+                     query: '',
+                     results: [],
+                     noResults: false,
+                     loading: false,
+                     async search() {
+                         if (this.query.length < 2) { this.results = []; this.noResults = false; return; }
+                         this.loading = true;
+                         const res = await fetch('/api/rappers/search?q=' + encodeURIComponent(this.query));
+                         this.results = await res.json();
+                         this.noResults = this.results.length === 0;
+                         this.loading = false;
+                     },
+                     submit() {
+                         if (this.query.trim()) window.location.href = '/rappers/search?q=' + encodeURIComponent(this.query);
+                     },
+                     close() { this.results = []; this.noResults = false; }
+                 }">
+                <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+                        </svg>
+                    </span>
+                    <input type="text"
+                           placeholder="Rechercher un rappeur..."
+                           x-model="query"
+                           @input.debounce.300ms="search"
+                           @keydown.enter="submit"
+                           @keydown.escape="close"
+                           class="w-full bg-zinc-900 border border-zinc-700 rounded-2xl pl-12 pr-28 py-4
+                                  text-white placeholder-zinc-600 text-base
+                                  focus:outline-none focus:border-zinc-500 focus:ring-2 focus:ring-zinc-600/40
+                                  transition-all shadow-lg shadow-black/20"/>
+                    <button @click="submit"
+                            class="absolute right-2 top-1/2 -translate-y-1/2 bg-white text-zinc-950 text-sm font-semibold px-4 py-2 rounded-xl hover:bg-zinc-200 transition-colors">
+                        Chercher
+                    </button>
+                </div>
+                <p class="text-zinc-700 text-xs mt-3">Ex : Booba, Freeze Corleone, XXXTentacion…</p>
+
+                <!-- Dropdown résultats -->
+                <div x-show="results.length > 0"
+                     x-transition:enter="transition ease-out duration-100"
+                     x-transition:enter-start="opacity-0 scale-98"
+                     x-transition:enter-end="opacity-100 scale-100"
+                     @click.away="close"
+                     class="absolute top-full mt-2 w-full bg-zinc-900 border border-zinc-700 rounded-2xl overflow-hidden shadow-2xl z-50 text-left">
+                    <template x-for="rapper in results" :key="rapper.id">
+                        <a :href="'/rappers/' + rapper.id"
+                           class="flex items-center gap-3 px-4 py-3 hover:bg-zinc-800 transition-colors border-b border-zinc-800/60 last:border-0">
+                            <div class="w-8 h-8 rounded-full bg-zinc-800 flex-shrink-0 overflow-hidden flex items-center justify-center">
+                                <template x-if="rapper.imageUrl">
+                                    <img :src="rapper.imageUrl" :alt="rapper.name" class="w-full h-full object-cover"/>
+                                </template>
+                                <template x-if="!rapper.imageUrl">
+                                    <span class="text-sm">🎤</span>
+                                </template>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-white text-sm font-medium truncate" x-text="rapper.name"></p>
+                                <p class="text-zinc-500 text-xs" x-text="rapper.status"></p>
+                            </div>
+                            <svg class="w-4 h-4 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                    </template>
+                </div>
+
+                <!-- Dropdown pas trouvé -->
+                <div x-show="noResults && query.length >= 2"
+                     x-transition:enter="transition ease-out duration-100"
+                     x-transition:enter-start="opacity-0 scale-98"
+                     x-transition:enter-end="opacity-100 scale-100"
+                     @click.away="close"
+                     class="absolute top-full mt-2 w-full bg-zinc-900 border border-zinc-700 rounded-2xl overflow-hidden shadow-2xl z-50 text-left">
+                    <a :href="'/rappers/suggest?name=' + encodeURIComponent(query)"
+                       class="flex items-center gap-3 px-4 py-4 hover:bg-zinc-800 transition-colors">
+                        <div class="w-8 h-8 rounded-full bg-zinc-800/80 flex items-center justify-center text-sm flex-shrink-0">🤷</div>
+                        <div>
+                            <p class="text-zinc-300 text-sm">
+                                Pas de résultat pour <span class="text-white font-semibold" x-text="'&quot;' + query + '&quot;'"></span>
+                            </p>
+                            <p class="text-zinc-600 text-xs mt-0.5">Soumettre une affaire →</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS STRIP -->
+    <section class="border-y border-zinc-800/60 bg-zinc-900/20">
+        <div class="max-w-5xl mx-auto px-4 py-7 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+            <div>
+                <p class="text-2xl font-extrabold text-white tabular-nums" th:text="${rapperCount}">—</p>
+                <p class="text-zinc-600 text-xs mt-1">Rappeurs indexés</p>
+            </div>
+            <div>
+                <p class="text-2xl font-extrabold text-red-400 tabular-nums" th:text="${convictedCount}">—</p>
+                <p class="text-zinc-600 text-xs mt-1">Condamnés</p>
+            </div>
+            <div>
+                <p class="text-2xl font-extrabold text-amber-400 tabular-nums" th:text="${accusedCount}">—</p>
+                <p class="text-zinc-600 text-xs mt-1">Accusés</p>
+            </div>
+            <div>
+                <p class="text-2xl font-extrabold text-zinc-300 tabular-nums" th:text="${accusationCount}">—</p>
+                <p class="text-zinc-600 text-xs mt-1">Affaires documentées</p>
+            </div>
+        </div>
+        <div class="max-w-5xl mx-auto px-4 pb-4 text-center">
+            <a href="/stats" class="inline-flex items-center gap-1 text-zinc-700 text-xs hover:text-zinc-400 transition-colors">
+                Statistiques détaillées
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </a>
+        </div>
+    </section>
+
+    <!-- RÉCEMMENT AJOUTÉS -->
+    <section class="max-w-5xl mx-auto px-4 py-14">
+        <div class="flex items-baseline justify-between mb-6">
+            <h2 class="text-base font-bold text-white">Récemment ajoutés</h2>
+            <a href="/rappers" class="text-xs text-zinc-600 hover:text-zinc-400 transition-colors">Voir tout →</a>
+        </div>
+
+        <div th:if="${not #lists.isEmpty(recentRappers)}"
+             class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            <a th:each="rapper : ${recentRappers}"
+               th:href="@{/rappers/{id}(id=${rapper.id})}"
+               class="group bg-zinc-900 border border-zinc-800 rounded-xl p-4 hover:border-zinc-700 hover:bg-zinc-800/50 transition-all">
+                <div class="w-9 h-9 rounded-xl mb-3 flex-shrink-0 overflow-hidden bg-zinc-800 group-hover:bg-zinc-700 transition-colors">
+                    <img th:if="${rapper.spotifyImageUrl != null}"
+                         th:src="${rapper.spotifyImageUrl}" th:alt="${rapper.name}"
+                         class="w-full h-full object-cover"/>
+                    <span th:if="${rapper.spotifyImageUrl == null}"
+                          class="w-full h-full flex items-center justify-center text-base">🎤</span>
+                </div>
+                <p class="font-semibold text-white text-sm truncate mb-2" th:text="${rapper.name}">Artiste</p>
+                <span th:switch="${rapper.status.name()}">
+                    <span th:case="'CONVICTED'" class="text-xs px-2 py-0.5 rounded-full bg-red-950 text-red-400 border border-red-900/60">⛔ Condamné</span>
+                    <span th:case="'ACCUSED'" class="text-xs px-2 py-0.5 rounded-full bg-amber-950 text-amber-400 border border-amber-900/60">🚨 Accusé</span>
+                    <span th:case="*" class="text-xs px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700/60">⚠️ Polémique</span>
+                </span>
+            </a>
+        </div>
+
+        <p th:if="${#lists.isEmpty(recentRappers)}" class="text-zinc-700 text-sm">
+            Aucun rappeur indexé pour l'instant.
+        </p>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="border-t border-zinc-800/60">
+        <div class="max-w-5xl mx-auto px-4 py-14">
+            <h2 class="text-base font-bold text-white mb-6">Questions fréquentes</h2>
+            <div class="space-y-2">
+
+                <div th:each="faq,stat : ${ {'Pourquoi ce site existe ?','Comment contribuer ?','Une information est incorrecte, que faire ?','Ce site est-il légal ?'} }"
+                     class="border border-zinc-800 rounded-xl overflow-hidden"
+                     x-data="{ open: false }">
+                    <button @click="open = !open"
+                            class="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-zinc-900 transition-colors">
+                        <span class="font-medium text-zinc-200 text-sm" th:text="${faq}"></span>
+                        <svg class="w-4 h-4 text-zinc-600 flex-shrink-0 transition-transform duration-200"
+                             :class="open ? 'rotate-180' : ''"
+                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div x-show="open" x-transition class="px-5 pb-5 text-zinc-500 text-sm leading-relaxed">
+                        <span th:if="${stat.index == 0}">En tant que fan de rap, il est difficile de trouver une source centralisée, neutre et sourcée sur les affaires impliquant des artistes. Ce site ne cherche pas à détruire des carrières — il documente des faits publics déjà relayés par la presse ou la justice.</span>
+                        <span th:if="${stat.index == 1}">Vous pouvez soumettre une affaire via le formulaire de contribution. Chaque soumission est vérifiée avant publication. Une source fiable (article de presse reconnu ou document judiciaire) est obligatoire.</span>
+                        <span th:if="${stat.index == 2}">Utilisez le formulaire de <a href="/legal#retrait" class="text-zinc-300 underline underline-offset-2 hover:text-white">demande de correction ou retrait</a>. Nous traitons toutes les demandes sous 72h.</span>
+                        <span th:if="${stat.index == 3}">Oui. Ce site compile uniquement des informations issues de sources publiques. Chaque affaire est sourcée. Nous utilisons des formulations neutres (<em>accusé de</em>, <em>condamné pour</em>) et ne portons aucun jugement personnel.</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- DISCLAIMER -->
+    <section class="border-t border-zinc-800/60">
+        <div class="max-w-5xl mx-auto px-4 py-8">
+            <p class="text-zinc-700 text-xs leading-relaxed text-center">
+                Ce site compile des informations issues de sources publiques (presse, décisions de justice).
+                Il ne constitue ni une accusation, ni un jugement. Seules les décisions de justice définitives font foi.
+                <a href="/legal#retrait" class="underline underline-offset-2 hover:text-zinc-500 transition-colors">Demande de correction ou retrait</a>.
+            </p>
+        </div>
+    </section>
+
+</main>
+
+<footer th:replace="~{layout :: footer}"></footer>
+
+</body>
+</html>
+

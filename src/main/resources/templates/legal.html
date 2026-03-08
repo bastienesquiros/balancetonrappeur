@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Mentions légales · Balance Ton Rappeur</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] } } } }</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col antialiased">
+
+<header th:replace="~{layout :: nav}"></header>
+
+<main class="flex-1">
+    <div class="max-w-3xl mx-auto px-4 py-12">
+
+        <!-- ═══════════════════════════════════════
+             MENTIONS LÉGALES
+        ════════════════════════════════════════ -->
+        <h1 class="text-2xl font-bold text-white mb-8">Mentions légales</h1>
+
+        <div class="space-y-6 text-zinc-400 text-sm leading-relaxed">
+
+            <div class="bg-zinc-900 border border-zinc-800 rounded-xl px-6 py-5">
+                <h2 class="text-white font-semibold mb-3">Nature du site</h2>
+                <p>
+                    Ce site compile des informations issues de <strong class="text-zinc-300">sources publiques</strong>
+                    (presse, décisions de justice, déclarations publiques).
+                    Il ne constitue ni une accusation, ni un jugement personnel.
+                    <strong class="text-zinc-300">Seules les décisions de justice définitives font foi.</strong>
+                </p>
+            </div>
+
+            <div class="bg-zinc-900 border border-zinc-800 rounded-xl px-6 py-5">
+                <h2 class="text-white font-semibold mb-3">Droit de réponse & rectification</h2>
+                <p>
+                    Conformément à la loi du 29 juillet 1881 sur la liberté de la presse,
+                    toute personne citée dispose d'un droit de réponse.
+                    Toute demande de correction ou de suppression sera traitée
+                    <strong class="text-zinc-300">sous 72 heures</strong> via le formulaire ci-dessous.
+                </p>
+            </div>
+
+            <div class="bg-zinc-900 border border-zinc-800 rounded-xl px-6 py-5">
+                <h2 class="text-white font-semibold mb-3">Modération</h2>
+                <p>
+                    Tout contenu soumis par un utilisateur est vérifié par un modérateur
+                    avant publication. Les informations sans source vérifiable ne sont pas publiées.
+                    Les formulations doivent rester neutres — aucun jugement personnel n'est admis.
+                </p>
+            </div>
+
+        </div>
+
+        <!-- ═══════════════════════════════════════
+             FORMULAIRE DE RETRAIT
+        ════════════════════════════════════════ -->
+        <div id="retrait" class="mt-14 scroll-mt-20">
+
+            <h2 class="text-xl font-bold text-white mb-2">Demande de correction ou retrait</h2>
+            <p class="text-zinc-500 text-sm mb-8">
+                Une information vous concerne et est incorrecte ou obsolète ? Remplissez ce formulaire.
+                Nous traitons toutes les demandes sous 72h.
+            </p>
+
+            <!-- Message succès -->
+            <div th:if="${success}"
+                 class="bg-green-950 border border-green-900 rounded-xl px-5 py-4 flex items-center gap-3 mb-6">
+                <span class="text-green-400 text-lg">✅</span>
+                <p class="text-green-400 text-sm">
+                    Votre demande a bien été reçue. Nous la traiterons sous 72 heures.
+                </p>
+            </div>
+
+            <form th:action="@{/legal/retrait}" method="post"
+                  class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+
+                <div class="px-6 py-5 border-b border-zinc-800">
+                    <p class="text-zinc-400 text-xs">Tous les champs marqués <span class="text-red-400">*</span> sont obligatoires.</p>
+                </div>
+
+                <div class="px-6 py-5 space-y-5"
+                     x-data="{
+                         rapperId: null,
+                         rapperQuery: '',
+                         rapperResults: [],
+                         accusations: [],
+                         selectedAccusationId: null,
+                         selectedAccusationTitle: '',
+                         async searchRapper() {
+                             if (this.rapperQuery.length < 2) { this.rapperResults = []; return; }
+                             const res = await fetch('/api/rappers/search?q=' + encodeURIComponent(this.rapperQuery));
+                             this.rapperResults = await res.json();
+                         },
+                         async selectRapper(id, name) {
+                             this.rapperId = id;
+                             this.rapperQuery = name;
+                             this.rapperResults = [];
+                             this.selectedAccusationId = null;
+                             this.selectedAccusationTitle = '';
+                             const res = await fetch('/api/rappers/' + id + '/accusations');
+                             this.accusations = await res.json();
+                         },
+                         selectAccusation(id, title) {
+                             this.selectedAccusationId = id;
+                             this.selectedAccusationTitle = title;
+                         },
+                         resetAccusation() {
+                             this.selectedAccusationId = null;
+                             this.selectedAccusationTitle = '';
+                         }
+                     }">
+
+                    <!--
+                        CAS 1 — Vient d'une fiche accusation : tout locké
+                    -->
+                    <th:block th:if="${prefillAccusationId}">
+
+                        <!-- Rappeur locké -->
+                        <div>
+                            <label class="block text-zinc-400 text-xs font-medium mb-1.5 uppercase tracking-wide">Rappeur concerné</label>
+                            <div class="bg-zinc-800/50 border border-zinc-700 rounded-lg px-3 py-2.5 flex items-center gap-2">
+                                <span class="text-base">🎤</span>
+                                <span class="text-zinc-300 text-sm" th:text="${prefillRapperName}">Rappeur</span>
+                                <span class="ml-auto text-zinc-600 text-xs">🔒</span>
+                            </div>
+                            <input type="hidden" name="rapperName" th:value="${prefillRapperName}"/>
+                        </div>
+
+                        <!-- Accusation lockée -->
+                        <div>
+                            <label class="block text-zinc-400 text-xs font-medium mb-1.5 uppercase tracking-wide">Affaire concernée</label>
+                            <div class="bg-zinc-800/50 border border-zinc-700 rounded-lg px-3 py-2.5 flex items-center gap-2">
+                                <span class="text-base">🎯</span>
+                                <span class="text-zinc-300 text-sm" th:text="${prefillAccusationTitle}">Titre</span>
+                                <span class="ml-auto text-zinc-600 text-xs">🔒</span>
+                            </div>
+                            <input type="hidden" name="accusationId" th:value="${prefillAccusationId}"/>
+                            <input type="hidden" name="accusationTitle" th:value="${prefillAccusationTitle}"/>
+                        </div>
+
+                    </th:block>
+
+                    <!--
+                        CAS 2 — Vient d'une fiche rappeur : rappeur locké, accusations en dropdown
+                        CAS 3 — Sans contexte : rappeur en autocomplete, puis accusations en dropdown
+                    -->
+                    <th:block th:unless="${prefillAccusationId}">
+
+                        <!-- Rappeur locké (cas 2) -->
+                        <div th:if="${prefillRapperName}"
+                             th:attr="x-init='selectRapper([[${prefillRapperId}]], [[${prefillRapperName}]])'">
+                            <label class="block text-zinc-400 text-xs font-medium mb-1.5 uppercase tracking-wide">Rappeur concerné</label>
+                            <div class="bg-zinc-800/50 border border-zinc-700 rounded-lg px-3 py-2.5 flex items-center gap-2">
+                                <span class="text-base">🎤</span>
+                                <span class="text-zinc-300 text-sm" th:text="${prefillRapperName}">Rappeur</span>
+                                <span class="ml-auto text-zinc-600 text-xs">🔒</span>
+                            </div>
+                            <input type="hidden" name="rapperName" th:value="${prefillRapperName}"/>
+                        </div>
+
+                        <!-- Rappeur autocomplete (cas 3) -->
+                        <div th:unless="${prefillRapperName}" class="relative">
+                            <label class="block text-zinc-400 text-xs font-medium mb-1.5 uppercase tracking-wide">
+                                Rappeur concerné <span class="text-red-400">*</span>
+                            </label>
+                            <input type="text"
+                                   name="rapperName"
+                                   x-model="rapperQuery"
+                                   @input.debounce.300ms="searchRapper"
+                                   @keydown.escape="rapperResults = []"
+                                   placeholder="Nom du rappeur"
+                                   required
+                                   class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5
+                                          text-white placeholder-zinc-600 text-sm
+                                          focus:outline-none focus:border-zinc-500 transition-colors"/>
+                            <!-- Dropdown rappeurs -->
+                            <div x-show="rapperResults.length > 0"
+                                 x-transition:enter="transition ease-out duration-100"
+                                 x-transition:enter-start="opacity-0 -translate-y-1"
+                                 x-transition:enter-end="opacity-100 translate-y-0"
+                                 @click.away="rapperResults = []"
+                                 class="absolute z-50 top-full mt-1 w-full bg-zinc-900 border border-zinc-700 rounded-xl overflow-hidden shadow-2xl">
+                                <template x-for="rapper in rapperResults" :key="rapper.id">
+                                    <button type="button"
+                                            @click="selectRapper(rapper.id, rapper.name)"
+                                            class="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-zinc-800 transition-colors text-left border-b border-zinc-800 last:border-0">
+                                        <span class="text-sm">🎤</span>
+                                        <div>
+                                            <p class="text-white text-sm font-medium" x-text="rapper.name"></p>
+                                            <p class="text-zinc-500 text-xs" x-text="rapper.status"></p>
+                                        </div>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Affaire — dropdown après sélection rappeur -->
+                        <div>
+                            <label class="block text-zinc-400 text-xs font-medium mb-1.5 uppercase tracking-wide">
+                                Affaire concernée <span class="text-zinc-600">(optionnel)</span>
+                            </label>
+
+                            <!-- Aucun rappeur sélectionné encore -->
+                            <div x-show="!rapperId && accusations.length === 0"
+                                 class="bg-zinc-800/40 border border-zinc-800 rounded-lg px-3 py-2.5 text-zinc-600 text-sm italic">
+                                Sélectionnez d'abord un rappeur ci-dessus
+                            </div>
+
+                            <!-- Rappeur sélectionné, aucune affaire indexée -->
+                            <div x-show="rapperId && accusations.length === 0"
+                                 class="bg-zinc-800/40 border border-zinc-800 rounded-lg px-3 py-2.5 text-zinc-500 text-sm">
+                                Aucune affaire indexée pour ce rappeur
+                            </div>
+
+                            <!-- Dropdown accusations -->
+                            <div x-show="accusations.length > 0 && !selectedAccusationId"
+                                 class="bg-zinc-800 border border-zinc-700 rounded-lg overflow-hidden">
+                                <template x-for="acc in accusations" :key="acc.id">
+                                    <button type="button"
+                                            @click="selectAccusation(acc.id, acc.title)"
+                                            class="w-full text-left px-3 py-2.5 text-zinc-300 text-sm
+                                                   hover:bg-zinc-700 transition-colors border-b border-zinc-700 last:border-0 flex items-center gap-2">
+                                        <span class="text-zinc-500 text-xs flex-shrink-0">🎯</span>
+                                        <span x-text="acc.title" class="truncate"></span>
+                                    </button>
+                                </template>
+                            </div>
+
+                            <!-- Accusation sélectionnée -->
+                            <div x-show="selectedAccusationId"
+                                 class="bg-zinc-800 border border-zinc-500 rounded-lg px-3 py-2.5 flex items-center gap-2">
+                                <span class="text-zinc-400 text-sm flex-shrink-0">🎯</span>
+                                <span class="text-zinc-200 text-sm truncate" x-text="selectedAccusationTitle"></span>
+                                <button type="button"
+                                        @click="resetAccusation"
+                                        class="ml-auto text-zinc-600 hover:text-zinc-300 text-xs transition-colors flex-shrink-0">
+                                    ✕ changer
+                                </button>
+                            </div>
+
+                            <!-- Champs cachés -->
+                            <input type="hidden" name="accusationId" :value="selectedAccusationId || ''"/>
+                            <input type="hidden" name="accusationTitle" :value="selectedAccusationTitle"/>
+                        </div>
+
+                    </th:block>
+
+                    <!-- Motif -->
+                    <div>
+                        <label class="block text-zinc-400 text-xs font-medium mb-1.5 uppercase tracking-wide">
+                            Motif de la demande <span class="text-red-400">*</span>
+                        </label>
+                        <div class="grid grid-cols-2 gap-2" x-data="{ selected: '' }">
+                            <label class="cursor-pointer">
+                                <input type="radio" name="reason" value="INCORRECT_INFO" class="sr-only peer" x-model="selected"/>
+                                <div class="px-3 py-2.5 rounded-lg border border-zinc-700 text-zinc-400 text-xs text-center
+                                            peer-checked:border-zinc-500 peer-checked:bg-zinc-800 peer-checked:text-white
+                                            hover:border-zinc-600 transition-colors">
+                                    Information incorrecte
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="reason" value="OUTDATED_INFO" class="sr-only peer" x-model="selected"/>
+                                <div class="px-3 py-2.5 rounded-lg border border-zinc-700 text-zinc-400 text-xs text-center
+                                            peer-checked:border-zinc-500 peer-checked:bg-zinc-800 peer-checked:text-white
+                                            hover:border-zinc-600 transition-colors">
+                                    Information obsolète
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="reason" value="PRIVACY" class="sr-only peer" x-model="selected"/>
+                                <div class="px-3 py-2.5 rounded-lg border border-zinc-700 text-zinc-400 text-xs text-center
+                                            peer-checked:border-zinc-500 peer-checked:bg-zinc-800 peer-checked:text-white
+                                            hover:border-zinc-600 transition-colors">
+                                    Atteinte à la vie privée
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="reason" value="OTHER" class="sr-only peer" x-model="selected"/>
+                                <div class="px-3 py-2.5 rounded-lg border border-zinc-700 text-zinc-400 text-xs text-center
+                                            peer-checked:border-zinc-500 peer-checked:bg-zinc-800 peer-checked:text-white
+                                            hover:border-zinc-600 transition-colors">
+                                    Autre
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Message -->
+                    <div>
+                        <label class="block text-zinc-400 text-xs font-medium mb-1.5 uppercase tracking-wide">
+                            Détails <span class="text-red-400">*</span>
+                        </label>
+                        <textarea name="message"
+                                  rows="4"
+                                  required
+                                  placeholder="Expliquez pourquoi cette information doit être corrigée ou retirée, et si possible apportez des preuves (jugement d'acquittement, etc.)"
+                                  class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5
+                                         text-white placeholder-zinc-600 text-sm resize-none
+                                         focus:outline-none focus:border-zinc-500 transition-colors"></textarea>
+                    </div>
+
+                    <!-- Email (optionnel) -->
+                    <div>
+                        <label class="block text-zinc-400 text-xs font-medium mb-1.5 uppercase tracking-wide">
+                            Email de contact <span class="text-zinc-600">(optionnel)</span>
+                        </label>
+                        <input type="email"
+                               name="email"
+                               placeholder="pour recevoir une réponse"
+                               class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5
+                                      text-white placeholder-zinc-600 text-sm
+                                      focus:outline-none focus:border-zinc-500 transition-colors"/>
+                        <p class="text-zinc-600 text-xs mt-1">Non obligatoire. Utilisé uniquement pour vous répondre.</p>
+                    </div>
+
+                </div>
+
+                <!-- Footer form -->
+                <div class="px-6 py-4 border-t border-zinc-800 flex items-center justify-between">
+                    <p class="text-zinc-600 text-xs">Traitement sous 72 heures.</p>
+                    <button type="submit"
+                            class="bg-white text-zinc-950 font-semibold text-sm px-5 py-2.5 rounded-lg
+                                   hover:bg-zinc-200 transition-colors">
+                        Envoyer la demande
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+</main>
+
+<footer th:replace="~{layout :: footer}"></footer>
+
+</body>
+</html>
+

@@ -1,0 +1,55 @@
+services:
+
+  app:
+    build: .
+    container_name: btr_app
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:postgresql://db:5432/balancetonrappeur
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      BTR_MAIL_FROM: ${BTR_MAIL_FROM}
+      BTR_MAIL_DIGEST_TO: ${BTR_MAIL_DIGEST_TO}
+      BTR_ADMIN_PASSWORD: ${BTR_ADMIN_PASSWORD}
+      SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID:-}
+      SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET:-}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - internal
+      - proxy
+    # Pas de ports exposés directement — passe par Nginx/ARR
+
+  db:
+    image: postgres:16-alpine
+    container_name: btr_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: balancetonrappeur
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - btr_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d balancetonrappeur"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+
+volumes:
+  btr_pgdata:
+
+networks:
+  internal:
+    internal: true   # DB non accessible depuis l'extérieur
+  proxy:
+    external: true   # Réseau partagé avec ton reverse proxy (ARR/Nginx)
+

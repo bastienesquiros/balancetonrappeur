@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Timeline · Balance Ton Rappeur</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] } } } }</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col antialiased">
+
+<header th:replace="~{layout :: nav}"></header>
+
+<main class="flex-1">
+    <div class="max-w-3xl mx-auto px-4 py-10">
+
+        <!-- Header -->
+        <div class="mb-10">
+            <h1 class="text-2xl font-bold text-white mb-1">Timeline</h1>
+            <p class="text-zinc-500 text-sm">Chronologie des affaires documentées, de la plus récente à la plus ancienne.</p>
+        </div>
+
+        <!-- Vide -->
+        <div th:if="${byYear.isEmpty()}" class="text-center py-20 text-zinc-600 text-sm">
+            Aucune affaire avec une date connue pour l'instant.
+        </div>
+
+        <!-- Années -->
+        <div th:each="yearEntry : ${byYear}" class="mb-12">
+
+            <!-- Ancre année -->
+            <div class="flex items-center gap-4 mb-6" th:id="${yearEntry.key}">
+                <span class="text-3xl font-extrabold text-white" th:text="${yearEntry.key}">2024</span>
+                <div class="flex-1 h-px bg-zinc-800"></div>
+                <span class="text-zinc-600 text-xs"
+                      th:text="${#lists.size(yearEntry.value)} + ' affaire' + (${#lists.size(yearEntry.value)} > 1 ? 's' : '')">
+                </span>
+            </div>
+
+            <!-- Affaires de l'année -->
+            <div class="space-y-3 pl-2 border-l-2 border-zinc-800 ml-4">
+                <a th:each="accusation : ${yearEntry.value}"
+                   th:href="@{/accusations/{id}(id=${accusation.id})}"
+                   class="group block ml-4 relative">
+
+                    <!-- Dot sur la timeline -->
+                    <span class="absolute -left-[1.35rem] top-3 w-2.5 h-2.5 rounded-full border-2 border-zinc-950 flex-shrink-0"
+                          th:classappend="${accusation.category.name() == 'SEXUAL_ASSAULT' or accusation.category.name() == 'PEDOPHILIA'} ? 'bg-red-500' :
+                                         (${accusation.category.name() == 'PHYSICAL_VIOLENCE'} ? 'bg-orange-500' : 'bg-yellow-500')">
+                    </span>
+
+                    <div class="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3
+                                group-hover:border-zinc-600 transition-colors">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="min-w-0">
+                                <!-- Rappeur -->
+                                <p class="text-zinc-500 text-xs mb-1" th:text="${accusation.rapper.name}">Rappeur</p>
+                                <!-- Titre -->
+                                <p class="text-white text-sm font-medium leading-snug group-hover:text-zinc-300 transition-colors"
+                                   th:text="${accusation.title}">Titre</p>
+                            </div>
+                            <!-- Badges -->
+                            <div class="flex flex-col items-end gap-1.5 flex-shrink-0">
+                                <span th:switch="${accusation.category.name()}">
+                                    <span th:case="'SEXUAL_ASSAULT'" class="text-xs px-2 py-0.5 rounded-full bg-red-950 text-red-400 border border-red-900 whitespace-nowrap">Agression sexuelle</span>
+                                    <span th:case="'PEDOPHILIA'" class="text-xs px-2 py-0.5 rounded-full bg-red-950 text-red-400 border border-red-900">Pédophilie</span>
+                                    <span th:case="'PHYSICAL_VIOLENCE'" class="text-xs px-2 py-0.5 rounded-full bg-orange-950 text-orange-400 border border-orange-900 whitespace-nowrap">Violence physique</span>
+                                    <span th:case="*" class="text-xs px-2 py-0.5 rounded-full bg-yellow-950 text-yellow-400 border border-yellow-900">Polémique</span>
+                                </span>
+                                <span th:switch="${accusation.status.name()}">
+                                    <span th:case="'CONVICTED'" class="text-xs px-2 py-0.5 rounded-full bg-red-950 text-red-400 border border-red-900">⛔ Condamné</span>
+                                    <span th:case="'ONGOING'" class="text-xs px-2 py-0.5 rounded-full bg-amber-950 text-amber-400 border border-amber-900">🚨 En cours</span>
+                                    <span th:case="'ACQUITTED'" class="text-xs px-2 py-0.5 rounded-full bg-green-950 text-green-400 border border-green-900">✅ Acquitté</span>
+                                    <span th:case="*" th:if="${accusation.category.name() != 'CONTROVERSY'}"
+                                          class="text-xs px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700">⚠️ Polémique</span>
+                                </span>
+                            </div>
+                        </div>
+                        <!-- Date précise si dispo -->
+                        <p th:if="${accusation.factDate != null}"
+                           class="text-zinc-600 text-xs mt-2"
+                           th:text="${#temporals.format(accusation.factDate, 'MMMM yyyy')}">janvier 2024</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<footer th:replace="~{layout :: footer}"></footer>
+
+</body>
+</html>
+

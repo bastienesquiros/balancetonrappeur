@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Affaires · Balance Ton Rappeur</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] } } } }</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col antialiased">
+
+<header th:replace="~{layout :: nav}"></header>
+
+<main class="flex-1">
+    <div class="max-w-5xl mx-auto px-4 py-10">
+
+        <!-- Header -->
+        <div class="flex items-baseline justify-between mb-8">
+            <div>
+                <h1 class="text-2xl font-bold text-white">Affaires</h1>
+                <p class="text-zinc-600 text-sm mt-1"
+                   th:text="${totalElements != null ? totalElements + ' affaires documentées' : #lists.size(accusations) + ' affaires documentées'}">0 affaires</p>
+            </div>
+        </div>
+
+        <!-- Filtres — une seule ligne scrollable -->
+        <div class="flex flex-wrap gap-2 mb-8">
+            <a href="/accusations"
+               th:class="${selectedCategory == null and selectedStatus == null} ? 'text-xs px-3 py-1.5 rounded-lg bg-zinc-800 text-white border border-zinc-700 transition-colors' : 'text-xs px-3 py-1.5 rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-800/50 border border-zinc-800 transition-colors'">
+                Toutes
+            </a>
+            <!-- Séparateur visuel -->
+            <span class="self-center text-zinc-800">|</span>
+            <!-- Catégories -->
+            <th:block th:each="cat : ${categories}">
+                <a th:href="@{/accusations(category=${cat.name()})}"
+                   th:class="${selectedCategory != null and selectedCategory == cat} ? 'text-xs px-3 py-1.5 rounded-lg bg-zinc-800 text-white border border-zinc-700 transition-colors' : 'text-xs px-3 py-1.5 rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-800/50 border border-zinc-800 transition-colors'">
+                    <th:block th:switch="${cat.name()}">
+                        <span th:case="'SEXUAL_ASSAULT'">Agression sexuelle</span>
+                        <span th:case="'PEDOPHILIA'">Pédophilie</span>
+                        <span th:case="'PHYSICAL_VIOLENCE'">Violence physique</span>
+                        <span th:case="*">Polémique</span>
+                    </th:block>
+                </a>
+            </th:block>
+            <span class="self-center text-zinc-800">|</span>
+            <!-- Statuts -->
+            <th:block th:each="st : ${statuses}">
+                <a th:href="@{/accusations(status=${st.name()})}"
+                   th:class="${selectedStatus != null and selectedStatus == st} ? 'text-xs px-3 py-1.5 rounded-lg bg-zinc-800 text-white border border-zinc-700 transition-colors' : 'text-xs px-3 py-1.5 rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-800/50 border border-zinc-800 transition-colors'">
+                    <th:block th:switch="${st.name()}">
+                        <span th:case="'CONVICTED'">⛔ Condamnés</span>
+                        <span th:case="'ONGOING'">🚨 En cours</span>
+                        <span th:case="'ACQUITTED'">✅ Acquittés</span>
+                        <span th:case="*">⚠️ Polémique</span>
+                    </th:block>
+                </a>
+            </th:block>
+        </div>
+
+        <!-- Liste -->
+        <div th:if="${not #lists.isEmpty(accusations)}" class="space-y-2">
+            <div th:each="accusation : ${accusations}"
+                 th:data-href="@{/accusations/{id}(id=${accusation.id})}"
+                 onclick="window.location.href=this.dataset.href"
+                 class="flex items-center gap-4 bg-zinc-900/60 border border-zinc-800/80 rounded-xl px-4 py-3.5
+                        hover:border-zinc-700 hover:bg-zinc-900 transition-all group cursor-pointer">
+
+                <!-- Dot catégorie -->
+                <div class="flex-shrink-0">
+                    <span th:switch="${accusation.category.name()}">
+                        <span th:case="'SEXUAL_ASSAULT'" class="block w-2 h-2 rounded-full bg-red-500"></span>
+                        <span th:case="'PEDOPHILIA'" class="block w-2 h-2 rounded-full bg-red-500"></span>
+                        <span th:case="'PHYSICAL_VIOLENCE'" class="block w-2 h-2 rounded-full bg-orange-500"></span>
+                        <span th:case="*" class="block w-2 h-2 rounded-full bg-yellow-500/70"></span>
+                    </span>
+                </div>
+
+                <!-- Contenu principal -->
+                <div class="flex-1 min-w-0 flex items-center gap-3">
+                    <!-- Avatar rappeur -->
+                    <div class="w-7 h-7 rounded-lg flex-shrink-0 overflow-hidden bg-zinc-800">
+                        <img th:if="${accusation.rapper.spotifyImageUrl != null}"
+                             th:src="${accusation.rapper.spotifyImageUrl}"
+                             th:alt="${accusation.rapper.name}"
+                             class="w-full h-full object-cover"/>
+                        <span th:if="${accusation.rapper.spotifyImageUrl == null}"
+                              class="w-full h-full flex items-center justify-center text-xs">🎤</span>
+                    </div>
+                    <!-- Rappeur + titre -->
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2 mb-0.5">
+                            <span class="text-zinc-500 text-xs font-medium flex-shrink-0" th:text="${accusation.rapper.name}">Rappeur</span>
+                            <span th:if="${accusation.factDate}" class="text-zinc-700 text-xs flex-shrink-0"
+                                  th:text="${#temporals.format(accusation.factDate, 'yyyy')}">2020</span>
+                        </div>
+                        <p class="text-white text-sm font-medium leading-snug truncate group-hover:text-zinc-200 transition-colors"
+                           th:text="${accusation.title}">Titre</p>
+                    </div>
+                </div>
+
+                <!-- Badges — stoppent la propagation -->
+                <div class="flex items-center gap-2 flex-shrink-0 ml-auto" onclick="event.stopPropagation()">
+                    <th:block th:switch="${accusation.category.name()}">
+                        <a th:case="'SEXUAL_ASSAULT'" href="/accusations?category=SEXUAL_ASSAULT" class="text-xs px-2 py-0.5 rounded-full bg-red-950/70 text-red-400 border border-red-900/40 hover:bg-red-900/60 transition-colors hidden sm:block">Agression sexuelle</a>
+                        <a th:case="'PEDOPHILIA'" href="/accusations?category=PEDOPHILIA" class="text-xs px-2 py-0.5 rounded-full bg-red-950/70 text-red-400 border border-red-900/40 hover:bg-red-900/60 transition-colors hidden sm:block">Pédophilie</a>
+                        <a th:case="'PHYSICAL_VIOLENCE'" href="/accusations?category=PHYSICAL_VIOLENCE" class="text-xs px-2 py-0.5 rounded-full bg-orange-950/70 text-orange-400 border border-orange-900/40 hover:bg-orange-900/60 transition-colors hidden sm:block">Violence physique</a>
+                        <a th:case="*" href="/accusations?category=CONTROVERSY" class="text-xs px-2 py-0.5 rounded-full bg-yellow-950/70 text-yellow-500 border border-yellow-900/40 hover:bg-yellow-900/60 transition-colors hidden sm:block">Polémique</a>
+                    </th:block>
+                    <th:block th:switch="${accusation.status.name()}">
+                        <a th:case="'CONVICTED'" href="/accusations?status=CONVICTED" class="text-xs px-2 py-0.5 rounded-full bg-red-950/70 text-red-400 border border-red-900/40 hover:bg-red-900/60 transition-colors">⛔ Condamné</a>
+                        <a th:case="'ONGOING'" href="/accusations?status=ONGOING" class="text-xs px-2 py-0.5 rounded-full bg-amber-950/70 text-amber-400 border border-amber-900/40 hover:bg-amber-900/60 transition-colors">🚨 En cours</a>
+                        <a th:case="'ACQUITTED'" href="/accusations?status=ACQUITTED" class="text-xs px-2 py-0.5 rounded-full bg-green-950/70 text-green-400 border border-green-900/40 hover:bg-green-900/60 transition-colors">✅ Acquitté</a>
+                        <a th:case="*" th:if="${accusation.category.name() != 'CONTROVERSY'}" href="/accusations?status=CONTROVERSY" class="text-xs px-2 py-0.5 rounded-full bg-zinc-800/70 text-zinc-400 border border-zinc-700/40 hover:bg-zinc-700/60 transition-colors">⚠️ Polémique</a>
+                    </th:block>
+                </div>
+
+                <!-- Chevron -->
+                <svg class="w-4 h-4 text-zinc-700 group-hover:text-zinc-500 flex-shrink-0 transition-colors"
+                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Vide -->
+        <div th:if="${#lists.isEmpty(accusations)}"
+             class="text-center py-20 text-zinc-600 text-sm">
+            Aucune affaire trouvée pour ce filtre.
+        </div>
+
+        <!-- Pagination -->
+        <nav th:if="${totalPages != null and totalPages > 1}"
+             class="flex items-center justify-center gap-1 mt-10">
+            <a th:if="${currentPage > 0}"
+               th:href="@{/accusations(page=${currentPage - 1})}"
+               class="px-3 py-2 rounded-lg text-zinc-400 text-sm hover:bg-zinc-800 hover:text-white transition-colors">← Préc.</a>
+            <span th:unless="${currentPage > 0}"
+                  class="px-3 py-2 rounded-lg text-zinc-700 text-sm cursor-not-allowed">← Préc.</span>
+            <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                <th:block th:if="${i == 0 or i == totalPages - 1 or (i >= currentPage - 2 and i <= currentPage + 2)}">
+                    <a th:if="${i != currentPage}" th:href="@{/accusations(page=${i})}" th:text="${i + 1}"
+                       class="px-3 py-2 rounded-lg text-zinc-400 text-sm hover:bg-zinc-800 hover:text-white transition-colors"></a>
+                    <span th:if="${i == currentPage}" th:text="${i + 1}"
+                          class="px-3 py-2 rounded-lg bg-white text-zinc-950 text-sm font-semibold"></span>
+                </th:block>
+                <span th:if="${(i == 1 and currentPage > 3) or (i == totalPages - 2 and currentPage < totalPages - 4)}"
+                      class="px-1 text-zinc-700 text-sm">…</span>
+            </th:block>
+            <a th:if="${currentPage < totalPages - 1}"
+               th:href="@{/accusations(page=${currentPage + 1})}"
+               class="px-3 py-2 rounded-lg text-zinc-400 text-sm hover:bg-zinc-800 hover:text-white transition-colors">Suiv. →</a>
+            <span th:unless="${currentPage < totalPages - 1}"
+                  class="px-3 py-2 rounded-lg text-zinc-700 text-sm cursor-not-allowed">Suiv. →</span>
+        </nav>
+
+    </div>
+</main>
+
+<footer th:replace="~{layout :: footer}"></footer>
+
+</body>
+</html>
+

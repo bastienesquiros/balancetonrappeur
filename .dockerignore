@@ -1,0 +1,72 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.idea
+*.iml
+.vscode
+.settings
+.project
+.classpath
+
+# Build
+target/
+*.class
+*.jar
+*.war
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+*.md
+LICENSE
+HELP.md
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Tests
+src/test/
+**/test/
+
+# Maven
+.mvn/
+!.mvn/wrapper/maven-wrapper.jar
+mvnw
+mvnw.cmd
+
+# Node (si utilisé pour Tailwind)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Backups
+backups/
+*.sql
+*.dump
+
+# Temporary
+tmp/
+temp/
+*.tmp
+*.swp
+*~
+
+# Misc
+application-dev.properties
+

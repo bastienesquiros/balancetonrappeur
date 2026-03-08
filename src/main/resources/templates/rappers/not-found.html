@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Rappeur non trouvé · Balance Ton Rappeur</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] } } } }</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col antialiased">
+
+<header th:replace="~{layout :: nav}"></header>
+
+<main class="flex-1">
+    <div class="max-w-2xl mx-auto px-4 py-24 text-center">
+
+        <p class="text-5xl mb-5">🤷</p>
+        <h1 class="text-2xl font-bold text-white mb-3">
+            Aucune fiche pour
+            <span class="text-zinc-400" th:text="'&quot;' + ${query} + '&quot;'">"..."</span>
+        </h1>
+        <p class="text-zinc-500 text-sm max-w-sm mx-auto mb-10">
+            Cet artiste n'est pas encore indexé.
+            Tu peux soumettre une affaire — elle sera vérifiée avant publication.
+        </p>
+
+        <a th:href="@{/rappers/suggest(name=${query})}"
+           class="inline-flex items-center gap-2 bg-white text-zinc-950 font-semibold text-sm
+                  px-6 py-3 rounded-xl hover:bg-zinc-200 transition-colors">
+            <span>＋</span>
+            Soumettre une affaire pour "<span th:text="${query}"></span>"
+        </a>
+        <p class="text-zinc-600 text-xs mt-3">Soumission vérifiée avant publication.</p>
+
+        <div class="mt-10">
+            <a href="/" class="text-zinc-600 text-sm hover:text-zinc-400 transition-colors">← Retour à l'accueil</a>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout :: footer}"></footer>
+
+</body>
+</html>
+

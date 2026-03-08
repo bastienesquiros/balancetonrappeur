@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://balancetonrappeur.fr/sitemap.xml
+
+# Pas d'indexation des forms de soumission
+Disallow: /rappers/suggest
+Disallow: /rappers/*/submit
+Disallow: /legal#retrait
+
