@@ -90,4 +90,5 @@ networks:
     name: btr_internal
     internal: true
   proxy:
-    external: true
+    name: btr_proxy
+    driver: bridge
