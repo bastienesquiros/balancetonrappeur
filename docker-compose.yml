@@ -1,5 +1,19 @@
 services:
 
+  nginx:
+    image: nginx:alpine
+    container_name: btr_nginx
+    restart: unless-stopped
+    ports:
+      - "443:443"
+    volumes:
+      - ./nginx/conf:/etc/nginx/conf.d
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - app
+    networks:
+      - proxy
+
   app:
     build: .
     container_name: btr_app
@@ -51,4 +65,3 @@ networks:
     internal: true
   proxy:
     external: true
-
