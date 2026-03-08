@@ -17,6 +17,7 @@ services:
       BTR_ADMIN_PASSWORD: ${BTR_ADMIN_PASSWORD}
       SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID:-}
       SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET:-}
+      SPOTIFY_REDIRECT_URI: ${SPOTIFY_REDIRECT_URI:-}
     depends_on:
       db:
         condition: service_healthy

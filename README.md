@@ -4,6 +4,7 @@ Base de données collaborative recensant des affaires, accusations et condamnati
 
 > Les informations présentées proviennent de sources publiques (presse, décisions de justice, réseaux sociaux).  
 > Ce site a une vocation documentaire et ne formule aucune accusation.
+
 ---
 
 ## Stack
@@ -11,7 +12,8 @@ Base de données collaborative recensant des affaires, accusations et condamnati
 - **Backend** — Spring Boot 4 / Java 21 / JPA + Hibernate
 - **Frontend** — Thymeleaf + Tailwind CSS + Alpine.js
 - **Base de données** — PostgreSQL
-- **Intégration** — Spotify API (photo des artistes)
+- **Intégration** — Spotify API (photo des artistes + scan de bibliothèque)
+- **Mail** — SMTP (Resend en prod, Mailpit en dev)
 - **Hébergement** — Docker + Nginx reverse proxy + Cloudflare
 
 ---
@@ -26,7 +28,9 @@ Base de données collaborative recensant des affaires, accusations et condamnati
 - Demande de retrait / correction
 - Page statistiques
 - Timeline globale des affaires
-- Scan de playlist
+- **Scan Spotify** — analyse tes liked songs et playlists, détecte les rappeurs cancel et permet de les retirer directement
+- Dashboard admin (`/admin`) — gestion des soumissions, retraits, sync Spotify
+- Digest mail quotidien (8h) avec les soumissions en attente
 
 ---
 
@@ -35,9 +39,9 @@ Base de données collaborative recensant des affaires, accusations et condamnati
 **Prérequis** : Java 21, PostgreSQL, Maven
 
 ```bash
-# Copier les properties de dev
+# Copier et adapter les properties de dev
 cp src/main/resources/application-dev.properties.example src/main/resources/application-dev.properties
-# Adapter les valeurs (BDD, Spotify...)
+# Adapter les valeurs (BDD locale, Spotify...)
 
 # Lancer
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
@@ -77,14 +81,15 @@ L'app tourne sur `btr_app:8080`, sans port exposé publiquement — à proxifier
 | `DB_USERNAME` | Utilisateur BDD |
 | `DB_PASSWORD` | Mot de passe BDD |
 | `MAIL_HOST` | Hôte SMTP |
+| `MAIL_PORT` | Port SMTP (587 pour Resend) |
 | `MAIL_USERNAME` | Utilisateur SMTP |
 | `MAIL_PASSWORD` | Mot de passe SMTP |
-| `BTR_MAIL_FROM` | Adresse expéditeur |
-| `BTR_MAIL_DIGEST_TO` | Destinataire du digest quotidien |
+| `BTR_MAIL_FROM` | Adresse expéditeur des mails |
+| `BTR_MAIL_DIGEST_TO` | Destinataire du digest quotidien (toi) |
 | `BTR_ADMIN_PASSWORD` | Mot de passe dashboard `/admin` |
-| `SPOTIFY_CLIENT_ID` | Client ID Spotify (optionnel) |
-| `SPOTIFY_CLIENT_SECRET` | Client Secret Spotify (optionnel) |
-| `SPOTIFY_REDIRECT_URI` | URI de redirection OAuth Spotify (optionnel) |
+| `SPOTIFY_CLIENT_ID` | Client ID Spotify (optionnel — feature scan) |
+| `SPOTIFY_CLIENT_SECRET` | Client Secret Spotify (optionnel — feature scan) |
+| `SPOTIFY_REDIRECT_URI` | URI de redirection OAuth Spotify (optionnel — feature scan) |
 
 ---
 
@@ -92,19 +97,23 @@ L'app tourne sur `btr_app:8080`, sans port exposé publiquement — à proxifier
 
 ```
 src/main/java/org/balancetonrappeur/
-├── spotify/        # Spotify API client
+├── client/        # Spotify public API client (photo artistes)
+├── spotify/       # Spotify OAuth client (scan bibliothèque)
+│   ├── client/
+│   └── dto/
 ├── config/        # Filtres (auth admin)
-├── controller/    # Controllers MVC + API REST
+├── controller/    # Controllers MVC
 ├── dto/           # DTOs
 ├── entity/        # Entités JPA
 ├── exception/     # Exceptions custom
 ├── repository/    # Spring Data repositories
-└── service/       # Logique métier
+├── service/       # Logique métier
+└── util/          # Utilitaires (normalisation chaînes...)
 
 src/main/resources/
 ├── templates/     # Templates Thymeleaf
 ├── static/        # favicon, robots.txt, sitemap.xml
-└── db/            # Scripts SQL (jdd, init)
+└── db/            # Scripts SQL (jdd.sql)
 ```
 
 ---
@@ -112,4 +121,3 @@ src/main/resources/
 ## Mentions légales
 
 Ce projet est à vocation informative et citoyenne. Toutes les informations publiées sont issues de sources publiques vérifiables. Formulaire de [demande de retrait](https://balancetonrappeur.fr/legal#retrait) disponible sur le site.
-

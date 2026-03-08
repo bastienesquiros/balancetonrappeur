@@ -44,11 +44,8 @@ docker-compose.yml
 src/test/
 **/test/
 
-# Maven
-.mvn/
-!.mvn/wrapper/maven-wrapper.jar
-mvnw
-mvnw.cmd
+# Maven wrapper — nécessaire pour le build Docker
+# .mvn/ et mvnw sont INCLUS volontairement
 
 # Node (si utilisé pour Tailwind)
 node_modules/
