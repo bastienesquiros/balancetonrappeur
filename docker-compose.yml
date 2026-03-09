@@ -50,6 +50,11 @@ services:
       - traefik.http.routers.btr-app.rule=Host(`balancetonrappeur.fr`)
       - traefik.http.routers.btr-app.entrypoints=websecure
       - traefik.http.routers.btr-app.tls.certresolver=btrresolver
+      - traefik.http.services.btr-app.loadbalancer.server.port=8080
+      - traefik.http.routers.btr-app-http.rule=Host(`balancetonrappeur.fr`)
+      - traefik.http.routers.btr-app-http.entrypoints=web
+      - traefik.http.routers.btr-app-http.middlewares=https-redirect
+      - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
 
   db:
     image: postgres:16-alpine
@@ -62,7 +67,7 @@ services:
     volumes:
       - btr_pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d balancetonrappeur"]
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d balancetonrappeur" ]
       interval: 10s
       timeout: 5s
       retries: 5
