@@ -47,7 +47,7 @@ services:
       - proxy
     labels:
       - traefik.enable=true
-      - traefik.http.routers.btr-app.rule=Host(`balancetonrappeur.fr`,`www.balancetonrappeur.fr`)
+      - traefik.http.routers.btr-app.rule=Host(`balancetonrappeur.fr`) || Host(`www.balancetonrappeur.fr`)
       - traefik.http.routers.btr-app.entrypoints=websecure
       - traefik.http.routers.btr-app.tls.certresolver=btrresolver
       - traefik.http.services.btr-app.loadbalancer.server.port=8080
