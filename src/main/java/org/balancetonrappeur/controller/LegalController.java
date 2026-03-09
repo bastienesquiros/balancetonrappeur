@@ -1,11 +1,14 @@
 package org.balancetonrappeur.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.balancetonrappeur.dto.form.WithdrawalForm;
 import org.balancetonrappeur.entity.WithdrawalReason;
 import org.balancetonrappeur.service.AccusationService;
 import org.balancetonrappeur.service.WithdrawalRequestService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -24,39 +27,42 @@ public class LegalController {
             @RequestParam(required = false) String rapperName,
             Model model
     ) {
-        // Vient d'une fiche accusation → tout locké
+        var form = new WithdrawalForm();
+
         if (accusationId != null) {
             accusationService.findById(accusationId).ifPresent(a -> {
-                model.addAttribute("prefillAccusationId", a.getId());
-                model.addAttribute("prefillAccusationTitle", a.getTitle());
-                model.addAttribute("prefillRapperName", a.getRapper().getName());
+                form.setAccusationId(a.getId());
+                form.setAccusationTitle(a.getTitle());
+                form.setRapperName(a.getRapper().getName());
             });
-        // Vient d'une fiche rappeur → rappeur locké, accusations en dropdown
         } else if (rapperId != null) {
+            if (rapperName != null) form.setRapperName(rapperName);
             model.addAttribute("prefillRapperId", rapperId);
-            if (rapperName != null) model.addAttribute("prefillRapperName", rapperName);
-        // Sans contexte → tout libre
         } else if (rapperName != null) {
-            model.addAttribute("prefillRapperName", rapperName);
+            form.setRapperName(rapperName);
         }
 
+        model.addAttribute("withdrawalForm", form);
         model.addAttribute("reasons", WithdrawalReason.values());
         return "legal";
     }
 
     @PostMapping("/retrait")
     public String submitWithdrawal(
-            @RequestParam(required = false) Long accusationId,
-            @RequestParam(required = false) String accusationTitle,
-            @RequestParam(required = false) String rapperName,
-            @RequestParam WithdrawalReason reason,
-            @RequestParam String message,
-            @RequestParam(required = false) String email,
-            RedirectAttributes redirectAttributes
+            @Valid @ModelAttribute("withdrawalForm") WithdrawalForm form,
+            BindingResult binding,
+            RedirectAttributes redirectAttributes,
+            Model model
     ) {
-        withdrawalRequestService.submit(accusationId, accusationTitle, rapperName, reason, message, email);
+        if (binding.hasErrors()) {
+            model.addAttribute("reasons", WithdrawalReason.values());
+            model.addAttribute("formHasErrors", true);
+            return "legal";
+        }
+
+        withdrawalRequestService.submit(form.getAccusationId(), form.getAccusationTitle(),
+                form.getRapperName(), form.getReason(), form.getMessage(), form.getEmail());
         redirectAttributes.addFlashAttribute("success", true);
         return "redirect:/legal#retrait";
     }
 }
-

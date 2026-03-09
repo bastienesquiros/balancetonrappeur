@@ -25,8 +25,8 @@ public class AccusationService {
 
 
     public Page<Accusation> findFiltered(AccusationCategory category, AccusationStatus status, Pageable pageable) {
-        if (category != null) return accusationRepository.findByCategoryWithRapper(category, pageable);
-        if (status != null) return accusationRepository.findByStatusWithRapper(status, pageable);
+        if (category != null) return accusationRepository.findByCategoryInWithRapper(List.of(category), pageable);
+        if (status   != null) return accusationRepository.findByStatusInWithRapper(List.of(status), pageable);
         return accusationRepository.findAllWithRapper(pageable);
     }
 

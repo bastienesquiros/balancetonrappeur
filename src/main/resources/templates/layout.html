@@ -35,33 +35,210 @@
 <body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col antialiased">
 
     <!-- NAV -->
-    <header th:fragment="nav" class="border-b border-zinc-800/60 sticky top-0 z-50 bg-zinc-950/95 backdrop-blur-md">
-        <nav class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-6">
-            <a href="/" class="font-bold text-sm tracking-tight text-white hover:text-zinc-300 transition-colors flex-shrink-0 flex items-center gap-2">
-                <span class="text-base">🎤</span>
+    <header th:fragment="nav" class="border-b border-zinc-800/60 sticky top-0 z-50 bg-zinc-950/95 backdrop-blur-md"
+            x-data="{
+                open: false,
+                searchOpen: false,
+                query: '',
+                results: [],
+                noResults: false,
+                isHome: window.location.pathname === '/',
+                openSearch() {
+                    if (this.isHome) {
+                        const el = document.getElementById('hero-search');
+                        if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => el.focus(), 400); return; }
+                    }
+                    this.searchOpen = true;
+                    this.$nextTick(() => this.$refs.searchInput && this.$refs.searchInput.focus());
+                },
+                closeSearch() { this.searchOpen = false; this.query = ''; this.results = []; this.noResults = false; },
+                async search() {
+                    if (this.query.length < 2) { this.results = []; this.noResults = false; return; }
+                    const res = await fetch('/api/rappers/search?q=' + encodeURIComponent(this.query));
+                    this.results = await res.json();
+                    this.noResults = this.results.length === 0;
+                },
+                submit() {
+                    if (this.query.trim()) window.location.href = '/rappers/search?q=' + encodeURIComponent(this.query);
+                }
+            }"
+            @keydown.escape.window="closeSearch()">
+
+        <nav class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+
+            <!-- Logo -->
+            <a href="/" class="font-bold text-sm tracking-tight text-white hover:text-zinc-300 transition-colors flex-shrink-0">
                 <span class="hidden sm:inline">Balance Ton Rappeur</span>
-                <span class="sm:hidden">BTR</span>
+                <span class="sm:hidden font-extrabold">BTR</span>
             </a>
-            <div class="flex items-center gap-1 text-sm text-zinc-500 flex-1 justify-center">
-                <a href="/rappers"     class="px-3 py-1.5 rounded-lg hover:bg-zinc-800 hover:text-white transition-colors">Rappeurs</a>
-                <a href="/accusations" class="px-3 py-1.5 rounded-lg hover:bg-zinc-800 hover:text-white transition-colors">Affaires</a>
-                <a href="/timeline"    class="px-3 py-1.5 rounded-lg hover:bg-zinc-800 hover:text-white transition-colors hidden sm:block">Timeline</a>
-                <a href="/stats"       class="px-3 py-1.5 rounded-lg hover:bg-zinc-800 hover:text-white transition-colors hidden sm:block">Stats</a>
+
+            <!-- Liens desktop -->
+            <div class="hidden sm:flex items-center gap-1 text-sm text-zinc-500 flex-1 justify-center">
+                <a href="/rappers"     class="px-3 py-1.5 rounded-lg hover:bg-zinc-800 hover:text-zinc-200 transition-colors">Rappeurs</a>
+                <a href="/accusations" class="px-3 py-1.5 rounded-lg hover:bg-zinc-800 hover:text-zinc-200 transition-colors">Affaires</a>
+                <a href="/timeline"    class="px-3 py-1.5 rounded-lg hover:bg-zinc-800 hover:text-zinc-200 transition-colors">Timeline</a>
+                <a href="/stats"       class="px-3 py-1.5 rounded-lg hover:bg-zinc-800 hover:text-zinc-200 transition-colors">Stats</a>
             </div>
-            <div class="flex items-center gap-2 flex-shrink-0">
+
+            <!-- Actions desktop -->
+            <div class="hidden sm:flex items-center gap-2 flex-shrink-0">
+                <!-- Loupe -->
+                <button @click="openSearch()"
+                        aria-label="Rechercher"
+                        class="p-2 rounded-lg text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-colors">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+                    </svg>
+                </button>
                 <a href="/scan"
-                   class="hidden sm:flex items-center gap-1.5 text-xs font-medium text-zinc-400 hover:text-white px-3 py-1.5 rounded-lg transition-colors border border-zinc-800 hover:border-zinc-600">
+                   class="flex items-center gap-1.5 text-xs font-medium text-zinc-400 hover:text-zinc-200 px-3 py-1.5 rounded-lg transition-colors border border-zinc-800 hover:border-zinc-600">
                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
                     </svg>
-                    Scanner
+                    Analyser mes écoutes
                 </a>
                 <a href="/rappers/suggest"
-                   class="text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white px-3 py-1.5 rounded-lg transition-colors border border-zinc-700/60">
-                    + Contribuer
+                   class="text-xs font-semibold bg-white text-zinc-950 hover:bg-zinc-200 px-3 py-1.5 rounded-lg transition-colors">
+                    Contribuer
                 </a>
             </div>
+
+            <!-- Actions mobile (loupe + contribuer + burger) -->
+            <div class="flex sm:hidden items-center gap-1">
+                <button @click="openSearch()"
+                        aria-label="Rechercher"
+                        class="p-2 rounded-lg text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-colors">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+                    </svg>
+                </button>
+                <a href="/rappers/suggest"
+                   class="text-xs font-semibold bg-white text-zinc-950 hover:bg-zinc-200 px-3 py-1.5 rounded-lg transition-colors">
+                    Contribuer
+                </a>
+                <button @click="open = !open"
+                        aria-label="Menu"
+                        class="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors">
+                    <svg x-show="!open" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                    <svg x-show="open" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
         </nav>
+
+        <!-- Menu mobile déroulant -->
+        <div x-show="open"
+             x-transition:enter="transition ease-out duration-150"
+             x-transition:enter-start="opacity-0 -translate-y-2"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-100"
+             x-transition:leave-start="opacity-100 translate-y-0"
+             x-transition:leave-end="opacity-0 -translate-y-2"
+             @click.away="open = false"
+             class="sm:hidden border-t border-zinc-800/60 bg-zinc-950/98 px-4 py-3 space-y-1">
+            <a href="/rappers"     @click="open = false" class="block px-3 py-2.5 rounded-lg text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors">Rappeurs</a>
+            <a href="/accusations" @click="open = false" class="block px-3 py-2.5 rounded-lg text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors">Affaires</a>
+            <a href="/timeline"    @click="open = false" class="block px-3 py-2.5 rounded-lg text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors">Timeline</a>
+            <a href="/stats"       @click="open = false" class="block px-3 py-2.5 rounded-lg text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors">Stats</a>
+            <div class="border-t border-zinc-800/60 pt-2 mt-2">
+                <a href="/scan" @click="open = false"
+                   class="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors">
+                    <svg class="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+                    </svg>
+                    Analyser mes écoutes Spotify
+                </a>
+            </div>
+        </div>
+
+        <!-- Search overlay (hors homepage) -->
+        <div x-show="searchOpen"
+             x-transition:enter="transition ease-out duration-150"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-100"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 z-[100] bg-zinc-950/60 backdrop-blur-sm flex items-start justify-center pt-20 px-4"
+             @click.self="closeSearch()">
+            <div class="w-full max-w-xl bg-zinc-950 border border-zinc-800 rounded-2xl p-4 shadow-2xl"
+                 x-transition:enter="transition ease-out duration-150"
+                 x-transition:enter-start="opacity-0 -translate-y-3"
+                 x-transition:enter-end="opacity-100 translate-y-0">
+                <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+                        </svg>
+                    </span>
+                    <input type="text"
+                           x-ref="searchInput"
+                           x-model="query"
+                           @input.debounce.250ms="search"
+                           @keydown.enter="submit"
+                           placeholder="Rechercher un rappeur..."
+                           class="w-full bg-zinc-900 border border-zinc-700 rounded-2xl pl-12 pr-12 py-4
+                                  text-white placeholder-zinc-600 text-base
+                                  focus:outline-none focus:border-zinc-500 focus:ring-2 focus:ring-zinc-600/40
+                                  transition-all shadow-2xl"/>
+                    <button @click="closeSearch()"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Résultats -->
+                <div x-show="results.length > 0"
+                     class="mt-2 bg-zinc-900 border border-zinc-700 rounded-2xl overflow-hidden shadow-2xl">
+                    <template x-for="rapper in results" :key="rapper.id">
+                        <a :href="'/rappers/' + rapper.id"
+                           class="flex items-center gap-3 px-4 py-3 hover:bg-zinc-800 transition-colors border-b border-zinc-800/60 last:border-0">
+                            <div class="w-8 h-8 rounded-full bg-zinc-800 flex-shrink-0 overflow-hidden flex items-center justify-center">
+                                <template x-if="rapper.imageUrl">
+                                    <img :src="rapper.imageUrl" :alt="rapper.name" class="w-full h-full object-cover"/>
+                                </template>
+                                <template x-if="!rapper.imageUrl">
+                                    <svg class="w-4 h-4 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z"/>
+                                    </svg>
+                                </template>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-white text-sm font-medium truncate" x-text="rapper.name"></p>
+                                <p class="text-zinc-500 text-xs" x-text="rapper.status"></p>
+                            </div>
+                            <svg class="w-4 h-4 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                    </template>
+                </div>
+
+                <!-- Pas de résultat -->
+                <div x-show="noResults && query.length >= 2"
+                     class="mt-2 bg-zinc-900 border border-zinc-700 rounded-2xl overflow-hidden shadow-2xl">
+                    <a :href="'/rappers/suggest?name=' + encodeURIComponent(query)"
+                       class="flex items-center gap-3 px-4 py-4 hover:bg-zinc-800 transition-colors">
+                        <div class="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-zinc-300 text-sm font-medium">Pas de résultat pour "<span x-text="query"></span>"</p>
+                            <p class="text-zinc-600 text-xs">Proposer ce rappeur →</p>
+                        </div>
+                    </a>
+                </div>
+
+                <p class="text-center text-zinc-700 text-xs mt-4">Échap pour fermer</p>
+            </div>
+        </div>
     </header>
 
     <!-- MAIN CONTENT -->
@@ -76,6 +253,7 @@
             <div class="flex gap-4">
                 <a href="/legal" class="hover:text-zinc-300 transition-colors">Mentions légales</a>
                 <a href="/legal#retrait" class="hover:text-zinc-300 transition-colors">Demande de retrait</a>
+                <a href="mailto:contact@balancetonrappeur.fr" class="hover:text-zinc-300 transition-colors">Contact</a>
             </div>
         </div>
     </footer>

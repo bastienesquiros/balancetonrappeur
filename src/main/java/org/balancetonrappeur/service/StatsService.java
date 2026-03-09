@@ -1,16 +1,18 @@
 package org.balancetonrappeur.service;
 
 import lombok.RequiredArgsConstructor;
-import org.balancetonrappeur.dto.StatsDto;
+import org.balancetonrappeur.dto.view.StatsDto;
 import org.balancetonrappeur.entity.*;
 import org.balancetonrappeur.repository.AccusationRepository;
 import org.balancetonrappeur.repository.RapperRepository;
 import org.balancetonrappeur.repository.SourceRepository;
-import org.balancetonrappeur.repository.StatsProjections;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.balancetonrappeur.repository.StatsProjections;
+
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -50,9 +52,7 @@ public class StatsService {
             byYear.put(String.valueOf(row.year()), row.count());
 
         // Top rappeurs
-        Map<String, Long> topRappers = new LinkedHashMap<>();
-        for (var row : accusationRepository.topRappersByAccusationCount())
-            topRappers.put(row.rapperName(), row.count());
+        List<StatsProjections.RapperCount> topRappers = accusationRepository.topRappersByAccusationCount();
 
         // Sources par type
         Map<String, Long> bySourceType = new LinkedHashMap<>();
@@ -63,7 +63,7 @@ public class StatsService {
 
         // Max pour les barres de progression — calculé ici, pas dans Thymeleaf
         long maxCat    = byCategory.values().stream().mapToLong(v -> v).max().orElse(1);
-        long maxRapper = topRappers.values().stream().mapToLong(v -> v).max().orElse(1);
+        long maxRapper = topRappers.stream().mapToLong(StatsProjections.RapperCount::count).max().orElse(1);
         long maxYear   = byYear.values().stream().mapToLong(v -> v).max().orElse(1);
         long maxSource = bySourceType.values().stream().mapToLong(v -> v).max().orElse(1);
 

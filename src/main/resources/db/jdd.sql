@@ -13,15 +13,15 @@ RESTART IDENTITY CASCADE;
 -- RAPPEURS (8 fictifs, statuts variés)
 -- ============================================================
 
-INSERT INTO rappers (name, status, spotify_id, created_at, updated_at) VALUES
-    ('MC Fantôme',        'CONVICTED',   NULL, NOW() - INTERVAL '3 years',  NOW() - INTERVAL '1 month'),
-    ('Lil Mirage',        'ACCUSED',     NULL, NOW() - INTERVAL '2 years',  NOW() - INTERVAL '2 weeks'),
-    ('DJ Spectre',        'CONTROVERSY', NULL, NOW() - INTERVAL '2 years',  NOW() - INTERVAL '3 months'),
-    ('Young Néant',       'CONVICTED',   NULL, NOW() - INTERVAL '4 years',  NOW() - INTERVAL '6 months'),
-    ('Krazy Void',        'ACCUSED',     NULL, NOW() - INTERVAL '1 year',   NOW() - INTERVAL '1 week'),
-    ('Le Vrai Personne',  'CONTROVERSY', NULL, NOW() - INTERVAL '6 months', NOW() - INTERVAL '5 days'),
-    ('Phantom Bass',      'CONVICTED',   NULL, NOW() - INTERVAL '5 years',  NOW() - INTERVAL '2 months'),
-    ('Nova Zéro',         'ACCUSED',     NULL, NOW() - INTERVAL '1 year',   NOW() - INTERVAL '3 weeks');
+INSERT INTO rappers (name, status, created_at, updated_at)
+VALUES ('MC Fantôme', 'CONVICTED', NOW() - INTERVAL '3 years', NOW() - INTERVAL '1 month'),
+       ('Lil Mirage', 'ACCUSED', NOW() - INTERVAL '2 years', NOW() - INTERVAL '2 weeks'),
+       ('DJ Spectre', 'CONTROVERSY', NOW() - INTERVAL '2 years', NOW() - INTERVAL '3 months'),
+       ('Young Néant', 'CONVICTED', NOW() - INTERVAL '4 years', NOW() - INTERVAL '6 months'),
+       ('Krazy Void', 'ACCUSED', NOW() - INTERVAL '1 year', NOW() - INTERVAL '1 week'),
+       ('Le Vrai Personne', 'CONTROVERSY', NOW() - INTERVAL '6 months', NOW() - INTERVAL '5 days'),
+       ('Phantom Bass', 'CONVICTED', NOW() - INTERVAL '5 years', NOW() - INTERVAL '2 months'),
+       ('Nova Zéro', 'ACCUSED', NOW() - INTERVAL '1 year', NOW() - INTERVAL '3 weeks');
 
 -- ============================================================
 -- ACCUSATIONS (2-3 par rappeur, catégories et statuts variés)
@@ -29,45 +29,45 @@ INSERT INTO rappers (name, status, spotify_id, created_at, updated_at) VALUES
 
 -- MC Fantôme — id 1
 INSERT INTO accusations (rapper_id, category, title, status, fact_date, created_at, updated_at) VALUES
-    (1, 'PHYSICAL_VIOLENCE', 'Altercation lors d''un concert à Fictiveville',   'CONVICTED',   '2021-06-14', NOW() - INTERVAL '3 years',  NOW() - INTERVAL '2 years'),
-    (1, 'CONTROVERSY',       'Propos polémiques tenus lors d''une interview',    'CONTROVERSY', '2022-03-08', NOW() - INTERVAL '2 years',  NOW() - INTERVAL '1 year');
+    (1, 'PHYSICAL_VIOLENCE', 'Condamné pour coups sur un membre de son crew',  'CONVICTED', '2021-06-14', NOW() - INTERVAL '3 years',  NOW() - INTERVAL '2 years'),
+    (1, 'POLEMIC',           'Propos polémiques tenus lors d''une interview',   'POLEMIC',   '2022-03-08', NOW() - INTERVAL '2 years',  NOW() - INTERVAL '1 year');
 
 -- Lil Mirage — id 2
 INSERT INTO accusations (rapper_id, category, title, status, fact_date, created_at, updated_at) VALUES
-    (2, 'SEXUAL_ASSAULT', 'Accusation d''agression lors d''une soirée privée',  'ONGOING', '2023-09-21', NOW() - INTERVAL '2 years',  NOW() - INTERVAL '6 months'),
-    (2, 'CONTROVERSY',    'Propos sexistes dans un freestyle non censuré',       'CONTROVERSY', '2022-05-10', NOW() - INTERVAL '3 years', NOW() - INTERVAL '2 years');
+    (2, 'SEXUAL_ASSAULT', 'Accusation d''agression sexuelle lors d''une soirée privée', 'ONGOING',     '2023-09-21', NOW() - INTERVAL '2 years',  NOW() - INTERVAL '6 months'),
+    (2, 'HATE_SPEECH',    'Plainte pour incitation à la haine dans un freestyle',        'POLEMIC', '2022-05-10', NOW() - INTERVAL '3 years',  NOW() - INTERVAL '2 years');
 
 -- DJ Spectre — id 3
 INSERT INTO accusations (rapper_id, category, title, status, fact_date, created_at, updated_at) VALUES
-    (3, 'CONTROVERSY', 'Déclarations jugées discriminatoires en direct radio',   'CONTROVERSY', '2024-01-17', NOW() - INTERVAL '2 years', NOW() - INTERVAL '1 year'),
-    (3, 'CONTROVERSY', 'Clash ayant dégénéré en appel à la haine en ligne',      'CONTROVERSY', '2023-07-04', NOW() - INTERVAL '2 years', NOW() - INTERVAL '1 year');
+    (3, 'HATE_SPEECH',  'Déclarations discriminatoires en direct radio — mise en examen', 'ONGOING',     '2024-01-17', NOW() - INTERVAL '2 years', NOW() - INTERVAL '1 year'),
+    (3, 'POLEMIC',     'Clash ayant dégénéré en appel à la haine en ligne',               'POLEMIC', '2023-07-04', NOW() - INTERVAL '2 years', NOW() - INTERVAL '1 year');
 
 -- Young Néant — id 4
 INSERT INTO accusations (rapper_id, category, title, status, fact_date, created_at, updated_at) VALUES
-    (4, 'PHYSICAL_VIOLENCE', 'Condamnation pour coups sur un membre de son équipe', 'CONVICTED', '2020-11-03', NOW() - INTERVAL '4 years', NOW() - INTERVAL '3 years'),
-    (4, 'CONTROVERSY',       'Mise en examen pour escroquerie envers des fans',      'ONGOING',   '2022-07-29', NOW() - INTERVAL '2 years', NOW() - INTERVAL '1 year'),
+    (4, 'PHYSICAL_VIOLENCE', 'Condamné pour coups sur un membre de son équipe',   'CONVICTED', '2020-11-03', NOW() - INTERVAL '4 years', NOW() - INTERVAL '3 years'),
+    (4, 'DOMESTIC_VIOLENCE', 'Plainte de son ex-compagne pour violences conjugales', 'ONGOING',   '2022-07-29', NOW() - INTERVAL '2 years', NOW() - INTERVAL '1 year'),
     (4, 'PHYSICAL_VIOLENCE', 'Rixe filmée à la sortie d''une boîte de nuit',         'CONVICTED', '2019-03-15', NOW() - INTERVAL '5 years', NOW() - INTERVAL '4 years');
 
 -- Krazy Void — id 5
 INSERT INTO accusations (rapper_id, category, title, status, fact_date, created_at, updated_at) VALUES
-    (5, 'CONTROVERSY',    'Mise en examen pour propos haineux dans un clip officiel', 'ONGOING',   '2023-12-05', NOW() - INTERVAL '1 year',  NOW() - INTERVAL '6 months'),
-    (5, 'SEXUAL_ASSAULT', 'Plainte déposée par une ancienne collaboratrice',           'ONGOING',   '2024-03-18', NOW() - INTERVAL '1 year',  NOW() - INTERVAL '3 months');
+    (5, 'HATE_SPEECH',    'Mise en examen pour propos haineux dans un clip officiel', 'ONGOING', '2023-12-05', NOW() - INTERVAL '1 year',  NOW() - INTERVAL '6 months'),
+    (5, 'SEXUAL_ASSAULT', 'Plainte déposée par une ancienne collaboratrice',           'ONGOING', '2024-03-18', NOW() - INTERVAL '1 year',  NOW() - INTERVAL '3 months');
 
 -- Le Vrai Personne — id 6
 INSERT INTO accusations (rapper_id, category, title, status, fact_date, created_at, updated_at) VALUES
-    (6, 'CONTROVERSY', 'Polémique suite à des propos tenus sur un réseau social',    'CONTROVERSY', '2025-02-11', NOW() - INTERVAL '6 months', NOW() - INTERVAL '1 month'),
-    (6, 'CONTROVERSY', 'Sortie d''un son jugé discriminatoire, retiré sous pression', 'CONTROVERSY', '2024-11-20', NOW() - INTERVAL '9 months', NOW() - INTERVAL '5 months');
+    (6, 'POLEMIC',     'Polémique suite à des propos tenus sur un réseau social',        'POLEMIC', '2025-02-11', NOW() - INTERVAL '6 months', NOW() - INTERVAL '1 month'),
+    (6, 'HATE_SPEECH', 'Son jugé discriminatoire retiré sous pression des plateformes',  'POLEMIC', '2024-11-20', NOW() - INTERVAL '9 months', NOW() - INTERVAL '5 months');
 
 -- Phantom Bass — id 7
 INSERT INTO accusations (rapper_id, category, title, status, fact_date, created_at, updated_at) VALUES
-    (7, 'SEXUAL_ASSAULT',    'Condamné pour agression sexuelle sur une collaboratrice', 'CONVICTED', '2019-04-22', NOW() - INTERVAL '5 years', NOW() - INTERVAL '4 years'),
-    (7, 'PHYSICAL_VIOLENCE', 'Accusation de violences conjugales — classée sans suite', 'ACQUITTED', '2021-08-14', NOW() - INTERVAL '3 years', NOW() - INTERVAL '2 years'),
-    (7, 'PEDOPHILIA',        'Signalement pour envoi de contenus à mineure — enquête',  'ONGOING',   '2023-05-09', NOW() - INTERVAL '2 years', NOW() - INTERVAL '1 year');
+    (7, 'RAPE',             'Condamné pour viol sur une collaboratrice',              'CONVICTED', '2019-04-22', NOW() - INTERVAL '5 years', NOW() - INTERVAL '4 years'),
+    (7, 'DOMESTIC_VIOLENCE','Accusation de violences conjugales — classée sans suite','ACQUITTED', '2021-08-14', NOW() - INTERVAL '3 years', NOW() - INTERVAL '2 years'),
+    (7, 'SEXUAL_ASSAULT',   'Signalement pour agression sur mineure — enquête',       'ONGOING',   '2023-05-09', NOW() - INTERVAL '2 years', NOW() - INTERVAL '1 year');
 
 -- Nova Zéro — id 8
 INSERT INTO accusations (rapper_id, category, title, status, fact_date, created_at, updated_at) VALUES
-    (8, 'PEDOPHILIA',     'Accusation d''envoi de contenus inappropriés à mineur', 'ONGOING',   '2024-10-30', NOW() - INTERVAL '1 year',  NOW() - INTERVAL '3 months'),
-    (8, 'SEXUAL_ASSAULT', 'Témoignage public d''une victime présumée sur les réseaux', 'ONGOING', '2024-12-01', NOW() - INTERVAL '9 months', NOW() - INTERVAL '2 months');
+    (8, 'HOMICIDE',       'Mis en examen pour homicide involontaire après un accident', 'ONGOING', '2024-10-30', NOW() - INTERVAL '1 year',  NOW() - INTERVAL '3 months'),
+    (8, 'SEXUAL_ASSAULT', 'Témoignage public d''une victime présumée sur les réseaux',  'ONGOING', '2024-12-01', NOW() - INTERVAL '9 months', NOW() - INTERVAL '2 months');
 
 -- ============================================================
 -- SOURCES (2 par accusation minimum)
@@ -167,7 +167,7 @@ INSERT INTO sources (accusation_id, type, title, url, source_date, created_at, u
 
 -- S1 — ADD_ACCUSATION sur rappeur connu (MC Fantôme, id=1) — PENDING
 INSERT INTO submissions (type, rapper_id, unknown_rapper_name, accusation_id, category, title, status, fact_date, submission_status, created_at)
-VALUES ('ADD_ACCUSATION', 1, NULL, NULL, 'CONTROVERSY', 'Altercation avec un photographe lors d''un festival', 'ONGOING', '2025-01-10', 'PENDING', NOW() - INTERVAL '5 days');
+VALUES ('ADD_ACCUSATION', 1, NULL, NULL, 'POLEMIC', 'Altercation avec un photographe lors d''un festival', 'ONGOING', '2025-01-10', 'PENDING', NOW() - INTERVAL '5 days');
 
 INSERT INTO submission_sources (submission_id, type, title, url) VALUES
     (1, 'PRESS',    'Fictif Live — Incident au festival',          'https://example.com/sub-s1-1'),
@@ -190,7 +190,7 @@ INSERT INTO submission_sources (submission_id, type, title, url) VALUES
 
 -- S4 — ADD_ACCUSATION sur rappeur connu (DJ Spectre, id=3) — APPROVED
 INSERT INTO submissions (type, rapper_id, unknown_rapper_name, accusation_id, category, title, status, fact_date, submission_status, created_at)
-VALUES ('ADD_ACCUSATION', 3, NULL, NULL, 'CONTROVERSY', 'Déclarations polémiques dans un podcast', 'CONTROVERSY', '2023-04-12', 'APPROVED', NOW() - INTERVAL '30 days');
+VALUES ('ADD_ACCUSATION', 3, NULL, NULL, 'POLEMIC', 'Déclarations polémiques dans un podcast', 'POLEMIC', '2023-04-12', 'APPROVED', NOW() - INTERVAL '30 days');
 
 INSERT INTO submission_sources (submission_id, type, title, url) VALUES
     (4, 'PRESS', 'Fictif Podcast — Revue de presse', 'https://example.com/sub-s4-1');
@@ -250,7 +250,7 @@ INSERT INTO withdrawal_requests (rapper_name, accusation_id, accusation_title, r
 VALUES (
     'Young Néant',
     8,
-    'Mise en examen pour escroquerie envers des fans',
+    'Plainte de son ex-compagne pour violences conjugales',
     'PRIVACY',
     'Demande de retrait pour atteinte à la vie privée.',
     NULL,

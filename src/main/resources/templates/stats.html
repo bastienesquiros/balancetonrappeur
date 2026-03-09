@@ -45,32 +45,32 @@
                 <h2 class="text-sm font-semibold text-white mb-5">Statut des rappeurs</h2>
                 <div class="space-y-1">
                     <!-- Condamnés -->
-                    <div class="flex items-center gap-3">
-                        <span class="text-zinc-400 text-xs w-24 flex-shrink-0">⛔ Condamnés</span>
+                    <a href="/rappers?status=CONVICTED" class="flex items-center gap-3 group rounded-lg py-1 hover:bg-zinc-800/50 transition-colors -mx-2 px-2">
+                        <span class="text-zinc-400 text-xs w-24 flex-shrink-0 group-hover:text-white transition-colors">Condamnés</span>
                         <div class="flex-1 bg-zinc-800 rounded-full h-2">
                             <div class="bg-red-500 h-2 rounded-full transition-all"
                                  th:style="'width:' + (${stats.totalRappers} > 0 ? ${#numbers.formatDecimal(stats.convicted * 100.0 / stats.totalRappers, 1, 1)} : 0) + '%'"></div>
                         </div>
                         <span class="text-white text-xs font-semibold w-6 text-right flex-shrink-0" th:text="${stats.convicted}">0</span>
-                    </div>
+                    </a>
                     <!-- Accusés -->
-                    <div class="flex items-center gap-3">
-                        <span class="text-zinc-400 text-xs w-24 flex-shrink-0">🚨 Accusés</span>
+                    <a href="/rappers?status=ACCUSED" class="flex items-center gap-3 group rounded-lg py-1 hover:bg-zinc-800/50 transition-colors -mx-2 px-2">
+                        <span class="text-zinc-400 text-xs w-24 flex-shrink-0 group-hover:text-white transition-colors">Accusés</span>
                         <div class="flex-1 bg-zinc-800 rounded-full h-2">
                             <div class="bg-amber-500 h-2 rounded-full transition-all"
                                  th:style="'width:' + (${stats.totalRappers} > 0 ? ${#numbers.formatDecimal(stats.accused * 100.0 / stats.totalRappers, 1, 1)} : 0) + '%'"></div>
                         </div>
                         <span class="text-white text-xs font-semibold w-6 text-right flex-shrink-0" th:text="${stats.accused}">0</span>
-                    </div>
+                    </a>
                     <!-- Polémique -->
-                    <div class="flex items-center gap-3">
-                        <span class="text-zinc-400 text-xs w-24 flex-shrink-0">⚠️ Polémique</span>
+                    <a href="/rappers?status=CONTROVERSY" class="flex items-center gap-3 group rounded-lg py-1 hover:bg-zinc-800/50 transition-colors -mx-2 px-2">
+                        <span class="text-zinc-400 text-xs w-24 flex-shrink-0 group-hover:text-white transition-colors">Polémique</span>
                         <div class="flex-1 bg-zinc-800 rounded-full h-2">
                             <div class="bg-yellow-500 h-2 rounded-full transition-all"
                                  th:style="'width:' + (${stats.totalRappers} > 0 ? ${#numbers.formatDecimal(stats.controversy * 100.0 / stats.totalRappers, 1, 1)} : 0) + '%'"></div>
                         </div>
                         <span class="text-white text-xs font-semibold w-6 text-right flex-shrink-0" th:text="${stats.controversy}">0</span>
-                    </div>
+                    </a>
                 </div>
 
                 <!-- % condamnés -->
@@ -95,22 +95,18 @@
                 <h2 class="text-sm font-semibold text-white mb-5">Statut juridique des affaires</h2>
                 <div class="space-y-1">
                     <th:block th:each="entry : ${stats.byStatus}">
-                        <div class="flex items-center gap-3">
-                            <span class="text-zinc-400 text-xs w-24 flex-shrink-0">
-                                <th:block th:switch="${entry.key}">
-                                    <span th:case="'CONVICTED'">⛔ Condamné</span>
-                                    <span th:case="'ONGOING'">🚨 En cours</span>
-                                    <span th:case="'ACQUITTED'">✅ Acquitté</span>
-                                    <span th:case="*">⚠️ Polémique</span>
-                                </th:block>
-                            </span>
+                        <a th:with="st=${T(org.balancetonrappeur.entity.AccusationStatus).valueOf(entry.key)}"
+                           th:href="'/accusations?status=' + ${entry.key}"
+                           class="flex items-center gap-3 group rounded-lg py-1 hover:bg-zinc-800/50 transition-colors -mx-2 px-2">
+                            <span class="text-zinc-400 text-xs w-24 flex-shrink-0 group-hover:text-white transition-colors"
+                                  th:text="${st.label()}"></span>
                             <div class="flex-1 bg-zinc-800 rounded-full h-2">
                                 <div class="h-2 rounded-full transition-all"
                                      th:classappend="${entry.key == 'CONVICTED'} ? 'bg-red-500' : (${entry.key == 'ONGOING'} ? 'bg-amber-500' : (${entry.key == 'ACQUITTED'} ? 'bg-green-500' : 'bg-yellow-500'))"
                                      th:style="'width:' + (${stats.totalAccusations} > 0 ? ${#numbers.formatDecimal(entry.value * 100.0 / stats.totalAccusations, 1, 1)} : 0) + '%'"></div>
                             </div>
                             <span class="text-white text-xs font-semibold w-6 text-right flex-shrink-0" th:text="${entry.value}">0</span>
-                        </div>
+                        </a>
                     </th:block>
                 </div>
             </div>
@@ -125,30 +121,19 @@
                 <h2 class="text-sm font-semibold text-white mb-5">Catégories d'affaires</h2>
                 <div class="space-y-3">
                     <th:block th:each="entry : ${stats.byCategory}">
-                        <div>
+                        <a th:with="cat=${T(org.balancetonrappeur.entity.AccusationCategory).valueOf(entry.key)}"
+                           th:href="'/accusations?category=' + ${entry.key}"
+                           class="block group">
                             <div class="flex items-center justify-between mb-1">
-                                <span class="text-zinc-400 text-xs flex items-center gap-1.5">
-                                    <span th:switch="${entry.key}">
-                                        <span th:case="'SEXUAL_ASSAULT'" class="w-2 h-2 rounded-full bg-red-500 inline-block"></span>
-                                        <span th:case="'PEDOPHILIA'" class="w-2 h-2 rounded-full bg-red-500 inline-block"></span>
-                                        <span th:case="'PHYSICAL_VIOLENCE'" class="w-2 h-2 rounded-full bg-orange-500 inline-block"></span>
-                                        <span th:case="*" class="w-2 h-2 rounded-full bg-yellow-500 inline-block"></span>
-                                    </span>
-                                    <th:block th:switch="${entry.key}">
-                                        <span th:case="'SEXUAL_ASSAULT'">Agression sexuelle / Viol</span>
-                                        <span th:case="'PEDOPHILIA'">Pédophilie</span>
-                                        <span th:case="'PHYSICAL_VIOLENCE'">Violence physique</span>
-                                        <span th:case="*">Polémique</span>
-                                    </th:block>
-                                </span>
+                                <span class="text-zinc-400 text-xs group-hover:text-white transition-colors" th:text="${cat.label()}"></span>
                                 <span class="text-white text-xs font-semibold" th:text="${entry.value}">0</span>
                             </div>
                             <div class="bg-zinc-800 rounded-full h-1.5">
-                                <div class="h-1.5 rounded-full transition-all"
-                                     th:classappend="${entry.key == 'SEXUAL_ASSAULT' or entry.key == 'PEDOPHILIA'} ? 'bg-red-500' : (${entry.key == 'PHYSICAL_VIOLENCE'} ? 'bg-orange-500' : 'bg-yellow-500')"
+                                <div class="h-1.5 rounded-full transition-all group-hover:brightness-125"
+                                     th:classappend="${cat.color() == 'red'} ? 'bg-red-500' : (${cat.color() == 'orange'} ? 'bg-orange-500' : (${cat.color() == 'purple'} ? 'bg-purple-500' : 'bg-yellow-500'))"
                                      th:style="'width:' + (${stats.maxCategory} > 0 ? ${#numbers.formatDecimal(entry.value * 100.0 / stats.maxCategory, 1, 1)} : 0) + '%'"></div>
                             </div>
-                        </div>
+                        </a>
                     </th:block>
                 </div>
             </div>
@@ -162,16 +147,17 @@
                     <th:block th:each="entry, iter : ${stats.topRappers}">
                         <div th:if="${iter.index < 8}">
                             <div class="flex items-center justify-between mb-1">
-                                <span class="text-zinc-300 text-xs flex items-center gap-2">
+                                <a th:href="@{/rappers/{id}(id=${entry.rapperId()})}"
+                                   class="text-zinc-300 text-xs flex items-center hover:text-white transition-colors group">
                                     <span class="text-zinc-600 text-xs w-4" th:text="${iter.index + 1} + '.'">1.</span>
-                                    <span th:text="${entry.key}">Rappeur</span>
-                                </span>
+                                    <span class="group-hover:underline underline-offset-2" th:text="${entry.rapperName()}">Rappeur</span>
+                                </a>
                                 <span class="text-white text-xs font-semibold"
-                                      th:text="${entry.value} + ' affaire' + (${entry.value} > 1 ? 's' : '')">0</span>
+                                      th:text="${entry.count()} + ' affaire' + (${entry.count()} > 1 ? 's' : '')">0</span>
                             </div>
                             <div class="bg-zinc-800 rounded-full h-1.5">
                                 <div class="bg-zinc-500 h-1.5 rounded-full transition-all"
-                                     th:style="'width:' + (${stats.maxRapper} > 0 ? ${#numbers.formatDecimal(entry.value * 100.0 / stats.maxRapper, 1, 1)} : 0) + '%'"></div>
+                                     th:style="'width:' + (${stats.maxRapper} > 0 ? ${#numbers.formatDecimal(entry.count() * 100.0 / stats.maxRapper, 1, 1)} : 0) + '%'"></div>
                             </div>
                         </div>
                     </th:block>
@@ -212,17 +198,18 @@
                 <div th:unless="${stats.bySourceType.isEmpty()}" class="space-y-3">
                     <th:block th:each="entry : ${stats.bySourceType}">
                         <div class="flex items-center gap-3">
-                            <span class="text-zinc-400 text-xs w-28 flex-shrink-0">
+                            <span class="text-xs w-28 flex-shrink-0"
+                                  th:classappend="${entry.key == 'JUDICIAL'} ? 'text-indigo-400' : (${entry.key == 'PRESS'} ? 'text-cyan-400' : (${entry.key == 'SOCIAL_MEDIA'} ? 'text-teal-400' : 'text-stone-400'))">
                                 <th:block th:switch="${entry.key}">
-                                    <span th:case="'JUDICIAL'">⚖️ Judiciaire</span>
-                                    <span th:case="'PRESS'">📰 Presse</span>
-                                    <span th:case="'SOCIAL_MEDIA'">📱 Réseau social</span>
-                                    <span th:case="*">📄 Autre</span>
+                                    <span th:case="'JUDICIAL'">Judiciaire</span>
+                                    <span th:case="'PRESS'">Presse</span>
+                                    <span th:case="'SOCIAL_MEDIA'">Réseau social</span>
+                                    <span th:case="*">Autre</span>
                                 </th:block>
                             </span>
                             <div class="flex-1 bg-zinc-800 rounded-full h-2">
                                 <div class="h-2 rounded-full"
-                                     th:classappend="${entry.key == 'JUDICIAL'} ? 'bg-blue-500' : (${entry.key == 'PRESS'} ? 'bg-zinc-400' : (${entry.key == 'SOCIAL_MEDIA'} ? 'bg-purple-500' : 'bg-zinc-500'))"
+                                     th:classappend="${entry.key == 'JUDICIAL'} ? 'bg-indigo-500' : (${entry.key == 'PRESS'} ? 'bg-cyan-500' : (${entry.key == 'SOCIAL_MEDIA'} ? 'bg-teal-500' : 'bg-stone-500'))"
                                      th:style="'width:' + (${stats.maxSource} > 0 ? ${#numbers.formatDecimal(entry.value * 100.0 / stats.maxSource, 1, 1)} : 0) + '%'"></div>
                             </div>
                             <span class="text-white text-xs font-semibold w-6 text-right flex-shrink-0" th:text="${entry.value}">0</span>
@@ -233,12 +220,15 @@
                 <div th:if="${not stats.bySourceType.isEmpty()}"
                      class="mt-4 pt-4 border-t border-zinc-800">
                     <p class="text-zinc-600 text-xs">
-                        <span class="text-blue-400 font-medium"
+                        <span class="text-indigo-400 font-medium"
                               th:text="${stats.bySourceType.getOrDefault('JUDICIAL', 0)}">0</span>
-                        source(s) judiciaire(s) ·
-                        <span class="text-zinc-400 font-medium"
+                        judiciaire(s) ·
+                        <span class="text-cyan-400 font-medium"
                               th:text="${stats.bySourceType.getOrDefault('PRESS', 0)}">0</span>
-                        presse
+                        presse ·
+                        <span class="text-teal-400 font-medium"
+                              th:text="${stats.bySourceType.getOrDefault('SOCIAL_MEDIA', 0)}">0</span>
+                        réseau social
                     </p>
                 </div>
             </div>

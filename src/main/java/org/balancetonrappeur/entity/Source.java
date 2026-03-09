@@ -30,7 +30,7 @@ public class Source {
     @Column(nullable = false)
     private SourceType type;
 
-    @Column(nullable = false, length = 500)
+    @Column(length = 500)
     private String title;
 
     @Column(nullable = false, columnDefinition = "TEXT")

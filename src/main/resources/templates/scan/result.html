@@ -80,13 +80,13 @@
                         <a th:href="@{/rappers/{id}(id=${result.rapperId})}"
                            class="text-white font-bold hover:underline"
                            th:text="${result.rapperName}">Rappeur</a>
-                        <div class="flex flex-wrap items-center gap-2 mt-1">
-                            <span th:if="${result.rapperStatus.name() == 'CONVICTED'}" class="text-xs px-2 py-0.5 rounded-full bg-red-950 text-red-400 border border-red-900">⛔ Condamné</span>
-                            <span th:if="${result.rapperStatus.name() == 'ACCUSED'}" class="text-xs px-2 py-0.5 rounded-full bg-amber-950 text-amber-400 border border-amber-900">🚨 Accusé</span>
-                            <span th:if="${result.rapperStatus.name() == 'CONTROVERSY'}" class="text-xs px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700">⚠️ Polémique</span>
-                            <span class="text-xs text-zinc-600"
-                                  th:text="${#lists.size(result.tracks)} + ' titre(s) concerné(s)'"></span>
-                        </div>
+                            <div class="flex flex-wrap items-center gap-2 mt-1">
+                                <span th:if="${result.rapperStatus.name() == 'CONVICTED'}" class="text-xs px-2 py-0.5 rounded-full bg-red-950 text-red-400 border border-red-900">Condamné</span>
+                                <span th:if="${result.rapperStatus.name() == 'ACCUSED'}" class="text-xs px-2 py-0.5 rounded-full bg-amber-950 text-amber-400 border border-amber-900">Accusé</span>
+                                <span th:if="${result.rapperStatus.name() == 'CONTROVERSY'}" class="text-xs px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700">Polémique</span>
+                                <span class="text-xs text-zinc-600"
+                                      th:text="${#lists.size(result.tracks)} + ' titre(s) concerné(s)'"></span>
+                            </div>
                     </div>
                     <a th:href="@{/rappers/{id}(id=${result.rapperId})}"
                        class="text-xs text-zinc-500 hover:text-white transition-colors flex-shrink-0">
@@ -101,9 +101,7 @@
                     <div class="space-y-1">
                         <div th:each="acc : ${result.accusations}"
                              class="flex items-center gap-2 text-xs text-zinc-400">
-                            <span th:if="${acc.category == 'SEXUAL_ASSAULT' or acc.category == 'PEDOPHILIA'}">🔴</span>
-                            <span th:if="${acc.category == 'PHYSICAL_VIOLENCE'}">🟠</span>
-                            <span th:if="${acc.category != 'SEXUAL_ASSAULT' and acc.category != 'PEDOPHILIA' and acc.category != 'PHYSICAL_VIOLENCE'}">🟡</span>
+                            <span th:text="${acc.category.color() == 'red'} ? '🔴' : (${acc.category.color() == 'orange'} ? '🟠' : (${acc.category.color() == 'purple'} ? '🟣' : '🟡'))"></span>
                             <span th:text="${acc.title}"></span>
                         </div>
                     </div>

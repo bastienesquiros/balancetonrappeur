@@ -1,8 +1,8 @@
 package org.balancetonrappeur.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.balancetonrappeur.dto.AccusationResultDto;
-import org.balancetonrappeur.dto.RapperSearchResultDto;
+import org.balancetonrappeur.dto.api.AccusationResultDto;
+import org.balancetonrappeur.dto.api.RapperSearchResultDto;
 import org.balancetonrappeur.service.AccusationService;
 import org.balancetonrappeur.service.RapperService;
 import org.springframework.web.bind.annotation.*;

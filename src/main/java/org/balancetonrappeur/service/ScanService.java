@@ -2,7 +2,7 @@ package org.balancetonrappeur.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.balancetonrappeur.dto.ScanResultDto;
+import org.balancetonrappeur.dto.api.ScanResultDto;
 import org.balancetonrappeur.exception.SpotifyRateLimitException;
 import org.balancetonrappeur.repository.RapperRepository;
 import org.balancetonrappeur.spotify.client.SpotifyUserClient;

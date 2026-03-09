@@ -1,4 +1,4 @@
-package org.balancetonrappeur.dto;
+package org.balancetonrappeur.dto.api;
 
 import org.balancetonrappeur.entity.Rapper;
 import org.balancetonrappeur.entity.RapperStatus;

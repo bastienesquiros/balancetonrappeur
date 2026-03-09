@@ -1,6 +1,6 @@
 package org.balancetonrappeur.service;
 
-import org.balancetonrappeur.dto.HomeStatsDto;
+import org.balancetonrappeur.dto.view.HomeStatsDto;
 import org.balancetonrappeur.entity.Accusation;
 import org.balancetonrappeur.entity.Rapper;
 import org.balancetonrappeur.entity.RapperStatus;

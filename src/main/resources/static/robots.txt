@@ -3,8 +3,9 @@ Allow: /
 
 Sitemap: https://balancetonrappeur.fr/sitemap.xml
 
-# Pas d'indexation des forms de soumission
+# Pas d'indexation des interfaces de soumission et de modération
 Disallow: /rappers/suggest
-Disallow: /rappers/*/submit
-Disallow: /legal#retrait
-
+Disallow: /legal/retrait
+Disallow: /admin/
+Disallow: /scan/
+Disallow: /api/

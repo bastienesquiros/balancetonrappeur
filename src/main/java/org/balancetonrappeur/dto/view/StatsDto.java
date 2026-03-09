@@ -1,5 +1,8 @@
-package org.balancetonrappeur.dto;
+package org.balancetonrappeur.dto.view;
 
+import org.balancetonrappeur.repository.StatsProjections;
+
+import java.util.List;
 import java.util.Map;
 
 public record StatsDto(
@@ -12,7 +15,7 @@ public record StatsDto(
     Map<String, Long> byCategory,
     Map<String, Long> byStatus,
     Map<String, Long> byYear,
-    Map<String, Long> topRappers,
+    List<StatsProjections.RapperCount> topRappers,
     Map<String, Long> bySourceType,
     long maxCategory,
     long maxRapper,

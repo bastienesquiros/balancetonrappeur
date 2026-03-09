@@ -16,6 +16,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/accusations")
 @RequiredArgsConstructor
@@ -34,14 +36,14 @@ public class AccusationController {
         var pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("factDate").descending());
         var result = accusationService.findFiltered(category, status, pageable);
 
-        model.addAttribute("accusations",       result.getContent());
-        model.addAttribute("currentPage",       page);
-        model.addAttribute("totalPages",        result.getTotalPages());
-        model.addAttribute("totalElements",     result.getTotalElements());
-        model.addAttribute("categories",        AccusationCategory.values());
-        model.addAttribute("statuses",          AccusationStatus.values());
-        model.addAttribute("selectedCategory",  category);
-        model.addAttribute("selectedStatus",    status);
+        model.addAttribute("accusations",          result.getContent());
+        model.addAttribute("currentPage",          page);
+        model.addAttribute("totalPages",           result.getTotalPages());
+        model.addAttribute("totalElements",        result.getTotalElements());
+        model.addAttribute("categories",           AccusationCategory.values());
+        model.addAttribute("statuses",             AccusationStatus.values());
+        model.addAttribute("selectedCategories",   category != null ? List.of(category) : List.of());
+        model.addAttribute("selectedStatuses",     status   != null ? List.of(status)   : List.of());
         return "accusations/list";
     }
 

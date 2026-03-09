@@ -2,7 +2,7 @@ package org.balancetonrappeur.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.balancetonrappeur.dto.AdminDashboardDto;
+import org.balancetonrappeur.dto.view.AdminDashboardDto;
 import org.balancetonrappeur.entity.*;
 import org.balancetonrappeur.repository.*;
 import org.springframework.stereotype.Service;

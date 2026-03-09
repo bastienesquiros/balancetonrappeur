@@ -22,16 +22,19 @@
         </div>
 
         <!-- Filtres -->
-        <div th:unless="${query != null}" class="flex flex-wrap gap-2 mb-8">
-            <a href="/rappers"
-               th:class="${selectedStatus == null} ? 'text-xs px-3 py-1.5 rounded-lg bg-zinc-800 text-white border border-zinc-700 transition-colors' : 'text-xs px-3 py-1.5 rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-800/50 border border-zinc-800 transition-colors'">
-                Tous
-            </a>
-            <a th:each="s : ${statuses}"
-               th:href="@{/rappers(status=${s.name()})}"
-               th:text="${s.name() == 'CONVICTED' ? '⛔ Condamnés' : s.name() == 'ACCUSED' ? '🚨 Accusés' : '⚠️ Polémiques'}"
-               th:class="${selectedStatus != null and selectedStatus.name() == s.name()} ? 'text-xs px-3 py-1.5 rounded-lg bg-zinc-800 text-white border border-zinc-700 transition-colors' : 'text-xs px-3 py-1.5 rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-800/50 border border-zinc-800 transition-colors'">
-            </a>
+        <div th:unless="${query != null}" class="mb-8">
+            <p class="text-zinc-600 text-xs uppercase tracking-wider mb-2">Statut</p>
+            <div class="flex flex-wrap gap-2">
+                <a href="/rappers"
+                   th:class="${selectedStatus == null} ? 'text-xs px-3 py-1.5 rounded-lg border bg-zinc-700 text-white border-zinc-500 transition-colors' : 'text-xs px-3 py-1.5 rounded-lg border text-zinc-500 border-zinc-800 hover:text-white hover:bg-zinc-800/50 transition-colors'">
+                    Tous
+                </a>
+                <a th:each="s : ${statuses}"
+                   th:href="@{/rappers(status=${s.name()})}"
+                   th:text="${s.name() == 'CONVICTED' ? 'Condamnés' : s.name() == 'ACCUSED' ? 'Accusés' : 'Polémiques'}"
+                   th:class="${selectedStatus != null and selectedStatus.name() == s.name()} ? 'text-xs px-3 py-1.5 rounded-lg border bg-zinc-700 text-white border-zinc-500 transition-colors' : 'text-xs px-3 py-1.5 rounded-lg border text-zinc-500 border-zinc-800 hover:text-white hover:bg-zinc-800/50 transition-colors'">
+                </a>
+            </div>
         </div>
 
         <!-- Grille -->
@@ -41,21 +44,17 @@
                th:href="@{/rappers/{id}(id=${rapper.id})}"
                class="group bg-zinc-900 border border-zinc-800 rounded-xl p-4 hover:border-zinc-700 hover:bg-zinc-800/50 transition-all flex flex-col">
                 <!-- Avatar -->
-                <div class="w-10 h-10 rounded-xl mb-3 flex-shrink-0 overflow-hidden bg-zinc-800 group-hover:bg-zinc-700 transition-colors">
-                    <img th:if="${rapper.spotifyImageUrl != null}"
-                         th:src="${rapper.spotifyImageUrl}" th:alt="${rapper.name}"
-                         class="w-full h-full object-cover"/>
-                    <span th:if="${rapper.spotifyImageUrl == null}"
-                          class="w-full h-full flex items-center justify-center text-lg">🎤</span>
+                <div class="mb-3">
+                    <th:block th:replace="~{fragments :: rapperAvatar(${rapper}, 'w-10 h-10')}"/>
                 </div>
                 <!-- Nom -->
                 <p class="font-semibold text-white text-sm truncate mb-auto" th:text="${rapper.name}">Artiste</p>
                 <!-- Badge -->
                 <div class="mt-2">
                     <span th:switch="${rapper.status.name()}">
-                        <span th:case="'CONVICTED'" class="text-xs px-2 py-0.5 rounded-full bg-red-950/80 text-red-400 border border-red-900/40">⛔ Condamné</span>
-                        <span th:case="'ACCUSED'" class="text-xs px-2 py-0.5 rounded-full bg-amber-950/80 text-amber-400 border border-amber-900/40">🚨 Accusé</span>
-                        <span th:case="*" class="text-xs px-2 py-0.5 rounded-full bg-zinc-800/80 text-zinc-500 border border-zinc-700/40">⚠️ Polémique</span>
+                        <span th:case="'CONVICTED'" class="text-xs px-2 py-0.5 rounded-full bg-red-950/80 text-red-400 border border-red-900/40">Condamné</span>
+                        <span th:case="'ACCUSED'" class="text-xs px-2 py-0.5 rounded-full bg-amber-950/80 text-amber-400 border border-amber-900/40">Accusé</span>
+                        <span th:case="*" class="text-xs px-2 py-0.5 rounded-full bg-zinc-800/80 text-zinc-500 border border-zinc-700/40">Polémique</span>
                     </span>
                 </div>
             </a>
@@ -63,7 +62,9 @@
 
         <!-- Vide -->
         <div th:if="${#lists.isEmpty(rappers)}" class="text-center py-20">
-            <p class="text-3xl mb-4">🤷</p>
+            <svg class="w-10 h-10 text-zinc-700 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.182 16.318A4.486 4.486 0 0012.016 15a4.486 4.486 0 00-3.198 1.318M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75zm-.375 0h.008v.015h-.008V9.75zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75zm-.375 0h.008v.015h-.008V9.75z"/>
+            </svg>
             <p class="text-zinc-500 text-sm mb-4">Aucun rappeur trouvé.</p>
             <a th:if="${query != null}"
                th:href="@{/rappers/suggest(name=${query})}"

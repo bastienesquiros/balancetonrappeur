@@ -3,7 +3,7 @@ package org.balancetonrappeur.controller;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.balancetonrappeur.dto.ScanResultDto;
+import org.balancetonrappeur.dto.api.ScanResultDto;
 import org.balancetonrappeur.service.ScanService;
 import org.balancetonrappeur.spotify.client.SpotifyUserClient;
 import org.springframework.stereotype.Controller;
@@ -43,7 +43,7 @@ public class ScanController {
         session.removeAttribute(SESSION_REMOVE_TOKEN);
         session.removeAttribute(SESSION_RESULTS);
         model.addAttribute("configured", spotifyUserClient.isConfigured());
-        return "scan";
+        return "scan/scan";
     }
 
     /** Redirige l'utilisateur vers Spotify pour autorisation. */

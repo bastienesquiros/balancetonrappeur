@@ -10,7 +10,11 @@
 
         <!-- Header -->
         <div class="text-center mb-12">
-            <p class="text-4xl mb-4">🎧</p>
+            <div class="w-14 h-14 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center mx-auto mb-5">
+                <svg class="w-7 h-7 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803a7.5 7.5 0 0010.607 0z"/>
+                </svg>
+            </div>
             <h1 class="text-3xl font-extrabold text-white mb-3">Scanner ma bibliothèque</h1>
             <p class="text-zinc-400 text-base leading-relaxed">
                 Connecte ton compte Spotify pour analyser tes sons likés et playlists.<br/>
@@ -21,14 +25,18 @@
         <!-- Flash erreur -->
         <div th:if="${scanError}"
              class="bg-red-950 border border-red-900 rounded-xl px-5 py-4 flex items-center gap-3 mb-8">
-            <span class="text-red-400 text-lg">⚠️</span>
+            <svg class="w-4 h-4 text-red-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            </svg>
             <p class="text-red-400 text-sm" th:text="${scanError}"></p>
         </div>
 
         <!-- Flash succès retrait -->
         <div th:if="${removeSuccess}"
              class="bg-green-950 border border-green-900 rounded-xl px-5 py-4 flex items-center gap-3 mb-8">
-            <span class="text-green-400">✅</span>
+            <svg class="w-4 h-4 text-green-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+            </svg>
             <p class="text-green-400 text-sm" th:text="${removeSuccess}"></p>
         </div>
 
@@ -46,15 +54,15 @@
             <div class="space-y-3 text-left">
                 <p class="text-zinc-400 text-xs uppercase tracking-widest font-semibold mb-4">Ce que l'on analyse</p>
                 <div class="flex items-center gap-3 text-sm text-zinc-400">
-                    <span class="text-lg">❤️</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-zinc-500 flex-shrink-0"></span>
                     <span>Tes <strong class="text-white">sons likés</strong></span>
                 </div>
                 <div class="flex items-center gap-3 text-sm text-zinc-400">
-                    <span class="text-lg">📂</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-zinc-500 flex-shrink-0"></span>
                     <span>Toutes tes <strong class="text-white">playlists</strong></span>
                 </div>
                 <div class="flex items-center gap-3 text-sm text-zinc-400">
-                    <span class="text-lg">🗑️</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-zinc-500 flex-shrink-0"></span>
                     <span>Possibilité de <strong class="text-white">retirer les sons</strong> directement</span>
                 </div>
             </div>

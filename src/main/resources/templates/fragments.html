@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- BADGE CATÉGORIE — linkable=true → <a>, false → <span> -->
+<th:block th:fragment="categoryBadge(category, linkable)">
+    <a th:if="${linkable}"
+       th:href="@{/accusations(category=${category.name()})}"
+       th:text="${category.label()}"
+       th:class="${category.color() == 'red'}    ? 'text-xs px-2 py-0.5 rounded-full bg-red-950/70 text-red-400 border border-red-900/40 hover:bg-red-900/60 transition-colors whitespace-nowrap' :
+                 (${category.color() == 'orange'} ? 'text-xs px-2 py-0.5 rounded-full bg-orange-950/70 text-orange-400 border border-orange-900/40 hover:bg-orange-900/60 transition-colors whitespace-nowrap' :
+                 (${category.color() == 'purple'} ? 'text-xs px-2 py-0.5 rounded-full bg-purple-950/70 text-purple-400 border border-purple-900/40 hover:bg-purple-900/60 transition-colors whitespace-nowrap' :
+                 'text-xs px-2 py-0.5 rounded-full bg-yellow-950/70 text-yellow-500 border border-yellow-900/40 hover:bg-yellow-900/60 transition-colors whitespace-nowrap'))">
+    </a>
+    <span th:if="${!linkable}"
+          th:text="${category.label()}"
+          th:class="${category.color() == 'red'}    ? 'text-xs px-2 py-0.5 rounded-full bg-red-950 text-red-400 border border-red-900 whitespace-nowrap' :
+                    (${category.color() == 'orange'} ? 'text-xs px-2 py-0.5 rounded-full bg-orange-950 text-orange-400 border border-orange-900 whitespace-nowrap' :
+                    (${category.color() == 'purple'} ? 'text-xs px-2 py-0.5 rounded-full bg-purple-950 text-purple-400 border border-purple-900 whitespace-nowrap' :
+                    'text-xs px-2 py-0.5 rounded-full bg-yellow-950 text-yellow-500 border border-yellow-900 whitespace-nowrap'))">
+    </span>
+</th:block>
+
+<!-- BADGE STATUT — linkable=true → <a>, false → <span> -->
+<th:block th:fragment="statusBadge(status, linkable)">
+    <a th:if="${linkable}"
+       th:href="@{/accusations(status=${status.name()})}"
+       th:text="${status.label()}"
+       th:class="${status.name() == 'CONVICTED'} ? 'text-xs px-2 py-0.5 rounded-full bg-red-950/70 text-red-400 border border-red-900/40 hover:bg-red-900/60 transition-colors whitespace-nowrap' :
+                 (${status.name() == 'ONGOING'}   ? 'text-xs px-2 py-0.5 rounded-full bg-amber-950/70 text-amber-400 border border-amber-900/40 hover:bg-amber-900/60 transition-colors whitespace-nowrap' :
+                 (${status.name() == 'ACQUITTED'} ? 'text-xs px-2 py-0.5 rounded-full bg-green-950/70 text-green-400 border border-green-900/40 hover:bg-green-900/60 transition-colors whitespace-nowrap' :
+                 'text-xs px-2 py-0.5 rounded-full bg-zinc-800/70 text-zinc-400 border border-zinc-700/40 hover:bg-zinc-700/60 transition-colors whitespace-nowrap'))">
+    </a>
+    <span th:if="${!linkable}"
+          th:text="${status.label()}"
+          th:class="${status.name() == 'CONVICTED'} ? 'text-xs px-2 py-0.5 rounded-full bg-red-950 text-red-400 border border-red-900 whitespace-nowrap' :
+                    (${status.name() == 'ONGOING'}   ? 'text-xs px-2 py-0.5 rounded-full bg-amber-950 text-amber-400 border border-amber-900 whitespace-nowrap' :
+                    (${status.name() == 'ACQUITTED'} ? 'text-xs px-2 py-0.5 rounded-full bg-green-950 text-green-400 border border-green-900 whitespace-nowrap' :
+                    'text-xs px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap'))">
+    </span>
+</th:block>
+
+<!-- BADGE STATUT RAPPEUR — pour RapperStatus (CONVICTED / ACCUSED / CONTROVERSY) -->
+<th:block th:fragment="rapperStatusBadge(status)">
+    <span th:text="${status.label()}"
+          th:class="${status.name() == 'CONVICTED'}   ? 'text-xs px-2 py-0.5 rounded-full bg-red-950 text-red-400 border border-red-900 whitespace-nowrap' :
+                    (${status.name() == 'ACCUSED'}    ? 'text-xs px-2 py-0.5 rounded-full bg-amber-950 text-amber-400 border border-amber-900 whitespace-nowrap' :
+                    'text-xs px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap')">
+    </span>
+</th:block>
+
+<!-- AVATAR RAPPEUR — size = classes Tailwind ex: "w-10 h-10" -->
+<th:block th:fragment="rapperAvatar(rapper, size)">
+    <div th:class="${size} + ' rounded-xl overflow-hidden bg-zinc-800 flex-shrink-0 flex items-center justify-center'">
+        <img th:if="${rapper.spotifyImageUrl != null}"
+             th:src="${rapper.spotifyImageUrl}"
+             th:alt="${rapper.name}"
+             class="w-full h-full object-cover"/>
+        <svg th:if="${rapper.spotifyImageUrl == null}" class="w-4 h-4 text-zinc-600 select-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z"/>
+        </svg>
+    </div>
+</th:block>
+
+<!-- LIGNE ACCUSATION compacte (dot + rappeur + titre + badges + chevron) -->
+<th:block th:fragment="accusationRow(accusation)">
+    <a th:href="@{/accusations/{id}(id=${accusation.id})}"
+       class="group flex items-center gap-3 px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl
+              hover:border-zinc-700 hover:bg-zinc-800/50 transition-all">
+
+        <span th:class="${accusation.category.color() == 'red'}    ? 'flex-shrink-0 w-2.5 h-2.5 rounded-full bg-red-500' :
+                        (${accusation.category.color() == 'orange'} ? 'flex-shrink-0 w-2.5 h-2.5 rounded-full bg-orange-500' :
+                        (${accusation.category.color() == 'purple'} ? 'flex-shrink-0 w-2.5 h-2.5 rounded-full bg-purple-500' :
+                        'flex-shrink-0 w-2.5 h-2.5 rounded-full bg-yellow-500'))">
+        </span>
+
+        <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2 mb-0.5">
+                <span class="text-zinc-500 text-xs font-medium flex-shrink-0"
+                      th:text="${accusation.rapper.name}">Rappeur</span>
+                <span th:if="${accusation.factDate}" class="text-zinc-700 text-xs flex-shrink-0"
+                      th:text="${#temporals.format(accusation.factDate, 'yyyy')}">2020</span>
+            </div>
+            <p class="text-white text-sm font-medium leading-snug truncate group-hover:text-zinc-200 transition-colors"
+               th:text="${accusation.title}">Titre</p>
+        </div>
+
+        <div class="hidden sm:flex items-center gap-2 flex-shrink-0" onclick="event.stopPropagation()">
+            <th:block th:replace="~{fragments :: categoryBadge(${accusation.category}, true)}"/>
+            <th:block th:replace="~{fragments :: statusBadge(${accusation.status}, true)}"/>
+        </div>
+
+        <svg class="w-4 h-4 text-zinc-700 group-hover:text-zinc-500 flex-shrink-0 transition-colors"
+             fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+    </a>
+</th:block>
+
+<!-- FLASH ALERT — type: 'success' | 'error', message: String -->
+<th:block th:fragment="flash(type, message)">
+    <div th:if="${message != null and !#strings.isEmpty(message)}"
+         th:class="${type == 'success'}
+             ? 'bg-green-950/60 border border-green-900/60 rounded-xl px-5 py-4 flex items-start gap-3 mb-6'
+             : 'bg-red-950/60 border border-red-900/60 rounded-xl px-5 py-4 flex items-start gap-3 mb-6'">
+        <svg th:if="${type == 'success'}" class="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+        </svg>
+        <svg th:if="${type != 'success'}" class="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+        </svg>
+        <p th:text="${message}"
+           th:class="${type == 'success'} ? 'text-green-400 text-sm' : 'text-red-400 text-sm'"></p>
+    </div>
+</th:block>
+
+<!-- DATE PICKER — prefillDay, prefillMonth, prefillYear: int|null -->
+<th:block th:fragment="datePicker(prefillDay, prefillMonth, prefillYear)">
+    <div x-data="{
+             day:   /*[[${prefillDay}]]*/ '',
+             month: /*[[${prefillMonth}]]*/ '',
+             year:  /*[[${prefillYear}]]*/ '',
+             get iso() {
+                 if (!this.year || !this.month || !this.day) return '';
+                 return this.year + '-' + String(this.month).padStart(2,'0') + '-' + String(this.day).padStart(2,'0');
+             }
+         }">
+        <label class="block text-zinc-400 text-xs font-medium mb-1.5 uppercase tracking-wide">
+            Date des faits <span class="text-zinc-600">(optionnel)</span>
+        </label>
+        <div class="flex gap-2">
+            <select x-model="day"
+                    class="w-20 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-white
+                           focus:outline-none focus:border-zinc-500 transition-colors appearance-none">
+                <option value="">Jour</option>
+                <template x-for="d in Array.from({length:31},(_,i)=>i+1)" :key="d">
+                    <option :value="d" :selected="day == d" x-text="d"></option>
+                </template>
+            </select>
+            <select x-model="month"
+                    class="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-white
+                           focus:outline-none focus:border-zinc-500 transition-colors appearance-none">
+                <option value="">Mois</option>
+                <template x-for="(m, i) in ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']" :key="i">
+                    <option :value="i+1" :selected="month == i+1" x-text="m"></option>
+                </template>
+            </select>
+            <select x-model="year"
+                    class="w-24 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-white
+                           focus:outline-none focus:border-zinc-500 transition-colors appearance-none">
+                <option value="">Année</option>
+                <template x-for="y in Array.from({length:35},(_,i)=>new Date().getFullYear()-i)" :key="y">
+                    <option :value="y" :selected="year == y" x-text="y"></option>
+                </template>
+            </select>
+        </div>
+        <input type="hidden" name="factDate" :value="iso"/>
+    </div>
+</th:block>
+
+<!-- STATUT RADIO GROUP — statuses: list, prefillStatus: AccusationStatus|null -->
+<th:block th:fragment="statusRadioGroup(statuses, prefillStatus)">
+    <div>
+        <label class="block text-zinc-400 text-xs font-medium mb-2 uppercase tracking-wide">
+            Statut juridique <span class="text-red-400">*</span>
+        </label>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <th:block th:each="st : ${statuses}">
+                <label class="cursor-pointer">
+                    <input type="radio" name="status" th:value="${st.name()}"
+                           th:checked="${prefillStatus != null ? prefillStatus == st : st.name() == 'ONGOING'}"
+                           class="sr-only peer" required/>
+                    <div th:text="${st.label()}"
+                         th:class="${st.name() == 'CONVICTED'} ? 'text-center px-3 py-2.5 rounded-lg border border-zinc-700 text-zinc-400 text-xs peer-checked:border-red-700 peer-checked:bg-red-950 peer-checked:text-red-400 hover:border-zinc-600 transition-colors' :
+                                  (${st.name() == 'ONGOING'}   ? 'text-center px-3 py-2.5 rounded-lg border border-zinc-700 text-zinc-400 text-xs peer-checked:border-amber-700 peer-checked:bg-amber-950 peer-checked:text-amber-400 hover:border-zinc-600 transition-colors' :
+                                  (${st.name() == 'ACQUITTED'} ? 'text-center px-3 py-2.5 rounded-lg border border-zinc-700 text-zinc-400 text-xs peer-checked:border-green-700 peer-checked:bg-green-950 peer-checked:text-green-400 hover:border-zinc-600 transition-colors' :
+                                  'text-center px-3 py-2.5 rounded-lg border border-zinc-700 text-zinc-400 text-xs peer-checked:border-zinc-500 peer-checked:bg-zinc-800 peer-checked:text-zinc-200 hover:border-zinc-600 transition-colors'))">
+                    </div>
+                </label>
+            </th:block>
+        </div>
+    </div>
+</th:block>
+
+<!-- SOURCES MULTI-INPUT — prefillSourcesJson: JSON string|null, hasError: boolean|null -->
+<th:block th:fragment="sourcesInput(prefillSourcesJson, hasError)">
+    <div th:class="'border-t border-zinc-800 pt-5 ' + (${hasError != null and hasError} ? 'ring-1 ring-red-500/40 rounded-xl px-3 pb-3' : '')"
+         th:attr="x-data=|{ sources: ${prefillSourcesJson != null ? prefillSourcesJson : '[{&quot;type&quot;:&quot;PRESS&quot;,&quot;title&quot;:&quot;&quot;,&quot;url&quot;:&quot;&quot;}]'}, add() { this.sources.push({ type: 'PRESS', title: '', url: '' }) }, remove(i) { if (this.sources.length > 1) this.sources.splice(i, 1) } }|">
+        <div class="flex items-center justify-between mb-3">
+            <div>
+                <label class="block text-zinc-400 text-xs font-medium uppercase tracking-wide">
+                    Sources <span class="text-red-400">*</span>
+                </label>
+                <p class="text-zinc-600 text-xs mt-0.5">Article de presse, jugement ou déclaration publique.</p>
+            </div>
+            <button type="button" @click="add"
+                    class="text-xs px-3 py-1.5 rounded-lg border border-zinc-700 text-zinc-400
+                           hover:border-zinc-500 hover:text-white transition-colors flex items-center gap-1">
+                <span>＋</span> Ajouter
+            </button>
+        </div>
+        <div class="space-y-3">
+            <template x-for="(source, i) in sources" :key="i">
+                <div class="bg-zinc-800/50 border border-zinc-700 rounded-lg p-3 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-zinc-500 text-xs" x-text="'Source ' + (i + 1)"></span>
+                        <button type="button" @click="remove(i)"
+                                x-show="sources.length > 1"
+                                class="text-zinc-600 hover:text-red-400 text-xs transition-colors">
+                            ✕ Retirer
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <select :name="'sourceType'" x-model="source.type"
+                                class="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2
+                                       text-white text-sm focus:outline-none focus:border-zinc-500
+                                       transition-colors appearance-none">
+                            <option value="PRESS">Presse</option>
+                            <option value="JUDICIAL">Judiciaire</option>
+                            <option value="SOCIAL_MEDIA">Réseau social</option>
+                            <option value="OTHER">Autre</option>
+                        </select>
+                        <input type="text" :name="'sourceTitle'" x-model="source.title"
+                               placeholder="Titre de la source"
+                               :required="i === 0"
+                               class="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2
+                                      text-white placeholder-zinc-600 text-sm
+                                      focus:outline-none focus:border-zinc-500 transition-colors"/>
+                    </div>
+                    <input type="url" :name="'sourceUrl'" x-model="source.url"
+                           placeholder="https://..."
+                           :required="i === 0"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2
+                                  text-white placeholder-zinc-600 text-sm
+                                  focus:outline-none focus:border-zinc-500 transition-colors"/>
+                </div>
+            </template>
+        </div>
+    </div>
+</th:block>
+
+</body>
+</html>

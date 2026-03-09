@@ -12,7 +12,7 @@ public final class StatsProjections {
     public record CategoryCount(AccusationCategory category, Long count) {}
     public record StatusCount(AccusationStatus status, Long count) {}
     public record YearCount(Integer year, Long count) {}
-    public record RapperCount(String rapperName, Long count) {}
+    public record RapperCount(Long rapperId, String rapperName, Long count) {}
     public record SourceTypeCount(SourceType type, Long count) {}
 }
 

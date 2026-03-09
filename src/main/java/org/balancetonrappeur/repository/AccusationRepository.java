@@ -33,14 +33,13 @@ public interface AccusationRepository extends JpaRepository<Accusation, Long> {
             countQuery = "SELECT COUNT(a) FROM Accusation a")
     Page<Accusation> findAllWithRapper(Pageable pageable);
 
-    @Query(value = "SELECT a FROM Accusation a JOIN FETCH a.rapper WHERE a.category = :category ORDER BY a.factDate DESC NULLS LAST",
-            countQuery = "SELECT COUNT(a) FROM Accusation a WHERE a.category = :category")
-    Page<Accusation> findByCategoryWithRapper(@Param("category") AccusationCategory category, Pageable pageable);
+    @Query(value = "SELECT a FROM Accusation a JOIN FETCH a.rapper WHERE a.category IN :categories ORDER BY a.factDate DESC NULLS LAST",
+            countQuery = "SELECT COUNT(a) FROM Accusation a WHERE a.category IN :categories")
+    Page<Accusation> findByCategoryInWithRapper(@Param("categories") List<AccusationCategory> categories, Pageable pageable);
 
-
-    @Query(value = "SELECT a FROM Accusation a JOIN FETCH a.rapper WHERE a.status = :status ORDER BY a.factDate DESC NULLS LAST",
-            countQuery = "SELECT COUNT(a) FROM Accusation a WHERE a.status = :status")
-    Page<Accusation> findByStatusWithRapper(@Param("status") AccusationStatus status, Pageable pageable);
+    @Query(value = "SELECT a FROM Accusation a JOIN FETCH a.rapper WHERE a.status IN :statuses ORDER BY a.factDate DESC NULLS LAST",
+            countQuery = "SELECT COUNT(a) FROM Accusation a WHERE a.status IN :statuses")
+    Page<Accusation> findByStatusInWithRapper(@Param("statuses") List<AccusationStatus> statuses, Pageable pageable);
 
     // Stats — projections typées
 
@@ -53,6 +52,6 @@ public interface AccusationRepository extends JpaRepository<Accusation, Long> {
     @Query("SELECT new org.balancetonrappeur.repository.StatsProjections$YearCount(CAST(EXTRACT(YEAR FROM a.factDate) AS integer), COUNT(a)) FROM Accusation a WHERE a.factDate IS NOT NULL GROUP BY EXTRACT(YEAR FROM a.factDate) ORDER BY EXTRACT(YEAR FROM a.factDate)")
     List<StatsProjections.YearCount> countByYear();
 
-    @Query("SELECT new org.balancetonrappeur.repository.StatsProjections$RapperCount(a.rapper.name, COUNT(a)) FROM Accusation a GROUP BY a.rapper.name ORDER BY COUNT(a) DESC")
+    @Query("SELECT new org.balancetonrappeur.repository.StatsProjections$RapperCount(a.rapper.id, a.rapper.name, COUNT(a)) FROM Accusation a GROUP BY a.rapper.id, a.rapper.name ORDER BY COUNT(a) DESC")
     List<StatsProjections.RapperCount> topRappersByAccusationCount();
 }

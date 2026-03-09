@@ -20,10 +20,9 @@
         <!-- Header -->
         <div class="mb-8">
             <div class="flex items-center gap-3 mb-2">
-                <span class="text-2xl">🎤</span>
                 <h1 class="text-xl font-bold text-white">
-                    <span th:if="${type.name() == 'ADD_ACCUSATION'}">Ajouter une affaire</span>
-                    <span th:if="${type.name() == 'EDIT_ACCUSATION'}">Suggérer une modification</span>
+                    <span th:if="${submitForm.type != null and submitForm.type.name() == 'EDIT_ACCUSATION'}">Suggérer une modification</span>
+                    <span th:unless="${submitForm.type != null and submitForm.type.name() == 'EDIT_ACCUSATION'}">Ajouter une affaire</span>
                 </h1>
             </div>
             <p class="text-zinc-500 text-sm">
@@ -33,41 +32,37 @@
         </div>
 
         <!-- Flash succès -->
-        <div th:if="${submissionSuccess}"
-             class="bg-green-950 border border-green-900 rounded-xl px-5 py-4 flex items-center gap-3 mb-6">
-            <span class="text-green-400">✅</span>
-            <p class="text-green-400 text-sm">Soumission envoyée, merci ! Elle sera vérifiée avant publication.</p>
+        <th:block th:replace="~{fragments :: flash('success', ${submissionSuccess != null and submissionSuccess ? 'Soumission envoyée, merci ! Elle sera vérifiée avant publication.' : null})}"/>
+
+        <!-- Flash erreur service -->
+        <th:block th:replace="~{fragments :: flash('error', ${submissionError})}"/>
+
+        <!-- Ancre scroll + banner erreurs validation -->
+        <div id="form-error"></div>
+        <div th:if="${formHasErrors}"
+             class="bg-red-950/60 border border-red-900/60 rounded-xl px-5 py-4 flex items-start gap-3 mb-6">
+            <svg class="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            </svg>
+            <p class="text-red-400 text-sm">Certains champs sont invalides. Veuillez les corriger ci-dessous.</p>
         </div>
 
-        <!-- Flash erreur -->
-        <div th:if="${submissionError}"
-             class="bg-red-950 border border-red-900 rounded-xl px-5 py-4 flex items-center gap-3 mb-6">
-            <span class="text-red-400">⚠️</span>
-            <p class="text-red-400 text-sm" th:text="${submissionError}"></p>
-        </div>
+        <form th:action="@{/rappers/{id}/submit(id=${rapper.id})}" th:object="${submitForm}" method="post" novalidate
+              class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
 
-        <form th:action="@{/rappers/{id}/submit(id=${rapper.id})}" method="post"
-              class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden"
-              th:attr="x-data=|{ status: '${prefillAccusation != null ? prefillAccusation.status.name() : 'ONGOING'}' }|">
-
-            <div class="px-6 py-4 border-b border-zinc-800 flex items-center justify-between">
+            <div class="px-6 py-4 border-b border-zinc-800">
                 <p class="text-zinc-400 text-xs">Champs <span class="text-red-400">*</span> obligatoires · Rester factuel et sourcé</p>
-                <!-- Type caché -->
-                <input type="hidden" name="type" th:value="${type.name()}"/>
-                <input type="hidden" th:if="${prefillAccusation}" name="accusationId" th:value="${prefillAccusation.id}"/>
+                <input type="hidden" th:field="*{type}"/>
+                <input type="hidden" th:field="*{accusationId}"/>
             </div>
 
             <div class="px-6 py-5 space-y-5">
 
                 <!-- Mode EDIT : affaire ciblée lockée -->
                 <div th:if="${prefillAccusation}"
-                     class="bg-zinc-800/50 border border-zinc-700 rounded-lg px-4 py-3 flex items-center gap-3">
-                    <span class="text-zinc-500 text-sm">🎯</span>
-                    <div>
-                        <p class="text-zinc-400 text-xs uppercase tracking-wide mb-0.5">Affaire modifiée</p>
-                        <p class="text-zinc-200 text-sm font-medium" th:text="${prefillAccusation.title}">Titre</p>
-                    </div>
-                    <span class="ml-auto text-zinc-600 text-xs">🔒</span>
+                     class="bg-zinc-800/50 border border-zinc-700 rounded-lg px-4 py-3">
+                    <p class="text-zinc-400 text-xs uppercase tracking-wide mb-0.5">Modification de l'affaire</p>
+                    <p class="text-zinc-200 text-sm font-medium" th:text="${prefillAccusation.title}">Titre</p>
                 </div>
 
                 <!-- Catégorie -->
@@ -75,31 +70,26 @@
                     <label class="block text-zinc-400 text-xs font-medium mb-2 uppercase tracking-wide">
                         Catégorie <span class="text-red-400">*</span>
                     </label>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div th:class="'grid grid-cols-1 sm:grid-cols-2 gap-2 ' + (${#fields.hasErrors('category')} ? 'ring-1 ring-red-500/40 rounded-xl p-1' : '')">
                         <th:block th:each="cat : ${categories}">
                             <label class="cursor-pointer">
-                                <input type="radio" name="category" th:value="${cat.name()}"
-                                       th:checked="${prefillAccusation != null and prefillAccusation.category == cat}"
-                                       class="sr-only peer" required/>
+                                <input type="radio" th:field="*{category}" th:value="${cat}" class="sr-only peer"/>
                                 <div class="px-3 py-2.5 rounded-lg border border-zinc-700 text-zinc-400 text-xs
                                             peer-checked:text-white peer-checked:border-zinc-500 peer-checked:bg-zinc-800
                                             hover:border-zinc-600 transition-colors flex items-center gap-2">
-                                    <span th:switch="${cat.name()}">
-                                        <span th:case="'SEXUAL_ASSAULT'" class="w-2 h-2 rounded-full bg-red-500 flex-shrink-0 inline-block"></span>
-                                        <span th:case="'PEDOPHILIA'" class="w-2 h-2 rounded-full bg-red-500 flex-shrink-0 inline-block"></span>
-                                        <span th:case="'PHYSICAL_VIOLENCE'" class="w-2 h-2 rounded-full bg-orange-500 flex-shrink-0 inline-block"></span>
-                                        <span th:case="*" class="w-2 h-2 rounded-full bg-yellow-500 flex-shrink-0 inline-block"></span>
-                                    </span>
-                                    <span th:switch="${cat.name()}">
-                                        <span th:case="'SEXUAL_ASSAULT'">Agression sexuelle / Viol</span>
-                                        <span th:case="'PEDOPHILIA'">Pédophilie</span>
-                                        <span th:case="'PHYSICAL_VIOLENCE'">Violence physique</span>
-                                        <span th:case="*">Polémique / Propos discriminatoires</span>
-                                    </span>
+                                    <span th:class="${cat.color() == 'red'} ? 'w-2 h-2 rounded-full bg-red-500 flex-shrink-0 inline-block' :
+                                                    (${cat.color() == 'orange'} ? 'w-2 h-2 rounded-full bg-orange-500 flex-shrink-0 inline-block' :
+                                                    (${cat.color() == 'purple'} ? 'w-2 h-2 rounded-full bg-purple-500 flex-shrink-0 inline-block' :
+                                                    'w-2 h-2 rounded-full bg-yellow-500 flex-shrink-0 inline-block'))"></span>
+                                    <span th:text="${cat.label()}"></span>
                                 </div>
                             </label>
                         </th:block>
                     </div>
+                    <p th:if="${#fields.hasErrors('category')}" class="text-red-400 text-xs mt-1.5 flex items-center gap-1.5">
+                        <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                        <span th:errors="*{category}"></span>
+                    </p>
                 </div>
 
                 <!-- Titre -->
@@ -107,14 +97,16 @@
                     <label class="block text-zinc-400 text-xs font-medium mb-1.5 uppercase tracking-wide">
                         Titre de l'affaire <span class="text-red-400">*</span>
                     </label>
-                    <input type="text" name="title"
-                           th:value="${prefillAccusation?.title}"
+                    <input type="text" th:field="*{title}"
                            placeholder="Ex : Accusé de violences lors d'un concert en 2022"
-                           maxlength="500" required
-                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5
-                                  text-white placeholder-zinc-600 text-sm
-                                  focus:outline-none focus:border-zinc-500 transition-colors"/>
-                    <p class="text-zinc-600 text-xs mt-1">Rester neutre : "Accusé de..." et non "Il a..."</p>
+                           maxlength="500"
+                           th:class="'w-full bg-zinc-800 border rounded-lg px-3 py-2.5 text-white placeholder-zinc-600 text-sm focus:outline-none transition-colors '
+                                     + (${#fields.hasErrors('title')} ? 'border-red-500 focus:border-red-500' : 'border-zinc-700 focus:border-zinc-500')"/>
+                    <p th:if="${#fields.hasErrors('title')}" class="text-red-400 text-xs mt-1.5 flex items-center gap-1.5">
+                        <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                        <span th:errors="*{title}"></span>
+                    </p>
+                    <p th:unless="${#fields.hasErrors('title')}" class="text-zinc-600 text-xs mt-1">Rester neutre : "Accusé de..." et non "Il a..."</p>
                 </div>
 
                 <!-- Statut -->
@@ -122,40 +114,21 @@
                     <label class="block text-zinc-400 text-xs font-medium mb-2 uppercase tracking-wide">
                         Statut juridique <span class="text-red-400">*</span>
                     </label>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                        <label class="cursor-pointer">
-                            <input type="radio" name="status" value="CONTROVERSY" class="sr-only peer"
-                                   required x-model="status"
-                                   th:checked="${prefillAccusation?.status?.name() == 'CONTROVERSY'}"/>
-                            <div class="text-center px-3 py-2.5 rounded-lg border border-zinc-700 text-zinc-400 text-xs
-                                        peer-checked:border-yellow-700 peer-checked:bg-yellow-950 peer-checked:text-yellow-400
-                                        hover:border-zinc-600 transition-colors">⚠️ Polémique</div>
-                        </label>
-                        <label class="cursor-pointer">
-                            <input type="radio" name="status" value="ONGOING" class="sr-only peer"
-                                   x-model="status"
-                                   th:checked="${prefillAccusation?.status?.name() == 'ONGOING' or prefillAccusation == null}"/>
-                            <div class="text-center px-3 py-2.5 rounded-lg border border-zinc-700 text-zinc-400 text-xs
-                                        peer-checked:border-amber-700 peer-checked:bg-amber-950 peer-checked:text-amber-400
-                                        hover:border-zinc-600 transition-colors">🚨 En cours</div>
-                        </label>
-                        <label class="cursor-pointer">
-                            <input type="radio" name="status" value="ACQUITTED" class="sr-only peer"
-                                   x-model="status"
-                                   th:checked="${prefillAccusation?.status?.name() == 'ACQUITTED'}"/>
-                            <div class="text-center px-3 py-2.5 rounded-lg border border-zinc-700 text-zinc-400 text-xs
-                                        peer-checked:border-green-700 peer-checked:bg-green-950 peer-checked:text-green-400
-                                        hover:border-zinc-600 transition-colors">✅ Acquitté</div>
-                        </label>
-                        <label class="cursor-pointer">
-                            <input type="radio" name="status" value="CONVICTED" class="sr-only peer"
-                                   x-model="status"
-                                   th:checked="${prefillAccusation?.status?.name() == 'CONVICTED'}"/>
-                            <div class="text-center px-3 py-2.5 rounded-lg border border-zinc-700 text-zinc-400 text-xs
-                                        peer-checked:border-red-700 peer-checked:bg-red-950 peer-checked:text-red-400
-                                        hover:border-zinc-600 transition-colors">⛔ Condamné</div>
-                        </label>
+                    <div th:class="'grid grid-cols-1 sm:grid-cols-2 gap-2 ' + (${#fields.hasErrors('status')} ? 'ring-1 ring-red-500/40 rounded-xl p-1' : '')">
+                        <th:block th:each="s : ${statuses}">
+                            <label class="cursor-pointer">
+                                <input type="radio" th:field="*{status}" th:value="${s}" class="sr-only peer"/>
+                                <div class="px-3 py-2.5 rounded-lg border border-zinc-700 text-zinc-400 text-xs
+                                            peer-checked:text-white peer-checked:border-zinc-500 peer-checked:bg-zinc-800
+                                            hover:border-zinc-600 transition-colors text-center"
+                                     th:text="${s.label()}"></div>
+                            </label>
+                        </th:block>
                     </div>
+                    <p th:if="${#fields.hasErrors('status')}" class="text-red-400 text-xs mt-1.5 flex items-center gap-1.5">
+                        <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                        <span th:errors="*{status}"></span>
+                    </p>
                 </div>
 
                 <!-- Date des faits -->
@@ -163,68 +136,18 @@
                     <label class="block text-zinc-400 text-xs font-medium mb-1.5 uppercase tracking-wide">
                         Date des faits <span class="text-zinc-600">(optionnel)</span>
                     </label>
-                    <input type="date" name="factDate"
-                           th:value="${prefillAccusation?.factDate}"
+                    <input type="date" th:field="*{factDate}"
                            class="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5
                                   text-white text-sm focus:outline-none focus:border-zinc-500
                                   transition-colors [color-scheme:dark]"/>
                 </div>
 
-                <!-- Sources multi -->
-                <div class="border-t border-zinc-800 pt-5"
-                     th:attr="x-data=|{ sources: ${prefillSourcesJson != null ? prefillSourcesJson : '[{&quot;type&quot;:&quot;PRESS&quot;,&quot;title&quot;:&quot;&quot;,&quot;url&quot;:&quot;&quot;}]'}, add() { this.sources.push({ type: 'PRESS', title: '', url: '' }) }, remove(i) { if (this.sources.length > 1) this.sources.splice(i, 1) } }|">
-                    <div class="flex items-center justify-between mb-3">
-                        <div>
-                            <label class="block text-zinc-400 text-xs font-medium uppercase tracking-wide">
-                                Sources <span class="text-red-400">*</span>
-                            </label>
-                            <p class="text-zinc-600 text-xs mt-0.5">Article de presse, jugement ou déclaration publique.</p>
-                        </div>
-                        <button type="button" @click="add"
-                                class="text-xs px-3 py-1.5 rounded-lg border border-zinc-700 text-zinc-400
-                                       hover:border-zinc-500 hover:text-white transition-colors flex items-center gap-1">
-                            <span>＋</span> Ajouter
-                        </button>
-                    </div>
-
-                    <div class="space-y-3">
-                        <template x-for="(source, i) in sources" :key="i">
-                            <div class="bg-zinc-800/50 border border-zinc-700 rounded-lg p-3 space-y-2">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-zinc-500 text-xs" x-text="'Source ' + (i + 1)"></span>
-                                    <button type="button" @click="remove(i)"
-                                            x-show="sources.length > 1"
-                                            class="text-zinc-600 hover:text-red-400 text-xs transition-colors">
-                                        ✕ Retirer
-                                    </button>
-                                </div>
-                                <div class="grid grid-cols-2 gap-2">
-                                    <select :name="'sourceType'" x-model="source.type"
-                                            class="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2
-                                                   text-white text-sm focus:outline-none focus:border-zinc-500
-                                                   transition-colors appearance-none">
-                                        <option value="PRESS">📰 Presse</option>
-                                        <option value="JUDICIAL">⚖️ Judiciaire</option>
-                                        <option value="SOCIAL_MEDIA">📱 Réseau social</option>
-                                        <option value="OTHER">📄 Autre</option>
-                                    </select>
-                                    <input type="text" :name="'sourceTitle'" x-model="source.title"
-                                           placeholder="Titre de la source"
-                                           :required="i === 0"
-                                           class="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2
-                                                  text-white placeholder-zinc-600 text-sm
-                                                  focus:outline-none focus:border-zinc-500 transition-colors"/>
-                                </div>
-                                <input type="url" :name="'sourceUrl'" x-model="source.url"
-                                       placeholder="https://..."
-                                       :required="i === 0"
-                                       class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2
-                                              text-white placeholder-zinc-600 text-sm
-                                              focus:outline-none focus:border-zinc-500 transition-colors"/>
-                            </div>
-                        </template>
-                    </div>
-                </div>
+                <!-- Sources -->
+                <th:block th:replace="~{fragments :: sourcesInput(${prefillSourcesJson}, ${#fields.hasErrors('sourceUrl')})}"/>
+                <p th:if="${#fields.hasErrors('sourceUrl')}" class="text-red-400 text-xs mt-1.5 flex items-center gap-1.5">
+                    <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                    <span th:errors="*{sourceUrl}"></span>
+                </p>
 
             </div>
 
@@ -243,6 +166,13 @@
 </main>
 
 <footer th:replace="~{layout :: footer}"></footer>
+
+<script th:if="${formHasErrors}">
+    document.addEventListener('DOMContentLoaded', function () {
+        var el = document.getElementById('form-error');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+</script>
 </body>
 </html>
 

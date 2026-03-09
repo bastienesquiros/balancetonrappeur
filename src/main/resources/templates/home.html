@@ -56,6 +56,7 @@
                         </svg>
                     </span>
                     <input type="text"
+                           id="hero-search"
                            placeholder="Rechercher un rappeur..."
                            x-model="query"
                            @input.debounce.300ms="search"
@@ -87,7 +88,9 @@
                                     <img :src="rapper.imageUrl" :alt="rapper.name" class="w-full h-full object-cover"/>
                                 </template>
                                 <template x-if="!rapper.imageUrl">
-                                    <span class="text-sm">🎤</span>
+                                    <svg class="w-4 h-4 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z"/>
+                                    </svg>
                                 </template>
                             </div>
                             <div class="flex-1 min-w-0">
@@ -110,8 +113,10 @@
                      class="absolute top-full mt-2 w-full bg-zinc-900 border border-zinc-700 rounded-2xl overflow-hidden shadow-2xl z-50 text-left">
                     <a :href="'/rappers/suggest?name=' + encodeURIComponent(query)"
                        class="flex items-center gap-3 px-4 py-4 hover:bg-zinc-800 transition-colors">
-                        <div class="w-8 h-8 rounded-full bg-zinc-800/80 flex items-center justify-center text-sm flex-shrink-0">
-                            🤷
+                        <div class="w-8 h-8 rounded-full bg-zinc-800/80 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
                         </div>
                         <div>
                             <p class="text-zinc-300 text-sm">
@@ -169,21 +174,23 @@
             <a th:each="rapper : ${recentRappers}"
                th:href="@{/rappers/{id}(id=${rapper.id})}"
                class="group bg-zinc-900 border border-zinc-800 rounded-xl p-4 hover:border-zinc-700 hover:bg-zinc-800/50 transition-all">
-                <div class="w-9 h-9 rounded-xl mb-3 flex-shrink-0 overflow-hidden bg-zinc-800 group-hover:bg-zinc-700 transition-colors">
+                <div class="w-9 h-9 rounded-xl mb-3 flex-shrink-0 overflow-hidden bg-zinc-800 group-hover:bg-zinc-700 transition-colors flex items-center justify-center">
                     <img th:if="${rapper.spotifyImageUrl != null}"
                          th:src="${rapper.spotifyImageUrl}" th:alt="${rapper.name}"
                          class="w-full h-full object-cover"/>
-                    <span th:if="${rapper.spotifyImageUrl == null}"
-                          class="w-full h-full flex items-center justify-center text-base">🎤</span>
+                    <svg th:if="${rapper.spotifyImageUrl == null}"
+                         class="w-4 h-4 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z"/>
+                    </svg>
                 </div>
                 <p class="font-semibold text-white text-sm truncate mb-2" th:text="${rapper.name}">Artiste</p>
                 <span th:switch="${rapper.status.name()}">
                     <span th:case="'CONVICTED'"
-                          class="text-xs px-2 py-0.5 rounded-full bg-red-950 text-red-400 border border-red-900/60">⛔ Condamné</span>
+                          class="text-xs px-2 py-0.5 rounded-full bg-red-950 text-red-400 border border-red-900/60">Condamné</span>
                     <span th:case="'ACCUSED'"
-                          class="text-xs px-2 py-0.5 rounded-full bg-amber-950 text-amber-400 border border-amber-900/60">🚨 Accusé</span>
+                          class="text-xs px-2 py-0.5 rounded-full bg-amber-950 text-amber-400 border border-amber-900/60">Accusé</span>
                     <span th:case="*"
-                          class="text-xs px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700/60">⚠️ Polémique</span>
+                          class="text-xs px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700/60">Polémique</span>
                 </span>
             </a>
         </div>
@@ -212,8 +219,8 @@
                         </svg>
                     </button>
                     <div x-show="open" x-transition class="px-5 pb-5 text-zinc-500 text-sm leading-relaxed">
-                        <span th:if="${stat.index == 0}">En tant que fan de rap, il est difficile de trouver une source centralisée, neutre et sourcée sur les affaires impliquant des artistes. Ce site ne cherche pas à détruire des carrières — il documente des faits publics déjà relayés par la presse ou la justice.</span>
-                        <span th:if="${stat.index == 1}">Vous pouvez soumettre une affaire via le formulaire de contribution. Chaque soumission est vérifiée avant publication. Une source fiable (article de presse reconnu ou document judiciaire) est obligatoire.</span>
+                        <span th:if="${stat.index == 0}">En tant que fan de rap, il est difficile de trouver une source centralisée, neutre et sourcée sur les affaires impliquant des artistes. Ce site ne cherche pas à détruire des carrières — il documente des faits publics déjà relayés par la presse, les réseaux ou la justice.</span>
+                        <span th:if="${stat.index == 1}">Vous pouvez soumettre une affaire via le formulaire de contribution. Chaque soumission est vérifiée avant publication. Une source vérifiable est obligatoire.</span>
                         <span th:if="${stat.index == 2}">Utilisez le formulaire de <a href="/legal#retrait"
                                                                                       class="text-zinc-300 underline underline-offset-2 hover:text-white">demande de correction ou retrait</a>. Nous traitons toutes les demandes sous 72h.</span>
                         <span th:if="${stat.index == 3}">Oui. Ce site compile uniquement des informations issues de sources publiques. Chaque affaire est sourcée. Nous utilisons des formulations neutres (<em>accusé de</em>, <em>condamné pour</em>) et ne portons aucun jugement personnel.</span>
@@ -228,7 +235,7 @@
     <section class="border-t border-zinc-800/60">
         <div class="max-w-5xl mx-auto px-4 py-8">
             <p class="text-zinc-700 text-xs leading-relaxed text-center">
-                Ce site compile des informations issues de sources publiques (presse, décisions de justice).
+                Ce site compile des informations issues de sources publiques vérifiables.
                 Il ne constitue ni une accusation, ni un jugement. Seules les décisions de justice définitives font foi.
                 <a href="/legal#retrait" class="underline underline-offset-2 hover:text-zinc-500 transition-colors">Demande
                     de correction ou retrait</a>.

@@ -7,9 +7,9 @@ public enum RapperStatus {
 
     public String label() {
         return switch (this) {
-            case CONVICTED  -> "⛔ Condamné";
-            case ACCUSED    -> "🚨 Accusé";
-            case CONTROVERSY -> "⚠️ Polémique";
+            case CONVICTED   -> "Condamné";
+            case ACCUSED     -> "Accusé";
+            case CONTROVERSY -> "Polémique";
         };
     }
 }

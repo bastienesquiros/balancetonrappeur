@@ -1,17 +1,17 @@
 package org.balancetonrappeur.entity;
 
 public enum AccusationStatus {
-    CONTROVERSY,
+    POLEMIC,
     ONGOING,
     ACQUITTED,
     CONVICTED;
 
     public String label() {
         return switch (this) {
-            case CONTROVERSY -> "⚠️ Polémique";
-            case ONGOING     -> "🚨 En cours";
-            case ACQUITTED   -> "✅ Acquitté";
-            case CONVICTED   -> "⛔ Condamné";
+            case POLEMIC    -> "Polémique";
+            case ONGOING    -> "En cours";
+            case ACQUITTED  -> "Acquitté";
+            case CONVICTED  -> "Condamné";
         };
     }
 }
