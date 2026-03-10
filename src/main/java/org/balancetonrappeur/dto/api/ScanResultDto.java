@@ -1,5 +1,6 @@
 package org.balancetonrappeur.dto.api;
 
+import org.balancetonrappeur.entity.AccusationCategory;
 import org.balancetonrappeur.entity.Rapper;
 import org.balancetonrappeur.entity.RapperStatus;
 
@@ -20,7 +21,7 @@ public record ScanResultDto(
     /** Construit un ScanResultDto depuis les entités, dans la transaction. */
     public static ScanResultDto from(Rapper rapper, List<MatchedTrack> tracks) {
         var accusations = rapper.getAccusations().stream()
-                .map(a -> new AccusationSummary(a.getTitle(), a.getCategory().name()))
+                .map(a -> new AccusationSummary(a.getTitle(), a.getCategory()))
                 .toList();
         return new ScanResultDto(
                 rapper.getId(),
@@ -39,5 +40,5 @@ public record ScanResultDto(
             String playlistName
     ) {}
 
-    public record AccusationSummary(String title, String category) {}
+    public record AccusationSummary(String title, AccusationCategory category) {}
 }
