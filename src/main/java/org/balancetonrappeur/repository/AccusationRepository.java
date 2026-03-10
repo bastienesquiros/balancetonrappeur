@@ -41,6 +41,14 @@ public interface AccusationRepository extends JpaRepository<Accusation, Long> {
             countQuery = "SELECT COUNT(a) FROM Accusation a WHERE a.status IN :statuses")
     Page<Accusation> findByStatusInWithRapper(@Param("statuses") List<AccusationStatus> statuses, Pageable pageable);
 
+    @Query(value = "SELECT a FROM Accusation a JOIN FETCH a.rapper WHERE a.status IS NULL ORDER BY a.createdAt DESC",
+            countQuery = "SELECT COUNT(a) FROM Accusation a WHERE a.status IS NULL")
+    Page<Accusation> findByStatusIsNullWithRapper(Pageable pageable);
+
+    @Query(value = "SELECT a FROM Accusation a JOIN FETCH a.rapper WHERE a.category IN :categories AND a.status IS NULL ORDER BY a.createdAt DESC",
+            countQuery = "SELECT COUNT(a) FROM Accusation a WHERE a.category IN :categories AND a.status IS NULL")
+    Page<Accusation> findByCategoryInAndStatusIsNullWithRapper(@Param("categories") List<AccusationCategory> categories, Pageable pageable);
+
     // Stats — projections typées
 
     @Query("SELECT new org.balancetonrappeur.repository.StatsProjections$CategoryCount(a.category, COUNT(a)) FROM Accusation a GROUP BY a.category ORDER BY COUNT(a) DESC")

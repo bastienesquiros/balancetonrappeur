@@ -1,5 +1,6 @@
 package org.balancetonrappeur.controller;
 
+import org.balancetonrappeur.entity.Accusation;
 import org.balancetonrappeur.entity.RapperStatus;
 import org.balancetonrappeur.service.RapperService;
 import lombok.RequiredArgsConstructor;
@@ -64,7 +65,15 @@ public class RapperController {
 
         var similar = rapperService.findSimilar(id, rapper.getStatus());
 
+        // Date de dernière mise à jour réelle : max(rapper.updatedAt, dernière accusation.updatedAt)
+        var lastUpdated = rapper.getAccusations().stream()
+                .map(Accusation::getUpdatedAt)
+                .max(java.time.LocalDateTime::compareTo)
+                .filter(accUpdated -> accUpdated.isAfter(rapper.getUpdatedAt()))
+                .orElse(rapper.getUpdatedAt());
+
         model.addAttribute("rapper", rapper);
+        model.addAttribute("lastUpdated", lastUpdated);
         model.addAttribute("similarRappers", similar);
         model.addAttribute("pageTitle", rapper.getName());
         model.addAttribute("pageDescription",

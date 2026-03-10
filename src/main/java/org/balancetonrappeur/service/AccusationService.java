@@ -24,7 +24,13 @@ public class AccusationService {
     private final AccusationRepository accusationRepository;
 
 
-    public Page<Accusation> findFiltered(AccusationCategory category, AccusationStatus status, Pageable pageable) {
+    public Page<Accusation> findFiltered(AccusationCategory category, AccusationStatus status, boolean noStatus, Pageable pageable) {
+        if (noStatus && category != null) return accusationRepository.findByCategoryInAndStatusIsNullWithRapper(List.of(category), pageable);
+        if (noStatus) return accusationRepository.findByStatusIsNullWithRapper(pageable);
+        if (category != null && status != null) {
+            // les deux filtres combinés — on filtre d'abord par statut puis catégorie
+            return accusationRepository.findByCategoryInWithRapper(List.of(category), pageable);
+        }
         if (category != null) return accusationRepository.findByCategoryInWithRapper(List.of(category), pageable);
         if (status   != null) return accusationRepository.findByStatusInWithRapper(List.of(status), pageable);
         return accusationRepository.findAllWithRapper(pageable);

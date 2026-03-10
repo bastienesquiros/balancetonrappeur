@@ -35,7 +35,7 @@
 
             <!-- Statuts -->
             <div class="mb-3">
-                <p class="text-zinc-600 text-xs uppercase tracking-wider mb-2">Statut juridique</p>
+                <p class="text-zinc-600 text-xs uppercase tracking-wider mb-2">Statut</p>
                 <div class="flex flex-wrap gap-2">
                     <th:block th:each="st : ${statuses}">
                         <a th:href="@{/accusations(status=${st.name()})}"
@@ -43,11 +43,15 @@
                            th:class="${selectedStatuses.contains(st)} ? 'text-xs px-3 py-1.5 rounded-lg border bg-zinc-700 text-white border-zinc-500 transition-colors' : 'text-xs px-3 py-1.5 rounded-lg border text-zinc-500 border-zinc-800 hover:text-white hover:bg-zinc-800/50 transition-colors'">
                         </a>
                     </th:block>
+                    <a href="/accusations?noStatus=true"
+                       th:class="${noStatus} ? 'text-xs px-3 py-1.5 rounded-lg border bg-zinc-700 text-white border-zinc-500 transition-colors' : 'text-xs px-3 py-1.5 rounded-lg border text-zinc-500 border-zinc-800 hover:text-white hover:bg-zinc-800/50 transition-colors'">
+                        Sans procédure
+                    </a>
                 </div>
             </div>
 
             <!-- Reset conditionnel -->
-            <div th:if="${not #lists.isEmpty(selectedCategories) or not #lists.isEmpty(selectedStatuses)}" class="mt-1">
+            <div th:if="${not #lists.isEmpty(selectedCategories) or not #lists.isEmpty(selectedStatuses) or noStatus}" class="mt-1">
                 <a href="/accusations" class="text-xs text-zinc-600 hover:text-zinc-400 transition-colors underline underline-offset-2">
                     Réinitialiser les filtres
                 </a>
@@ -58,11 +62,10 @@
 
         <!-- Liste -->
         <div th:if="${not #lists.isEmpty(accusations)}" class="space-y-2">
-            <div th:each="accusation : ${accusations}"
-                 th:data-href="@{/accusations/{id}(id=${accusation.id})}"
-                 onclick="window.location.href=this.dataset.href"
-                 class="flex items-center gap-4 bg-zinc-900/60 border border-zinc-800/80 rounded-xl px-4 py-3.5
-                        hover:border-zinc-700 hover:bg-zinc-900 transition-all group cursor-pointer">
+            <a th:each="accusation : ${accusations}"
+               th:href="@{/accusations/{id}(id=${accusation.id})}"
+               class="flex items-center gap-4 bg-zinc-900/60 border border-zinc-800/80 rounded-xl px-4 py-3.5
+                      hover:border-zinc-700 hover:bg-zinc-900 transition-all group">
 
                 <!-- Dot catégorie -->
                 <div class="flex-shrink-0">
@@ -89,9 +92,9 @@
                 </div>
 
                 <!-- Badges -->
-                <div class="hidden sm:flex items-center gap-2 flex-shrink-0 ml-auto" onclick="event.stopPropagation()">
-                    <th:block th:replace="~{fragments :: categoryBadge(${accusation.category}, true)}"/>
-                    <th:block th:replace="~{fragments :: statusBadge(${accusation.status}, true)}"/>
+                <div class="hidden sm:flex items-center gap-2 flex-shrink-0 ml-auto">
+                    <th:block th:replace="~{fragments :: categoryBadge(${accusation.category}, false)}"/>
+                    <th:block th:replace="~{fragments :: statusBadge(${accusation.status}, false)}"/>
                 </div>
 
                 <!-- Chevron -->
@@ -99,7 +102,7 @@
                      fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                 </svg>
-            </div>
+            </a>
         </div>
 
         <!-- Vide -->

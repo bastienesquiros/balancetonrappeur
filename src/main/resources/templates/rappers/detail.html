@@ -53,14 +53,16 @@
                           th:text="${rapper.status.label()}"></span>
                 </span>
 
-                <!-- Bouton ajouter une affaire -->
-                <div class="mt-4">
+                <!-- Bouton ajouter une affaire + date de mise à jour -->
+                <div class="mt-4 flex items-center gap-3 flex-wrap">
                     <a th:href="@{/rappers/{id}/submit(id=${rapper.id})}"
                        class="inline-flex items-center gap-2 text-xs px-3 py-2 rounded-lg
                               bg-zinc-800 border border-zinc-700 text-zinc-400
                               hover:bg-zinc-700 hover:text-white transition-colors">
                         <span>＋</span> Ajouter une affaire
                     </a>
+                    <span class="text-zinc-600 text-xs"
+                          th:text="'Mis à jour le ' + ${#temporals.format(lastUpdated, 'dd/MM/yyyy')}"></span>
                 </div>
             </div>
         </div>
@@ -107,8 +109,8 @@
 
                             <!-- Badges catégorie + statut cliquables -->
                             <div class="flex flex-wrap gap-2">
-                                <th:block th:replace="~{fragments :: categoryBadge(${accusation.category}, true)}"/>
-                                <th:block th:replace="~{fragments :: statusBadge(${accusation.status}, true)}"/>
+                                <th:block th:replace="~{fragments :: categoryBadge(${accusation.category}, false)}"/>
+                                <th:block th:replace="~{fragments :: statusBadge(${accusation.status}, false)}"/>
                             </div>
                         </div>
 
@@ -198,7 +200,20 @@
         <!-- ═══════════════════════════════════════
              DISCLAIMER
         ════════════════════════════════════════ -->
-        <div class="mt-12 bg-zinc-900/50 border border-zinc-800 rounded-xl px-5 py-4 flex gap-3 items-start">
+
+        <!-- Note présomption d'innocence pour rappeurs non condamnés -->
+        <div th:if="${rapper.status.name() == 'ACCUSED' or rapper.status.name() == 'ONGOING'}"
+             class="mt-6 bg-amber-950/30 border border-amber-900/40 rounded-xl px-5 py-3 flex gap-3 items-start">
+            <svg class="w-4 h-4 text-amber-500/70 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            </svg>
+            <p class="text-amber-500/70 text-xs leading-relaxed">
+                Cet artiste <strong class="text-amber-400/80">n'a pas été condamné</strong>.
+                En l'absence de décision de justice définitive, la présomption d'innocence s'applique.
+            </p>
+        </div>
+
+        <div class="mt-4 bg-zinc-900/50 border border-zinc-800 rounded-xl px-5 py-4 flex gap-3 items-start">
             <svg class="w-4 h-4 text-zinc-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
