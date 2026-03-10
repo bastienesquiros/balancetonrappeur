@@ -71,7 +71,7 @@
                         Chercher
                     </button>
                 </div>
-                <p class="text-zinc-700 text-xs mt-3">Ex : Booba, Freeze Corleone, XXXTentacion…</p>
+                <p class="text-zinc-400 text-xs mt-3">Ex : Booba, Freeze Corleone, XXXTentacion…</p>
 
                 <!-- Dropdown résultats -->
                 <div x-show="results.length > 0"
@@ -138,24 +138,24 @@
         <div class="max-w-5xl mx-auto px-4 py-7 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
             <div>
                 <p class="text-2xl font-extrabold text-white tabular-nums" th:text="${rapperCount}">—</p>
-                <p class="text-zinc-600 text-xs mt-1">Rappeurs indexés</p>
+                <p class="text-zinc-400 text-xs mt-1">Rappeurs indexés</p>
             </div>
             <div>
                 <p class="text-2xl font-extrabold text-red-400 tabular-nums" th:text="${convictedCount}">—</p>
-                <p class="text-zinc-600 text-xs mt-1">Condamnés</p>
+                <p class="text-zinc-400 text-xs mt-1">Condamnés</p>
             </div>
             <div>
                 <p class="text-2xl font-extrabold text-amber-400 tabular-nums" th:text="${accusedCount}">—</p>
-                <p class="text-zinc-600 text-xs mt-1">Accusés</p>
+                <p class="text-zinc-400 text-xs mt-1">Accusés</p>
             </div>
             <div>
                 <p class="text-2xl font-extrabold text-zinc-300 tabular-nums" th:text="${accusationCount}">—</p>
-                <p class="text-zinc-600 text-xs mt-1">Affaires documentées</p>
+                <p class="text-zinc-400 text-xs mt-1">Affaires documentées</p>
             </div>
         </div>
         <div class="max-w-5xl mx-auto px-4 pb-4 text-center">
             <a href="/stats"
-               class="inline-flex items-center gap-1 text-zinc-700 text-xs hover:text-zinc-400 transition-colors">
+               class="inline-flex items-center gap-1 text-zinc-500 text-xs hover:text-zinc-300 transition-colors">
                 Statistiques détaillées
                 <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -168,7 +168,7 @@
     <section class="max-w-5xl mx-auto px-4 py-14">
         <div class="flex items-baseline justify-between mb-6">
             <h2 class="text-base font-bold text-white">Récemment ajoutés</h2>
-            <a href="/rappers" class="text-xs text-zinc-600 hover:text-zinc-400 transition-colors">Voir tout →</a>
+            <a href="/rappers" class="text-xs text-zinc-500 hover:text-zinc-300 transition-colors">Voir tout →</a>
         </div>
 
         <div th:if="${not #lists.isEmpty(recentRappers)}"
@@ -230,10 +230,10 @@
     <!-- DISCLAIMER -->
     <section class="border-t border-zinc-800/60">
         <div class="max-w-5xl mx-auto px-4 py-8">
-            <p class="text-zinc-700 text-xs leading-relaxed text-center">
+            <p class="text-zinc-500 text-xs leading-relaxed text-center">
                 Ce site compile des informations issues de sources publiques vérifiables.
                 Il ne constitue ni une accusation, ni un jugement. Seules les décisions de justice définitives font foi.
-                <a href="/legal#retrait" class="underline underline-offset-2 hover:text-zinc-500 transition-colors">Demande
+                <a href="/legal#retrait" class="underline underline-offset-2 hover:text-zinc-300 transition-colors">Demande
                     de correction ou retrait</a>.
             </p>
         </div>
