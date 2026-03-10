@@ -46,12 +46,12 @@
                 </div>
             </div>
 
-            <!-- Reset — visible seulement si un filtre est actif -->
-            <a th:if="${not #lists.isEmpty(selectedCategories) or not #lists.isEmpty(selectedStatuses)}"
-               href="/accusations"
-               class="text-xs text-zinc-600 hover:text-zinc-400 transition-colors underline underline-offset-2">
-                Réinitialiser les filtres
-            </a>
+            <!-- Reset conditionnel -->
+            <div th:if="${not #lists.isEmpty(selectedCategories) or not #lists.isEmpty(selectedStatuses)}" class="mt-1">
+                <a href="/accusations" class="text-xs text-zinc-600 hover:text-zinc-400 transition-colors underline underline-offset-2">
+                    Réinitialiser les filtres
+                </a>
+            </div>
 
         </div>
 

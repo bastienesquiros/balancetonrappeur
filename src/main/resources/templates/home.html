@@ -186,14 +186,7 @@
                     </svg>
                 </div>
                 <p class="font-semibold text-white text-sm truncate mb-2" th:text="${rapper.name}">Artiste</p>
-                <span th:switch="${rapper.status.name()}">
-                    <span th:case="'CONVICTED'"
-                          class="text-xs px-2 py-0.5 rounded-full bg-red-950 text-red-400 border border-red-900/60">Condamné</span>
-                    <span th:case="'ACCUSED'"
-                          class="text-xs px-2 py-0.5 rounded-full bg-amber-950 text-amber-400 border border-amber-900/60">Accusé</span>
-                    <span th:case="*"
-                          class="text-xs px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700/60">Polémique</span>
-                </span>
+                <th:block th:replace="~{fragments :: rapperStatusBadge(${rapper.status})}"/>
             </a>
         </div>
 

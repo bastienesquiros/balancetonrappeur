@@ -42,7 +42,6 @@ public class SubmissionController {
         var form = new SuggestForm();
         if (name != null) form.setRapperName(name);
         model.addAttribute("suggestForm", form);
-        model.addAttribute("nameLocked", name != null);
         return "rappers/suggest";
     }
 
@@ -57,20 +56,23 @@ public class SubmissionController {
             binding.rejectValue("sourceUrl", "required", "Au moins une source avec une URL est obligatoire.");
         }
 
+        // Check if rapper already exists before other errors so the user can be redirected
+        if (!binding.hasFieldErrors("rapperName") && form.getRapperName() != null) {
+            var existing = rapperService.findByNameIgnoreCase(form.getRapperName().trim());
+            if (existing.isPresent()) {
+                redirectAttributes.addFlashAttribute("info",
+                        "« " + existing.get().getName() + " » est déjà dans notre base — tu peux ajouter une affaire directement depuis sa fiche.");
+                return "redirect:/rappers/" + existing.get().getId();
+            }
+        }
+
         if (binding.hasErrors()) {
-            model.addAttribute("nameLocked", false);
             model.addAttribute("prefillSourcesJson",
                     SourceJsonSerializer.toJsonFromParams(form.getSourceType(), form.getSourceTitle(), form.getSourceUrl()));
             model.addAttribute("formHasErrors", true);
             return "rappers/suggest";
         }
 
-        var existing = rapperService.findByNameIgnoreCase(form.getRapperName());
-        if (existing.isPresent()) {
-            redirectAttributes.addFlashAttribute("info",
-                    "\"" + form.getRapperName() + "\" est déjà dans notre base — tu peux ajouter une affaire directement depuis sa fiche.");
-            return "redirect:/rappers/" + existing.get().getId();
-        }
 
         submissionService.submitUnknownRapper(form.getRapperName(), form.getCategory(), form.getTitle(),
                 form.getStatus(), form.getFactDate(), form.getSourceType(), form.getSourceTitle(), form.getSourceUrl(),

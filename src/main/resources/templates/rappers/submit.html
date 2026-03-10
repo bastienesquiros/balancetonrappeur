@@ -110,7 +110,8 @@
                 </div>
 
                 <!-- Statut -->
-                <div>
+                <div th:attr="data-init-status=${submitForm.status != null ? submitForm.status.name() : ''}"
+                     x-data="statusPicker($el.dataset.initStatus)">
                     <label class="block text-zinc-400 text-xs font-medium mb-1 uppercase tracking-wide">
                         Statut juridique <span class="text-zinc-600">(optionnel)</span>
                     </label>
@@ -118,22 +119,31 @@
                         À remplir uniquement si l'affaire a donné lieu à une procédure judiciaire.
                         Une polémique ou un call-out public n'a pas forcément de statut juridique.
                     </p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+
+                    <!-- Fallback statique affiché avant init Alpine (supprimé par Alpine dès init) -->
+                    <div class="grid grid-cols-3 gap-2" x-init="$el.remove()">
                         <th:block th:each="s : ${statuses}">
-                            <label class="cursor-pointer">
-                                <input type="radio" th:field="*{status}" th:value="${s}" class="sr-only peer"/>
-                                <div class="px-3 py-2.5 rounded-lg border border-zinc-700 text-zinc-400 text-xs
-                                            peer-checked:text-white peer-checked:border-zinc-500 peer-checked:bg-zinc-800
-                                            hover:border-zinc-600 transition-colors text-center"
-                                     th:text="${s.label()}"></div>
-                            </label>
+                            <button type="button" disabled
+                                    class="px-3 py-2.5 rounded-lg border border-zinc-700 text-zinc-400 text-xs text-center"
+                                    th:text="${s.label()}"></button>
                         </th:block>
                     </div>
-                    <!-- Lien pour effacer la sélection si un statut est coché -->
-                    <div class="mt-1.5" th:if="${submitForm.status != null}">
-                        <a href="#" onclick="document.querySelectorAll('input[name=status]').forEach(r=>r.checked=false); this.closest('div').style.display='none'; return false;"
-                           class="text-zinc-600 text-xs hover:text-zinc-400 transition-colors">Effacer la sélection</a>
+                    <!-- Boutons toggle Alpine (cachés jusqu'à init) -->
+                    <div class="grid grid-cols-3 gap-2" x-cloak>
+                        <th:block th:each="s : ${statuses}">
+                            <button type="button"
+                                    th:attr="data-value=${s.name()}"
+                                    @click="selected = (selected === $el.dataset.value ? '' : $el.dataset.value)"
+                                    :class="selected === $el.dataset.value
+                                        ? 'border-zinc-400 text-white bg-zinc-700'
+                                        : 'border-zinc-700 text-zinc-400 hover:border-zinc-500 hover:text-zinc-200'"
+                                    class="px-3 py-2.5 rounded-lg border text-xs transition-colors text-center cursor-pointer"
+                                    th:text="${s.label()}"></button>
+                        </th:block>
                     </div>
+
+                    <!-- Input caché qui soumet la valeur -->
+                    <input type="hidden" name="status" :value="selected"/>
                 </div>
 
                 <!-- Date des faits -->
@@ -188,6 +198,20 @@
 </main>
 
 <footer th:replace="~{layout :: footer}"></footer>
+
+<script>
+    const STATUS_LABELS = {
+        'ONGOING':     'En cours',
+        'ACQUITTED':   'Hors de cause',
+        'CONVICTED':   'Condamné',
+        'CONTROVERSY': 'Polémique'
+    };
+    function statusPicker(init) {
+        return {
+            selected: init || ''
+        };
+    }
+</script>
 
 <script th:if="${formHasErrors}">
     document.addEventListener('DOMContentLoaded', function () {

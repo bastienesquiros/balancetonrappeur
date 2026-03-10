@@ -10,7 +10,7 @@ public enum RapperStatus {
         return switch (this) {
             case ACCUSED   -> "Mis en cause";
             case ONGOING   -> "Procédure en cours";
-            case ACQUITTED -> "Relaxé ou classé sans suite";
+            case ACQUITTED -> "Hors de cause";
             case CONVICTED -> "Condamné";
         };
     }

@@ -8,7 +8,7 @@ public enum AccusationStatus {
     public String label() {
         return switch (this) {
             case ONGOING   -> "En cours";
-            case ACQUITTED -> "Acquitté";
+            case ACQUITTED -> "Hors de cause";
             case CONVICTED -> "Condamné";
         };
     }

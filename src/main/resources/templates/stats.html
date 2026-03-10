@@ -46,7 +46,7 @@
                 <div class="space-y-1">
                     <!-- Condamnés -->
                     <a href="/rappers?status=CONVICTED" class="flex items-center gap-3 group rounded-lg py-1 hover:bg-zinc-800/50 transition-colors -mx-2 px-2">
-                        <span class="text-zinc-400 text-xs w-24 flex-shrink-0 group-hover:text-white transition-colors">Condamnés</span>
+                        <span class="text-zinc-400 text-xs w-28 flex-shrink-0 group-hover:text-white transition-colors">Condamné</span>
                         <div class="flex-1 bg-zinc-800 rounded-full h-2">
                             <div class="bg-red-500 h-2 rounded-full transition-all"
                                  th:style="'width:' + (${stats.totalRappers} > 0 ? ${#numbers.formatDecimal(stats.convicted * 100.0 / stats.totalRappers, 1, 1)} : 0) + '%'"></div>
@@ -55,27 +55,27 @@
                     </a>
                     <!-- En cours -->
                     <a href="/rappers?status=ONGOING" class="flex items-center gap-3 group rounded-lg py-1 hover:bg-zinc-800/50 transition-colors -mx-2 px-2">
-                        <span class="text-zinc-400 text-xs w-24 flex-shrink-0 group-hover:text-white transition-colors">En cours</span>
+                        <span class="text-zinc-400 text-xs w-28 flex-shrink-0 group-hover:text-white transition-colors">Procédure en cours</span>
                         <div class="flex-1 bg-zinc-800 rounded-full h-2">
                             <div class="bg-amber-500 h-2 rounded-full transition-all"
                                  th:style="'width:' + (${stats.totalRappers} > 0 ? ${#numbers.formatDecimal(stats.ongoing * 100.0 / stats.totalRappers, 1, 1)} : 0) + '%'"></div>
                         </div>
                         <span class="text-white text-xs font-semibold w-6 text-right flex-shrink-0" th:text="${stats.ongoing}">0</span>
                     </a>
-                    <!-- Accusés -->
+                    <!-- Mis en cause -->
                     <a href="/rappers?status=ACCUSED" class="flex items-center gap-3 group rounded-lg py-1 hover:bg-zinc-800/50 transition-colors -mx-2 px-2">
-                        <span class="text-zinc-400 text-xs w-24 flex-shrink-0 group-hover:text-white transition-colors">Accusés</span>
+                        <span class="text-zinc-400 text-xs w-28 flex-shrink-0 group-hover:text-white transition-colors">Mis en cause</span>
                         <div class="flex-1 bg-zinc-800 rounded-full h-2">
                             <div class="bg-zinc-400 h-2 rounded-full transition-all"
                                  th:style="'width:' + (${stats.totalRappers} > 0 ? ${#numbers.formatDecimal(stats.accused * 100.0 / stats.totalRappers, 1, 1)} : 0) + '%'"></div>
                         </div>
                         <span class="text-white text-xs font-semibold w-6 text-right flex-shrink-0" th:text="${stats.accused}">0</span>
                     </a>
-                    <!-- Relaxés -->
+                    <!-- Hors de cause -->
                     <a href="/rappers?status=ACQUITTED" class="flex items-center gap-3 group rounded-lg py-1 hover:bg-zinc-800/50 transition-colors -mx-2 px-2">
-                        <span class="text-zinc-400 text-xs w-24 flex-shrink-0 group-hover:text-white transition-colors">Relaxés</span>
+                        <span class="text-zinc-400 text-xs w-28 flex-shrink-0 group-hover:text-white transition-colors">Hors de cause</span>
                         <div class="flex-1 bg-zinc-800 rounded-full h-2">
-                            <div class="bg-green-500 h-2 rounded-full transition-all"
+                            <div class="bg-slate-500 h-2 rounded-full transition-all"
                                  th:style="'width:' + (${stats.totalRappers} > 0 ? ${#numbers.formatDecimal(stats.acquitted * 100.0 / stats.totalRappers, 1, 1)} : 0) + '%'"></div>
                         </div>
                         <span class="text-white text-xs font-semibold w-6 text-right flex-shrink-0" th:text="${stats.acquitted}">0</span>
@@ -111,7 +111,7 @@
                                   th:text="${st.label()}"></span>
                             <div class="flex-1 bg-zinc-800 rounded-full h-2">
                                 <div class="h-2 rounded-full transition-all"
-                                     th:classappend="${entry.key == 'CONVICTED'} ? 'bg-red-500' : (${entry.key == 'ONGOING'} ? 'bg-amber-500' : (${entry.key == 'ACQUITTED'} ? 'bg-green-500' : 'bg-slate-500'))"
+                                     th:classappend="${entry.key == 'CONVICTED'} ? 'bg-red-500' : (${entry.key == 'ONGOING'} ? 'bg-amber-500' : (${entry.key == 'ACQUITTED'} ? 'bg-slate-500' : 'bg-zinc-600'))"
                                      th:style="'width:' + (${stats.totalAccusations} > 0 ? ${#numbers.formatDecimal(entry.value * 100.0 / stats.totalAccusations, 1, 1)} : 0) + '%'"></div>
                             </div>
                             <span class="text-white text-xs font-semibold w-6 text-right flex-shrink-0" th:text="${entry.value}">0</span>
