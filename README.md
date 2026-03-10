@@ -1,4 +1,4 @@
-# 🎤 Balance Ton Rappeur
+# Balance Ton Rappeur
 
 Base de données collaborative recensant des affaires, accusations et condamnations liées au monde du rap, documentées et sourcées.
 
@@ -21,16 +21,17 @@ Base de données collaborative recensant des affaires, accusations et condamnati
 ## Fonctionnalités
 
 - Fiches rappeurs avec timeline des affaires
-- Système de classification (agression sexuelle, violence physique, escroquerie, polémique…)
-- Niveaux de gravité : ⚠️ Polémique · 🚨 Accusation · ⛔ Condamnation
+- Système de classification (agression sexuelle, violence physique, violences conjugales, escroquerie, propos discriminatoires, polémique)
+- Statuts juridiques : Polémique · En cours · Condamné · Relaxé
 - Recherche avec autocomplétion
 - Soumission communautaire (modération obligatoire avant publication)
 - Demande de retrait / correction
 - Page statistiques
 - Timeline globale des affaires
-- **Scan Spotify** — analyse tes liked songs et playlists, détecte les rappeurs cancel et permet de les retirer directement
+- **Scan Spotify** — analyse les liked songs et playlists, détecte les rappeurs concernés et permet de les retirer directement
 - Dashboard admin (`/admin`) — gestion des soumissions, retraits, sync Spotify
 - Digest mail quotidien (8h) avec les soumissions en attente
+- Notifications mail aux contributeurs (confirmation, acceptation, refus)
 
 ---
 
@@ -84,7 +85,8 @@ L'app tourne sur `btr_app:8080`, sans port exposé publiquement — à proxifier
 | `MAIL_PORT` | Port SMTP (587 pour Resend) |
 | `MAIL_USERNAME` | Utilisateur SMTP |
 | `MAIL_PASSWORD` | Mot de passe SMTP |
-| `BTR_MAIL_FROM` | Adresse expéditeur des mails |
+| `BTR_MAIL_FROM` | Adresse expéditeur du digest admin |
+| `BTR_MAIL_NOREPLY` | Adresse expéditeur des mails transactionnels (confirmations, refus) — fallback sur `BTR_MAIL_FROM` si absent |
 | `BTR_MAIL_DIGEST_TO` | Destinataire du digest quotidien (toi) |
 | `BTR_ADMIN_PASSWORD` | Mot de passe dashboard `/admin` |
 | `SPOTIFY_CLIENT_ID` | Client ID Spotify (optionnel — feature scan) |

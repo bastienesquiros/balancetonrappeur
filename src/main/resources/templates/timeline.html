@@ -8,7 +8,6 @@
 <main class="flex-1">
     <div class="max-w-3xl mx-auto px-4 py-10">
 
-        <!-- Header -->
         <div class="mb-10">
             <h1 class="text-2xl font-bold text-white mb-1">Timeline</h1>
             <p class="text-zinc-500 text-sm">Chronologie des affaires documentées, de la plus récente à la plus ancienne.</p>
@@ -23,59 +22,114 @@
         </div>
 
         <!-- Années -->
-        <div th:each="yearEntry : ${byYear}" class="mb-12">
+        <div th:unless="${byYear.isEmpty()}" id="timeline-root" th:attr="data-total=${byYear.size()}">
 
-            <!-- Ancre année -->
-            <div class="flex items-center gap-4 mb-6" th:id="${yearEntry.key}">
-                <span class="text-3xl font-extrabold text-white" th:text="${yearEntry.key}">2024</span>
-                <div class="flex-1 h-px bg-zinc-800"></div>
-                <span class="text-zinc-600 text-xs"
-                      th:text="${#lists.size(yearEntry.value)} + ' affaire' + (${#lists.size(yearEntry.value)} > 1 ? 's' : '')">
-                </span>
-            </div>
+            <th:block th:each="yearEntry, iter : ${byYear}">
+                <div class="year-block mb-12"
+                     th:style="${iter.index >= 3} ? 'display:none' : ''">
 
-            <!-- Affaires de l'année -->
-            <div class="space-y-3 pl-2 border-l-2 border-zinc-800 ml-4">
-                <a th:each="accusation : ${yearEntry.value}"
-                   th:href="@{/accusations/{id}(id=${accusation.id})}"
-                   class="group block ml-4 relative">
-
-                    <!-- Dot sur la timeline -->
-                    <span class="absolute -left-[1.35rem] top-3 w-2.5 h-2.5 rounded-full border-2 border-zinc-950 flex-shrink-0"
-                          th:classappend="${accusation.category.color() == 'red'} ? 'bg-red-500' :
-                                         (${accusation.category.color() == 'orange'} ? 'bg-orange-500' :
-                                         (${accusation.category.color() == 'purple'} ? 'bg-purple-500' : 'bg-yellow-500'))">
-                    </span>
-
-                    <div class="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3
-                                group-hover:border-zinc-600 transition-colors">
-                        <div class="flex items-start justify-between gap-3">
-                            <div class="min-w-0">
-                                <!-- Rappeur -->
-                                <p class="text-zinc-500 text-xs mb-1" th:text="${accusation.rapper.name}">Rappeur</p>
-                                <!-- Titre -->
-                                <p class="text-white text-sm font-medium leading-snug group-hover:text-zinc-300 transition-colors"
-                                   th:text="${accusation.title}">Titre</p>
-                            </div>
-                            <!-- Badges -->
-                            <div class="flex flex-col items-end gap-1.5 flex-shrink-0">
-                                <th:block th:replace="~{fragments :: categoryBadge(${accusation.category}, false)}"/>
-                                <th:block th:replace="~{fragments :: statusBadge(${accusation.status}, false)}"/>
-                            </div>
-                        </div>
-                        <!-- Date précise si dispo -->
-                        <p th:if="${accusation.factDate != null}"
-                           class="text-zinc-600 text-xs mt-2"
-                           th:text="${#temporals.format(accusation.factDate, 'MMMM yyyy')}">janvier 2024</p>
+                    <div class="flex items-center gap-4 mb-6" th:id="${yearEntry.key}">
+                        <span class="text-3xl font-extrabold text-white" th:text="${yearEntry.key}">2024</span>
+                        <div class="flex-1 h-px bg-zinc-800"></div>
+                        <span class="text-zinc-600 text-xs"
+                              th:text="${#lists.size(yearEntry.value)} + ' affaire' + (${#lists.size(yearEntry.value)} > 1 ? 's' : '')">
+                        </span>
                     </div>
-                </a>
+
+                    <div class="space-y-3 pl-2 border-l-2 border-zinc-800 ml-4">
+                        <a th:each="accusation : ${yearEntry.value}"
+                           th:href="@{/accusations/{id}(id=${accusation.id})}"
+                           class="group block ml-4 relative">
+                            <span class="absolute -left-[1.35rem] top-3 w-2.5 h-2.5 rounded-full border-2 border-zinc-950 flex-shrink-0"
+                                  th:classappend="${accusation.category.color() == 'red'} ? 'bg-red-500' :
+                                                 (${accusation.category.color() == 'orange'} ? 'bg-orange-500' :
+                                                 (${accusation.category.color() == 'purple'} ? 'bg-purple-500' : 'bg-yellow-500'))">
+                            </span>
+                            <div class="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 group-hover:border-zinc-600 transition-colors">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div class="min-w-0">
+                                        <p class="text-zinc-500 text-xs mb-1" th:text="${accusation.rapper.name}">Rappeur</p>
+                                        <p class="text-white text-sm font-medium leading-snug group-hover:text-zinc-300 transition-colors"
+                                           th:text="${accusation.title}">Titre</p>
+                                    </div>
+                                    <div class="flex flex-col items-end gap-1.5 flex-shrink-0">
+                                        <th:block th:replace="~{fragments :: categoryBadge(${accusation.category}, false)}"/>
+                                        <th:block th:replace="~{fragments :: statusBadge(${accusation.status}, false)}"/>
+                                    </div>
+                                </div>
+                                <p th:if="${accusation.factDate != null}"
+                                   class="text-zinc-600 text-xs mt-2"
+                                   th:text="${#temporals.format(accusation.factDate, 'MMMM yyyy')}">janvier 2024</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </th:block>
+
+            <!-- Bouton Charger plus — caché si <= 3 années -->
+            <div id="load-more-section"
+                 th:style="${byYear.size() <= 3} ? 'display:none' : ''"
+                 class="flex flex-col items-center gap-2 mt-4 pb-6">
+                <button id="load-more-btn"
+                        onclick="loadMore()"
+                        class="px-5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-zinc-300 text-sm
+                               hover:bg-zinc-800 hover:text-white hover:border-zinc-600 transition-all">
+                    Charger plus
+                </button>
+                <p id="load-more-counter" class="text-zinc-700 text-xs"></p>
             </div>
+
         </div>
 
     </div>
 </main>
 
 <footer th:replace="~{layout :: footer}"></footer>
+
+<script>
+    (function () {
+        const root = document.getElementById('timeline-root');
+        if (!root) return;
+        const total = parseInt(root.dataset.total, 10);
+        let visible = 3;
+
+        const counter = document.getElementById('load-more-counter');
+        const section = document.getElementById('load-more-section');
+
+        function updateCounter() {
+            if (counter) counter.textContent = visible + ' / ' + total + ' années';
+        }
+
+        function updateButton() {
+            if (section) section.style.display = visible >= total ? 'none' : '';
+        }
+
+        updateCounter();
+        updateButton();
+
+        window.loadMore = function () {
+            const blocks = root.querySelectorAll('.year-block');
+            const newVisible = Math.min(visible + 3, total);
+            blocks.forEach((el, i) => {
+                if (i >= visible && i < newVisible) {
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(8px)';
+                    el.style.display = '';
+                    el.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            el.style.opacity = '1';
+                            el.style.transform = 'translateY(0)';
+                        });
+                    });
+                }
+            });
+            visible = newVisible;
+            updateCounter();
+            updateButton();
+        };
+    })();
+</script>
 
 </body>
 </html>

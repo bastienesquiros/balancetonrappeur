@@ -1,5 +1,6 @@
 package org.balancetonrappeur.dto.form;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -24,7 +25,7 @@ public class SubmitForm {
     @NotBlank(message = "Le titre est obligatoire.")
     private String title;
 
-    @NotNull(message = "Le statut juridique est obligatoire.")
+    // Optionnel : pas toutes les affaires ne font l'objet d'une procédure judiciaire
     private AccusationStatus status;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -35,5 +36,6 @@ public class SubmitForm {
     private List<String> sourceTitle;
     private List<String> sourceUrl;
 
+    @Email(message = "L'adresse email n'est pas valide.")
+    private String email;
 }
-

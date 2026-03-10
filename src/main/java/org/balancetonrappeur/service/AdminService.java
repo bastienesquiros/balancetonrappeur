@@ -8,7 +8,7 @@ import org.balancetonrappeur.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+
 
 @Slf4j
 @Service
@@ -19,6 +19,8 @@ public class AdminService {
     private final WithdrawalRequestRepository withdrawalRequestRepository;
     private final RapperRepository rapperRepository;
     private final AccusationRepository accusationRepository;
+    private final SubmissionMailService submissionMailService;
+    private final WithdrawalMailService withdrawalMailService;
 
     // Dashboard
 
@@ -82,6 +84,7 @@ public class AdminService {
 
         submission.setSubmissionStatus(SubmissionStatus.APPROVED);
         submissionRepository.save(submission);
+        submissionMailService.sendAccepted(submission);
         log.info("[Admin] Submission #{} acceptée — accusation #{} créée", submission.getId(), accusation.getId());
         return rapper;
     }
@@ -112,79 +115,80 @@ public class AdminService {
 
         submission.setSubmissionStatus(SubmissionStatus.APPROVED);
         submissionRepository.save(submission);
+        submissionMailService.sendAccepted(submission);
         log.info("[Admin] Submission #{} acceptée — accusation #{} modifiée", submission.getId(), accusation.getId());
         return accusation.getRapper();
     }
 
     @Transactional
-    public void rejectSubmission(Long submissionId) {
+    public void rejectSubmission(Long submissionId, String rejectionReason) {
         var submission = submissionRepository.findById(submissionId)
                 .orElseThrow(() -> new IllegalArgumentException("Submission #" + submissionId + " introuvable"));
         submission.setSubmissionStatus(SubmissionStatus.REJECTED);
         submissionRepository.save(submission);
+        submissionMailService.sendRejected(submission, rejectionReason);
         log.info("[Admin] Submission #{} rejetée", submissionId);
     }
 
     // Withdrawals
 
     /**
-     * Accepte et retourne optionnellement un message de reminder mail.
+     * Accepte la demande de retrait et envoie un mail de confirmation si email fourni.
      */
     @Transactional
-    public Optional<String> acceptWithdrawal(Long withdrawalId) {
+    public void acceptWithdrawal(Long withdrawalId, String comment) {
         var wr = withdrawalRequestRepository.findById(withdrawalId)
                 .orElseThrow(() -> new IllegalArgumentException("Withdrawal #" + withdrawalId + " introuvable"));
 
-        if (wr.getAccusationId() == null)
+        var accusation = wr.getAccusation();
+        if (accusation == null)
             throw new IllegalStateException("Withdrawal #" + withdrawalId + " sans accusation liée");
 
-        accusationRepository.deleteById(wr.getAccusationId());
+        long accusationId = accusation.getId();
+        accusationRepository.deleteById(accusationId);
         wr.setStatus(WithdrawalStatus.PROCESSED);
         withdrawalRequestRepository.save(wr);
-        log.info("[Admin] Withdrawal #{} accepté — accusation #{} supprimée", withdrawalId, wr.getAccusationId());
+        log.info("[Admin] Withdrawal #{} accepté — accusation #{} supprimée", withdrawalId, accusationId);
 
-        return buildMailReminder(wr, "acceptée");
+        withdrawalMailService.sendAccepted(wr, comment);
     }
 
     /**
-     * Rejette et retourne optionnellement un message de reminder mail.
+     * Rejette la demande de retrait et envoie un mail si email fourni.
      */
     @Transactional
-    public Optional<String> rejectWithdrawal(Long withdrawalId) {
+    public void rejectWithdrawal(Long withdrawalId, String reason) {
         var wr = withdrawalRequestRepository.findById(withdrawalId)
                 .orElseThrow(() -> new IllegalArgumentException("Withdrawal #" + withdrawalId + " introuvable"));
         wr.setStatus(WithdrawalStatus.REJECTED);
         withdrawalRequestRepository.save(wr);
         log.info("[Admin] Withdrawal #{} rejeté", withdrawalId);
-        return buildMailReminder(wr, "rejetée");
+
+        withdrawalMailService.sendRejected(wr, reason);
     }
 
     // Helpers
 
-    private Optional<String> buildMailReminder(WithdrawalRequest wr, String action) {
-        if (wr.getEmail() == null || wr.getEmail().isBlank()) return Optional.empty();
-        return Optional.of("Envoyer un mail à " + wr.getEmail()
-                + " pour l'informer que la demande de retrait concernant "
-                + wr.getRapperName() + " a été " + action + ".");
-    }
 
     private RapperStatus deriveRapperStatus(AccusationStatus accusationStatus) {
-        if (accusationStatus == null) return RapperStatus.CONTROVERSY;
+        if (accusationStatus == null) return RapperStatus.ACCUSED;
         return switch (accusationStatus) {
             case CONVICTED -> RapperStatus.CONVICTED;
-            case ONGOING -> RapperStatus.ACCUSED;
-            default -> RapperStatus.CONTROVERSY;
+            case ONGOING   -> RapperStatus.ONGOING;
+            case ACQUITTED -> RapperStatus.ACQUITTED;
         };
     }
 
     private void recalculateRapperStatus(Rapper rapper) {
         var accusations = accusationRepository.findByRapperId(rapper.getId());
         boolean hasConvicted = accusations.stream().anyMatch(a -> a.getStatus() == AccusationStatus.CONVICTED);
-        boolean hasOngoing = accusations.stream().anyMatch(a -> a.getStatus() == AccusationStatus.ONGOING);
+        boolean hasOngoing   = accusations.stream().anyMatch(a -> a.getStatus() == AccusationStatus.ONGOING);
+        boolean hasAcquitted = accusations.stream().anyMatch(a -> a.getStatus() == AccusationStatus.ACQUITTED);
 
         RapperStatus newStatus = hasConvicted ? RapperStatus.CONVICTED
-                : hasOngoing ? RapperStatus.ACCUSED
-                : RapperStatus.CONTROVERSY;
+                : hasOngoing   ? RapperStatus.ONGOING
+                : hasAcquitted ? RapperStatus.ACQUITTED
+                : RapperStatus.ACCUSED;
 
         if (rapper.getStatus() != newStatus) {
             rapper.setStatus(newStatus);

@@ -9,12 +9,13 @@
 
         <!-- Icône animée -->
         <div class="relative inline-flex items-center justify-center">
-            <!-- Cercle tournant -->
             <svg class="w-24 h-24 animate-spin text-zinc-700" viewBox="0 0 100 100" fill="none">
                 <circle cx="50" cy="50" r="42" stroke="currentColor" stroke-width="6" stroke-dasharray="60 200"/>
             </svg>
-            <!-- Icône centrale fixe -->
-            <span class="absolute text-4xl">🎧</span>
+            <svg class="absolute w-10 h-10 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+            </svg>
         </div>
 
         <!-- Texte -->
@@ -25,50 +26,68 @@
             </p>
         </div>
 
-        <!-- Steps animés -->
+        <!-- Steps -->
         <div class="text-left space-y-3" id="steps">
-            <div class="flex items-center gap-3 text-sm text-zinc-600" id="step-1">
-                <span class="w-5 h-5 rounded-full border border-zinc-700 flex items-center justify-center flex-shrink-0 text-xs">1</span>
+            <div class="flex items-center gap-3 text-sm text-zinc-600 transition-colors duration-500" id="step-1">
+                <span class="w-5 h-5 rounded-full border border-zinc-700 flex items-center justify-center flex-shrink-0 text-xs transition-colors duration-500">1</span>
                 <span>Récupération des sons likés</span>
             </div>
-            <div class="flex items-center gap-3 text-sm text-zinc-600" id="step-2">
-                <span class="w-5 h-5 rounded-full border border-zinc-700 flex items-center justify-center flex-shrink-0 text-xs">2</span>
+            <div class="flex items-center gap-3 text-sm text-zinc-600 transition-colors duration-500" id="step-2">
+                <span class="w-5 h-5 rounded-full border border-zinc-700 flex items-center justify-center flex-shrink-0 text-xs transition-colors duration-500">2</span>
                 <span>Analyse des playlists</span>
             </div>
-            <div class="flex items-center gap-3 text-sm text-zinc-600" id="step-3">
-                <span class="w-5 h-5 rounded-full border border-zinc-700 flex items-center justify-center flex-shrink-0 text-xs">3</span>
+            <div class="flex items-center gap-3 text-sm text-zinc-600 transition-colors duration-500" id="step-3">
+                <span class="w-5 h-5 rounded-full border border-zinc-700 flex items-center justify-center flex-shrink-0 text-xs transition-colors duration-500">3</span>
                 <span>Croisement avec notre base</span>
             </div>
+        </div>
+
+        <!-- Disclaimer patience — apparaît après 5s -->
+        <div id="patience-msg"
+             class="hidden bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-left transition-opacity duration-700 opacity-0">
+            <p class="text-zinc-400 text-xs leading-relaxed">
+                Le scan peut prendre quelques secondes selon la taille de ta bibliothèque.
+                <span class="text-zinc-500">Ne ferme pas cet onglet.</span>
+            </p>
         </div>
 
     </div>
 </main>
 
 <script>
-    const stepIds = ['step-1', 'step-2', 'step-3'];
-    const labels = [
-        'Récupération des sons likés…',
-        'Analyse des playlists…',
-        'Croisement avec notre base…'
+    const steps = [
+        { id: 'step-1', label: 'Récupération des sons likés…' },
+        { id: 'step-2', label: 'Analyse des playlists…' },
+        { id: 'step-3', label: 'Croisement avec notre base…' },
     ];
 
     function activateStep(index) {
-        const el = document.getElementById(stepIds[index]);
+        const el = document.getElementById(steps[index].id);
         el.classList.remove('text-zinc-600');
         el.classList.add('text-white');
-        el.querySelector('span').classList.remove('border-zinc-700');
-        el.querySelector('span').classList.add('border-green-500', 'text-green-400');
-        document.getElementById('status-text').textContent = labels[index];
+        const dot = el.querySelector('span');
+        dot.classList.remove('border-zinc-700');
+        dot.classList.add('border-green-500', 'text-green-400');
+        document.getElementById('status-text').textContent = steps[index].label;
     }
 
+    // Déroulement des steps
     activateStep(0);
-    setTimeout(() => activateStep(1), 1200);
-    setTimeout(() => activateStep(2), 2400);
-    setTimeout(() => { window.location.href = '/scan/result'; }, 500);
-    // Redirige vers le résultat — le navigateur attend la réponse serveur (scan en cours)
+    setTimeout(() => activateStep(1), 1500);
+    setTimeout(() => activateStep(2), 3000);
+
+    // Disclaimer patience après 5s
+    setTimeout(() => {
+        const msg = document.getElementById('patience-msg');
+        msg.classList.remove('hidden');
+        // Petite frame pour déclencher la transition
+        requestAnimationFrame(() => msg.classList.replace('opacity-0', 'opacity-100'));
+    }, 5000);
+
+    // Redirection vers le résultat — le navigateur attend la réponse serveur
     setTimeout(() => {
         window.location.href = '/scan/result';
-    }, 500);
+    }, 4000);
 </script>
 
 </body>

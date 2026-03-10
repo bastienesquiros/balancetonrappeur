@@ -27,7 +27,7 @@ public class Rapper {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private RapperStatus status = RapperStatus.CONTROVERSY;
+    private RapperStatus status = RapperStatus.ACCUSED;
 
     @Column(name = "spotify_image_url", columnDefinition = "TEXT")
     private String spotifyImageUrl;

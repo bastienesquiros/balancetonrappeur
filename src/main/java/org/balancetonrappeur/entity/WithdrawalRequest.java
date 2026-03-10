@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 
@@ -20,8 +22,10 @@ public class WithdrawalRequest {
     @Column(name = "rapper_name", length = 255)
     private String rapperName;
 
-    @Column(name = "accusation_id")
-    private Long accusationId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "accusation_id", foreignKey = @ForeignKey(name = "fk_withdrawal_accusation"))
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    private Accusation accusation;
 
     @Column(name = "accusation_title", length = 500)
     private String accusationTitle;

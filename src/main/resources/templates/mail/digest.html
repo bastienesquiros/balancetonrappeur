@@ -2,64 +2,88 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="fr">
 <head>
     <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Digest quotidien — Balance Ton Rappeur</title>
 </head>
-<body style="font-family: system-ui, sans-serif; background:#0f0f0f; color:#e4e4e7; padding:32px; max-width:640px; margin:0 auto;">
+<body style="font-family:system-ui,-apple-system,sans-serif;background:#09090b;color:#e4e4e7;padding:0;margin:0;">
 
-    <h2 style="color:#fff; font-size:20px; margin-bottom:4px;">📋 Balance Ton Rappeur — Digest quotidien</h2>
-    <p style="color:#71717a; font-size:13px; margin-bottom:32px;">
-        <strong style="color:#a1a1aa;" th:text="${submissions.size()}">0</strong> soumission(s) en attente ·
-        <strong style="color:#a1a1aa;" th:text="${withdrawals.size()}">0</strong> retrait(s) en attente
-    </p>
+<div style="max-width:620px;margin:0 auto;padding:40px 24px;">
+
+    <!-- Header -->
+    <div style="margin-bottom:32px;">
+        <p style="margin:0 0 2px;font-size:18px;font-weight:700;color:#fff;">Balance Ton Rappeur</p>
+        <p style="margin:0;font-size:13px;color:#71717a;">Digest quotidien</p>
+    </div>
+
+    <!-- Résumé -->
+    <div style="background:#18181b;border:1px solid #27272a;border-radius:12px;padding:16px 20px;margin-bottom:28px;">
+        <table style="width:100%;border-collapse:collapse;">
+            <tr>
+                <td style="padding:3px 0;font-size:13px;color:#71717a;width:160px;">Soumissions en attente</td>
+                <td style="padding:3px 0;font-size:13px;font-weight:600;color:#e4e4e7;" th:text="${submissions.size()}">0</td>
+            </tr>
+            <tr>
+                <td style="padding:3px 0;font-size:13px;color:#71717a;">Retraits en attente</td>
+                <td style="padding:3px 0;font-size:13px;font-weight:600;color:#e4e4e7;" th:text="${withdrawals.size()}">0</td>
+            </tr>
+        </table>
+    </div>
 
     <!-- Soumissions -->
     <th:block th:if="${!submissions.isEmpty()}">
-        <h3 style="color:#fff; font-size:15px; border-bottom:1px solid #27272a; padding-bottom:8px; margin-bottom:16px;">
-            🆕 Nouvelles soumissions (<span th:text="${submissions.size()}">0</span>)
-        </h3>
+        <p style="margin:0 0 12px;font-size:11px;color:#52525b;text-transform:uppercase;letter-spacing:.06em;font-weight:600;border-bottom:1px solid #27272a;padding-bottom:8px;">
+            Nouvelles soumissions
+        </p>
 
         <div th:each="s : ${submissions}"
-             style="background:#18181b; border:1px solid #27272a; border-radius:10px; padding:14px 16px; margin-bottom:10px;">
-            <p style="margin:0 0 6px; font-size:13px; color:#a1a1aa;">
+             style="background:#18181b;border:1px solid #27272a;border-left:3px solid #52525b;border-radius:10px;padding:14px 16px;margin-bottom:10px;">
+            <p style="margin:0 0 4px;font-size:12px;color:#71717a;">
                 <span th:text="${s.type.name() == 'ADD_ACCUSATION' ? 'Ajout' : 'Modification'}">Ajout</span>
                 · <span th:text="${#temporals.format(s.createdAt, 'dd/MM/yyyy HH:mm')}">date</span>
             </p>
-            <p style="margin:0 0 4px; font-size:15px; font-weight:600; color:#fff;" th:text="${s.title}">Titre</p>
-            <p style="margin:0; font-size:13px; color:#71717a;">
-                Rappeur :
-                <span th:text="${s.rapper != null ? s.rapper.name : (s.unknownRapperName != null ? s.unknownRapperName : '?')}">Nom</span>
+            <p style="margin:0 0 3px;font-size:14px;font-weight:600;color:#fff;" th:text="${s.title}">Titre</p>
+            <p style="margin:0;font-size:12px;color:#71717a;">
+                Rappeur : <span style="color:#a1a1aa;"
+                    th:text="${s.rapper != null ? s.rapper.name : (s.unknownRapperName != null ? s.unknownRapperName : '—')}">Nom</span>
             </p>
         </div>
     </th:block>
 
     <!-- Retraits -->
     <th:block th:if="${!withdrawals.isEmpty()}">
-        <h3 style="color:#fff; font-size:15px; border-bottom:1px solid #27272a; padding-bottom:8px; margin-bottom:16px; margin-top:28px;">
-            ⚠️ Demandes de retrait (<span th:text="${withdrawals.size()}">0</span>)
-        </h3>
+        <p style="margin:28px 0 12px;font-size:11px;color:#52525b;text-transform:uppercase;letter-spacing:.06em;font-weight:600;border-bottom:1px solid #27272a;padding-bottom:8px;">
+            Demandes de retrait
+        </p>
 
         <div th:each="w : ${withdrawals}"
-             style="background:#18181b; border:1px solid #3f1a1a; border-radius:10px; padding:14px 16px; margin-bottom:10px;">
-            <p style="margin:0 0 6px; font-size:13px; color:#a1a1aa;">
+             style="background:#18181b;border:1px solid #27272a;border-left:3px solid #dc2626;border-radius:10px;padding:14px 16px;margin-bottom:10px;">
+            <p style="margin:0 0 4px;font-size:12px;color:#71717a;">
                 <span th:text="${#temporals.format(w.createdAt, 'dd/MM/yyyy HH:mm')}">date</span>
                 · <span th:text="${w.reason.label()}">raison</span>
             </p>
-            <p style="margin:0 0 4px; font-size:15px; font-weight:600; color:#fff;"
+            <p style="margin:0 0 3px;font-size:14px;font-weight:600;color:#fff;"
                th:text="${w.rapperName != null ? w.rapperName : '—'}">Rappeur</p>
             <p th:if="${w.accusationTitle != null}"
-               style="margin:0 0 4px; font-size:13px; color:#71717a;">
-                Affaire : <span th:text="${w.accusationTitle}">titre</span>
+               style="margin:0 0 3px;font-size:12px;color:#71717a;">
+                Affaire : <span style="color:#a1a1aa;" th:text="${w.accusationTitle}">titre</span>
             </p>
-            <p style="margin:4px 0 0; font-size:13px; color:#a1a1aa; font-style:italic;"
+            <p style="margin:4px 0 0;font-size:12px;color:#71717a;font-style:italic;"
                th:text="${w.message}">message</p>
             <p th:if="${w.email != null}"
-               style="margin:4px 0 0; font-size:12px; color:#52525b;">
+               style="margin:4px 0 0;font-size:11px;color:#52525b;">
                 Contact : <span th:text="${w.email}">email</span>
             </p>
         </div>
     </th:block>
 
-    <p style="color:#3f3f46; font-size:11px; margin-top:32px;">Balance Ton Rappeur · digest automatique quotidien</p>
+    <!-- Footer -->
+    <div style="border-top:1px solid #27272a;padding-top:20px;margin-top:32px;">
+        <p style="margin:0;font-size:11px;color:#3f3f46;">
+            Balance Ton Rappeur · digest automatique quotidien
+        </p>
+    </div>
 
+</div>
 </body>
 </html>
 

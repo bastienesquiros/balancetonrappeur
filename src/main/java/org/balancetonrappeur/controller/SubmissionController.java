@@ -73,7 +73,8 @@ public class SubmissionController {
         }
 
         submissionService.submitUnknownRapper(form.getRapperName(), form.getCategory(), form.getTitle(),
-                form.getStatus(), form.getFactDate(), form.getSourceType(), form.getSourceTitle(), form.getSourceUrl());
+                form.getStatus(), form.getFactDate(), form.getSourceType(), form.getSourceTitle(), form.getSourceUrl(),
+                form.getEmail());
         redirectAttributes.addFlashAttribute("submissionSuccess", true);
         return "redirect:/rappers/suggest";
     }
@@ -138,11 +139,13 @@ public class SubmissionController {
             if (form.getType() == SubmissionType.EDIT_ACCUSATION && form.getAccusationId() != null) {
                 submissionService.submitEdit(rapperId, form.getAccusationId(), form.getCategory(),
                         form.getTitle(), form.getStatus(), form.getFactDate(),
-                        form.getSourceType(), form.getSourceTitle(), form.getSourceUrl());
+                        form.getSourceType(), form.getSourceTitle(), form.getSourceUrl(),
+                        form.getEmail());
             } else {
                 submissionService.submitAdd(rapperId, form.getCategory(), form.getTitle(),
                         form.getStatus(), form.getFactDate(),
-                        form.getSourceType(), form.getSourceTitle(), form.getSourceUrl());
+                        form.getSourceType(), form.getSourceTitle(), form.getSourceUrl(),
+                        form.getEmail());
             }
             redirectAttributes.addFlashAttribute("submissionSuccess", true);
             return "redirect:/rappers/" + rapperId;

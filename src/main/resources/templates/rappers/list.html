@@ -31,7 +31,7 @@
                 </a>
                 <a th:each="s : ${statuses}"
                    th:href="@{/rappers(status=${s.name()})}"
-                   th:text="${s.name() == 'CONVICTED' ? 'Condamnés' : s.name() == 'ACCUSED' ? 'Accusés' : 'Polémiques'}"
+                   th:text="${s.label()}"
                    th:class="${selectedStatus != null and selectedStatus.name() == s.name()} ? 'text-xs px-3 py-1.5 rounded-lg border bg-zinc-700 text-white border-zinc-500 transition-colors' : 'text-xs px-3 py-1.5 rounded-lg border text-zinc-500 border-zinc-800 hover:text-white hover:bg-zinc-800/50 transition-colors'">
                 </a>
             </div>
@@ -51,11 +51,7 @@
                 <p class="font-semibold text-white text-sm truncate mb-auto" th:text="${rapper.name}">Artiste</p>
                 <!-- Badge -->
                 <div class="mt-2">
-                    <span th:switch="${rapper.status.name()}">
-                        <span th:case="'CONVICTED'" class="text-xs px-2 py-0.5 rounded-full bg-red-950/80 text-red-400 border border-red-900/40">Condamné</span>
-                        <span th:case="'ACCUSED'" class="text-xs px-2 py-0.5 rounded-full bg-amber-950/80 text-amber-400 border border-amber-900/40">Accusé</span>
-                        <span th:case="*" class="text-xs px-2 py-0.5 rounded-full bg-zinc-800/80 text-zinc-500 border border-zinc-700/40">Polémique</span>
-                    </span>
+                    <th:block th:replace="~{fragments :: rapperStatusBadge(${rapper.status})}"/>
                 </div>
             </a>
         </div>
@@ -74,29 +70,7 @@
         </div>
 
         <!-- Pagination -->
-        <nav th:if="${totalPages != null and totalPages > 1}"
-             class="flex items-center justify-center gap-1 mt-10">
-            <a th:if="${currentPage > 0}"
-               th:href="@{/rappers(page=${currentPage - 1})}"
-               class="px-3 py-2 rounded-lg text-zinc-400 text-sm hover:bg-zinc-800 hover:text-white transition-colors">← Préc.</a>
-            <span th:unless="${currentPage > 0}"
-                  class="px-3 py-2 rounded-lg text-zinc-700 text-sm cursor-not-allowed">← Préc.</span>
-            <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-                <th:block th:if="${i == 0 or i == totalPages - 1 or (i >= currentPage - 2 and i <= currentPage + 2)}">
-                    <a th:if="${i != currentPage}" th:href="@{/rappers(page=${i})}" th:text="${i + 1}"
-                       class="px-3 py-2 rounded-lg text-zinc-400 text-sm hover:bg-zinc-800 hover:text-white transition-colors"></a>
-                    <span th:if="${i == currentPage}" th:text="${i + 1}"
-                          class="px-3 py-2 rounded-lg bg-white text-zinc-950 text-sm font-semibold"></span>
-                </th:block>
-                <span th:if="${(i == 1 and currentPage > 3) or (i == totalPages - 2 and currentPage < totalPages - 4)}"
-                      class="px-1 text-zinc-700 text-sm">…</span>
-            </th:block>
-            <a th:if="${currentPage < totalPages - 1}"
-               th:href="@{/rappers(page=${currentPage + 1})}"
-               class="px-3 py-2 rounded-lg text-zinc-400 text-sm hover:bg-zinc-800 hover:text-white transition-colors">Suiv. →</a>
-            <span th:unless="${currentPage < totalPages - 1}"
-                  class="px-3 py-2 rounded-lg text-zinc-700 text-sm cursor-not-allowed">Suiv. →</span>
-        </nav>
+        <div th:replace="~{fragments :: pagination('/rappers', ${currentPage}, ${totalPages}, ${filterParams})}"></div>
 
     </div>
 </main>

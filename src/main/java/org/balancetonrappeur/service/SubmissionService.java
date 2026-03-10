@@ -8,6 +8,7 @@ import org.balancetonrappeur.repository.RapperRepository;
 import org.balancetonrappeur.repository.SubmissionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.lang.Nullable;
 
 
 import java.time.LocalDate;
@@ -22,25 +23,32 @@ public class SubmissionService {
     private final SubmissionRepository submissionRepository;
     private final RapperRepository rapperRepository;
     private final AccusationRepository accusationRepository;
+    private final SubmissionMailService submissionMailService;
 
     @Transactional
     public void submitUnknownRapper(String rapperName, AccusationCategory category, String title,
                                     AccusationStatus status, LocalDate factDate,
-                                    List<SourceType> types, List<String> titles, List<String> urls) {
+                                    List<SourceType> types, List<String> titles, List<String> urls,
+                                    @Nullable String email) {
         var submission = buildAddSubmission(category, title, status, factDate, types, titles, urls);
         submission.setUnknownRapperName(rapperName);
+        submission.setSubmitterEmail(email);
         submissionRepository.save(submission);
+        submissionMailService.sendConfirmation(submission);
     }
 
     @Transactional
     public void submitAdd(Long rapperId, AccusationCategory category, String title,
                           AccusationStatus status, LocalDate factDate,
-                          List<SourceType> types, List<String> titles, List<String> urls) {
+                          List<SourceType> types, List<String> titles, List<String> urls,
+                          @Nullable String email) {
         var rapper = rapperRepository.findById(rapperId)
                 .orElseThrow(() -> new IllegalArgumentException("Rappeur introuvable"));
         var submission = buildAddSubmission(category, title, status, factDate, types, titles, urls);
         submission.setRapper(rapper);
+        submission.setSubmitterEmail(email);
         submissionRepository.save(submission);
+        submissionMailService.sendConfirmation(submission);
     }
 
     private Submission buildAddSubmission(AccusationCategory category, String title,
@@ -55,7 +63,8 @@ public class SubmissionService {
     @Transactional
     public void submitEdit(Long rapperId, Long accusationId, AccusationCategory category,
                            String title, AccusationStatus status, LocalDate factDate,
-                           List<SourceType> types, List<String> titles, List<String> urls) {
+                           List<SourceType> types, List<String> titles, List<String> urls,
+                           @Nullable String email) {
         var rapper = rapperRepository.findById(rapperId)
                 .orElseThrow(() -> new IllegalArgumentException("Rappeur introuvable"));
         var accusation = accusationRepository.findById(accusationId)
@@ -83,8 +92,10 @@ public class SubmissionService {
         submission.setType(SubmissionType.EDIT_ACCUSATION);
         submission.setRapper(rapper);
         submission.setAccusation(accusation);
+        submission.setSubmitterEmail(email);
         attachSources(submission, types, titles, urls);
         submissionRepository.save(submission);
+        submissionMailService.sendConfirmation(submission);
     }
 
 

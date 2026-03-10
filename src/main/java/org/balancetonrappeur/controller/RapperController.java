@@ -32,12 +32,15 @@ public class RapperController {
         var pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("name").ascending());
         var result = rapperService.findFiltered(status, pageable);
 
+        var filterParams = status != null ? "&status=" + status.name() : "";
+
         model.addAttribute("rappers", result.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", result.getTotalPages());
         model.addAttribute("totalElements", result.getTotalElements());
         model.addAttribute("statuses", RapperStatus.values());
         model.addAttribute("selectedStatus", status);
+        model.addAttribute("filterParams", filterParams);
         return "rappers/list";
     }
 

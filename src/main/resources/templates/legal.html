@@ -180,7 +180,7 @@
                                        :class="submitted && !rapperId ? 'border-red-500 focus:border-red-500' : 'border-zinc-700 focus:border-zinc-500'"
                                        th:class="${formHasErrors != null and formHasErrors and (withdrawalForm.rapperName == null or #strings.isEmpty(withdrawalForm.rapperName))} ? 'w-full bg-zinc-800 border border-red-500 rounded-lg px-3 py-2.5 text-white placeholder-zinc-600 text-sm focus:outline-none transition-colors pr-8' : 'w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white placeholder-zinc-600 text-sm focus:outline-none transition-colors pr-8'"
                                        />
-                                <span x-show="rapperId" class="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
+                                <span x-show="rapperId" x-cloak class="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                                     </svg>
@@ -194,15 +194,18 @@
                             </p>
                             <!-- Hint Alpine dynamique -->
                             <p x-show="rapperQuery.length >= 2 && !rapperId"
+                               x-cloak
                                th:if="${not (formHasErrors != null and formHasErrors and (withdrawalForm.rapperName == null or #strings.isEmpty(withdrawalForm.rapperName)))}"
                                class="text-zinc-600 text-xs mt-1">Sélectionnez un rappeur dans la liste.</p>
                             <p x-show="submitted && !rapperId"
+                               x-cloak
                                th:if="${not (formHasErrors != null and formHasErrors and (withdrawalForm.rapperName == null or #strings.isEmpty(withdrawalForm.rapperName)))}"
                                class="text-red-400 text-xs mt-1">Veuillez sélectionner un rappeur dans la liste.</p>
                             <!-- Hidden input -->
                             <input type="hidden" name="rapperName" id="rapperName" :value="rapperId ? rapperQuery : ''"/>
                             <!-- Dropdown rappeurs -->
                             <div x-show="rapperResults.length > 0"
+                                 x-cloak
                                  x-transition:enter="transition ease-out duration-100"
                                  x-transition:enter-start="opacity-0 -translate-y-1"
                                  x-transition:enter-end="opacity-100 translate-y-0"
@@ -229,18 +232,21 @@
 
                             <!-- Aucun rappeur sélectionné encore -->
                             <div x-show="!rapperId && accusations.length === 0"
+                                 x-cloak
                                  class="bg-zinc-800/40 border border-zinc-800 rounded-lg px-3 py-2.5 text-zinc-600 text-sm italic">
                                 Sélectionnez d'abord un rappeur ci-dessus
                             </div>
 
                             <!-- Rappeur sélectionné, aucune affaire indexée -->
                             <div x-show="rapperId && accusations.length === 0"
+                                 x-cloak
                                  class="bg-zinc-800/40 border border-zinc-800 rounded-lg px-3 py-2.5 text-zinc-500 text-sm">
                                 Aucune affaire indexée pour ce rappeur
                             </div>
 
                             <!-- Dropdown accusations -->
                             <div x-show="accusations.length > 0 && !selectedAccusationId"
+                                 x-cloak
                                  class="bg-zinc-800 border border-zinc-700 rounded-lg overflow-hidden">
                                 <template x-for="acc in accusations" :key="acc.id">
                                     <button type="button"
@@ -255,6 +261,7 @@
 
                             <!-- Accusation sélectionnée -->
                             <div x-show="selectedAccusationId"
+                                 x-cloak
                                  class="bg-zinc-800 border border-zinc-500 rounded-lg px-3 py-2.5 flex items-center gap-2">
                                 <span class="text-zinc-200 text-sm truncate" x-text="selectedAccusationTitle"></span>
                                 <button type="button"
@@ -338,14 +345,14 @@
                             Email de contact <span class="text-zinc-600">(optionnel)</span>
                         </label>
                         <input type="email" th:field="*{email}"
-                               placeholder="pour recevoir une réponse"
+                               placeholder="votre@email.com"
                                th:class="'w-full bg-zinc-800 border rounded-lg px-3 py-2.5 text-white placeholder-zinc-600 text-sm focus:outline-none transition-colors '
                                          + (${#fields.hasErrors('email')} ? 'border-red-500 focus:border-red-500' : 'border-zinc-700 focus:border-zinc-500')"/>
                         <p th:if="${#fields.hasErrors('email')}" class="text-red-400 text-xs mt-1.5 flex items-center gap-1.5">
                             <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
                             <span th:errors="*{email}"></span>
                         </p>
-                        <p th:unless="${#fields.hasErrors('email')}" class="text-zinc-600 text-xs mt-1">Non obligatoire. Utilisé uniquement pour vous répondre.</p>
+                        <p th:unless="${#fields.hasErrors('email')}" class="text-zinc-600 text-xs mt-1">Utilisé uniquement pour vous répondre.</p>
                     </div>
 
                 </div>

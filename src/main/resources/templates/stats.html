@@ -53,23 +53,32 @@
                         </div>
                         <span class="text-white text-xs font-semibold w-6 text-right flex-shrink-0" th:text="${stats.convicted}">0</span>
                     </a>
+                    <!-- En cours -->
+                    <a href="/rappers?status=ONGOING" class="flex items-center gap-3 group rounded-lg py-1 hover:bg-zinc-800/50 transition-colors -mx-2 px-2">
+                        <span class="text-zinc-400 text-xs w-24 flex-shrink-0 group-hover:text-white transition-colors">En cours</span>
+                        <div class="flex-1 bg-zinc-800 rounded-full h-2">
+                            <div class="bg-amber-500 h-2 rounded-full transition-all"
+                                 th:style="'width:' + (${stats.totalRappers} > 0 ? ${#numbers.formatDecimal(stats.ongoing * 100.0 / stats.totalRappers, 1, 1)} : 0) + '%'"></div>
+                        </div>
+                        <span class="text-white text-xs font-semibold w-6 text-right flex-shrink-0" th:text="${stats.ongoing}">0</span>
+                    </a>
                     <!-- Accusés -->
                     <a href="/rappers?status=ACCUSED" class="flex items-center gap-3 group rounded-lg py-1 hover:bg-zinc-800/50 transition-colors -mx-2 px-2">
                         <span class="text-zinc-400 text-xs w-24 flex-shrink-0 group-hover:text-white transition-colors">Accusés</span>
                         <div class="flex-1 bg-zinc-800 rounded-full h-2">
-                            <div class="bg-amber-500 h-2 rounded-full transition-all"
+                            <div class="bg-zinc-400 h-2 rounded-full transition-all"
                                  th:style="'width:' + (${stats.totalRappers} > 0 ? ${#numbers.formatDecimal(stats.accused * 100.0 / stats.totalRappers, 1, 1)} : 0) + '%'"></div>
                         </div>
                         <span class="text-white text-xs font-semibold w-6 text-right flex-shrink-0" th:text="${stats.accused}">0</span>
                     </a>
-                    <!-- Polémique -->
-                    <a href="/rappers?status=CONTROVERSY" class="flex items-center gap-3 group rounded-lg py-1 hover:bg-zinc-800/50 transition-colors -mx-2 px-2">
-                        <span class="text-zinc-400 text-xs w-24 flex-shrink-0 group-hover:text-white transition-colors">Polémique</span>
+                    <!-- Relaxés -->
+                    <a href="/rappers?status=ACQUITTED" class="flex items-center gap-3 group rounded-lg py-1 hover:bg-zinc-800/50 transition-colors -mx-2 px-2">
+                        <span class="text-zinc-400 text-xs w-24 flex-shrink-0 group-hover:text-white transition-colors">Relaxés</span>
                         <div class="flex-1 bg-zinc-800 rounded-full h-2">
-                            <div class="bg-yellow-500 h-2 rounded-full transition-all"
-                                 th:style="'width:' + (${stats.totalRappers} > 0 ? ${#numbers.formatDecimal(stats.controversy * 100.0 / stats.totalRappers, 1, 1)} : 0) + '%'"></div>
+                            <div class="bg-green-500 h-2 rounded-full transition-all"
+                                 th:style="'width:' + (${stats.totalRappers} > 0 ? ${#numbers.formatDecimal(stats.acquitted * 100.0 / stats.totalRappers, 1, 1)} : 0) + '%'"></div>
                         </div>
-                        <span class="text-white text-xs font-semibold w-6 text-right flex-shrink-0" th:text="${stats.controversy}">0</span>
+                        <span class="text-white text-xs font-semibold w-6 text-right flex-shrink-0" th:text="${stats.acquitted}">0</span>
                     </a>
                 </div>
 
@@ -102,12 +111,35 @@
                                   th:text="${st.label()}"></span>
                             <div class="flex-1 bg-zinc-800 rounded-full h-2">
                                 <div class="h-2 rounded-full transition-all"
-                                     th:classappend="${entry.key == 'CONVICTED'} ? 'bg-red-500' : (${entry.key == 'ONGOING'} ? 'bg-amber-500' : (${entry.key == 'ACQUITTED'} ? 'bg-green-500' : 'bg-yellow-500'))"
+                                     th:classappend="${entry.key == 'CONVICTED'} ? 'bg-red-500' : (${entry.key == 'ONGOING'} ? 'bg-amber-500' : (${entry.key == 'ACQUITTED'} ? 'bg-green-500' : 'bg-slate-500'))"
                                      th:style="'width:' + (${stats.totalAccusations} > 0 ? ${#numbers.formatDecimal(entry.value * 100.0 / stats.totalAccusations, 1, 1)} : 0) + '%'"></div>
                             </div>
                             <span class="text-white text-xs font-semibold w-6 text-right flex-shrink-0" th:text="${entry.value}">0</span>
                         </a>
                     </th:block>
+                    <!-- Sans procédure judiciaire -->
+                    <a href="/accusations" class="flex items-center gap-3 group rounded-lg py-1 hover:bg-zinc-800/50 transition-colors -mx-2 px-2">
+                        <span class="text-zinc-400 text-xs w-24 flex-shrink-0 group-hover:text-white transition-colors">Sans procédure</span>
+                        <div class="flex-1 bg-zinc-800 rounded-full h-2">
+                            <div class="bg-zinc-600 h-2 rounded-full transition-all"
+                                 th:style="'width:' + (${stats.totalAccusations} > 0 ? ${#numbers.formatDecimal(stats.accusationsWithoutStatus * 100.0 / stats.totalAccusations, 1, 1)} : 0) + '%'"></div>
+                        </div>
+                        <span class="text-white text-xs font-semibold w-6 text-right flex-shrink-0" th:text="${stats.accusationsWithoutStatus}">0</span>
+                    </a>
+                </div>
+
+                <!-- Récapitulatif -->
+                <div class="mt-5 pt-4 border-t border-zinc-800 flex gap-4">
+                    <div>
+                        <p class="text-xl font-bold text-amber-400"
+                           th:text="${stats.totalAccusations > 0 ? #numbers.formatDecimal((stats.totalAccusations - stats.accusationsWithoutStatus) * 100.0 / stats.totalAccusations, 1, 0) + '%' : '—'}">—</p>
+                        <p class="text-zinc-600 text-xs">avec procédure judiciaire</p>
+                    </div>
+                    <div>
+                        <p class="text-xl font-bold text-zinc-400"
+                           th:text="${stats.accusationsWithoutStatus}">0</p>
+                        <p class="text-zinc-600 text-xs">polémiques ou call-outs</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -218,18 +250,25 @@
                 </div>
                 <!-- Fiabilité sources -->
                 <div th:if="${not stats.bySourceType.isEmpty()}"
-                     class="mt-4 pt-4 border-t border-zinc-800">
-                    <p class="text-zinc-600 text-xs">
-                        <span class="text-indigo-400 font-medium"
-                              th:text="${stats.bySourceType.getOrDefault('JUDICIAL', 0)}">0</span>
-                        judiciaire(s) ·
-                        <span class="text-cyan-400 font-medium"
-                              th:text="${stats.bySourceType.getOrDefault('PRESS', 0)}">0</span>
-                        presse ·
-                        <span class="text-teal-400 font-medium"
-                              th:text="${stats.bySourceType.getOrDefault('SOCIAL_MEDIA', 0)}">0</span>
-                        réseau social
-                    </p>
+                     class="mt-5 pt-4 border-t border-zinc-800 flex gap-4"
+                     th:with="press=${stats.bySourceType.getOrDefault('PRESS', 0)},
+                               judicial=${stats.bySourceType.getOrDefault('JUDICIAL', 0)},
+                               social=${stats.bySourceType.getOrDefault('SOCIAL_MEDIA', 0)}">
+                    <div>
+                        <p class="text-xl font-bold text-cyan-400"
+                           th:text="${stats.totalSources > 0 ? #numbers.formatDecimal((press + judicial) * 100.0 / stats.totalSources, 1, 0) + '%' : '—'}">—</p>
+                        <p class="text-zinc-600 text-xs">sources vérifiables</p>
+                    </div>
+                    <div>
+                        <p class="text-xl font-bold text-indigo-400"
+                           th:text="${stats.totalSources > 0 ? #numbers.formatDecimal(judicial * 100.0 / stats.totalSources, 1, 0) + '%' : '—'}">—</p>
+                        <p class="text-zinc-600 text-xs">sources judiciaires</p>
+                    </div>
+                    <div>
+                        <p class="text-xl font-bold text-zinc-400"
+                           th:text="${stats.totalSources > 0 ? #numbers.formatDecimal(social * 100.0 / stats.totalSources, 1, 0) + '%' : '—'}">—</p>
+                        <p class="text-zinc-600 text-xs">réseaux sociaux</p>
+                    </div>
                 </div>
             </div>
 

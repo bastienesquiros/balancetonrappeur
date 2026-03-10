@@ -36,6 +36,11 @@ public class AccusationController {
         var pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("factDate").descending());
         var result = accusationService.findFiltered(category, status, pageable);
 
+        // Construit la query string sans le paramètre page pour la pagination
+        var filterParams = new StringBuilder();
+        if (category != null) filterParams.append("&category=").append(category.name());
+        if (status   != null) filterParams.append("&status=").append(status.name());
+
         model.addAttribute("accusations",          result.getContent());
         model.addAttribute("currentPage",          page);
         model.addAttribute("totalPages",           result.getTotalPages());
@@ -44,6 +49,7 @@ public class AccusationController {
         model.addAttribute("statuses",             AccusationStatus.values());
         model.addAttribute("selectedCategories",   category != null ? List.of(category) : List.of());
         model.addAttribute("selectedStatuses",     status   != null ? List.of(status)   : List.of());
+        model.addAttribute("filterParams",         filterParams.toString());
         return "accusations/list";
     }
 

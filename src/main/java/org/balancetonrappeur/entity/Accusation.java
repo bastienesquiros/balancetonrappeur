@@ -38,7 +38,7 @@ public class Accusation {
     private String title;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = true)
     private AccusationStatus status;
 
     @Column(name = "fact_date")

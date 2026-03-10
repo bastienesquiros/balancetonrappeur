@@ -92,7 +92,7 @@ public class ScanController {
     @GetMapping("/loading")
     public String loading(HttpSession session) {
         if (session.getAttribute(SESSION_TOKEN) == null) return "redirect:/scan";
-        return "scan-loading";
+        return "scan/loading";
     }
 
     /** Lance le scan et affiche les résultats. */
@@ -106,7 +106,7 @@ public class ScanController {
         if (cached != null && token == null) {
             model.addAttribute("results", cached);
             model.addAttribute("clean", cached.isEmpty());
-            return "scan-result";
+            return "scan/result";
         }
 
         String activeToken = token != null ? token : (String) session.getAttribute(SESSION_REMOVE_TOKEN);
@@ -124,7 +124,7 @@ public class ScanController {
         model.addAttribute("results", results);
         model.addAttribute("clean", results.isEmpty());
         model.addAttribute("playlistsUnavailable", scanResult.playlistsUnavailable());
-        return "scan-result";
+        return "scan/result";
     }
 
     /** Retire un titre (liked ou playlist). */

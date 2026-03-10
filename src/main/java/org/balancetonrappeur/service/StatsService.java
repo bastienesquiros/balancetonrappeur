@@ -29,7 +29,8 @@ public class StatsService {
         long totalRappers = rapperRepository.count();
         long convicted    = rapperRepository.countByStatus(RapperStatus.CONVICTED);
         long accused      = rapperRepository.countByStatus(RapperStatus.ACCUSED);
-        long controversy  = rapperRepository.countByStatus(RapperStatus.CONTROVERSY);
+        long ongoing      = rapperRepository.countByStatus(RapperStatus.ONGOING);
+        long acquitted    = rapperRepository.countByStatus(RapperStatus.ACQUITTED);
 
         // Accusations
         long totalAccusations = accusationRepository.count();
@@ -40,11 +41,14 @@ public class StatsService {
         for (var row : accusationRepository.countByCategory())
             byCategory.put(row.category().name(), row.count());
 
-        // Par statut juridique
+        // Par statut juridique (les accusations sans statut sont exclues)
         Map<String, Long> byStatus = new LinkedHashMap<>();
         for (AccusationStatus st : AccusationStatus.values()) byStatus.put(st.name(), 0L);
         for (var row : accusationRepository.countByStatus())
-            byStatus.put(row.status().name(), row.count());
+            if (row.status() != null) byStatus.put(row.status().name(), row.count());
+
+        long accusationsWithStatus   = byStatus.values().stream().mapToLong(v -> v).sum();
+        long accusationsWithoutStatus = totalAccusations - accusationsWithStatus;
 
         // Par année
         Map<String, Long> byYear = new LinkedHashMap<>();
@@ -68,8 +72,8 @@ public class StatsService {
         long maxSource = bySourceType.values().stream().mapToLong(v -> v).max().orElse(1);
 
         return new StatsDto(
-            totalRappers, convicted, accused, controversy,
-            totalAccusations, totalSources,
+            totalRappers, convicted, accused, ongoing, acquitted,
+            totalAccusations, totalSources, accusationsWithoutStatus,
             byCategory, byStatus, byYear, topRappers, bySourceType,
             maxCat, maxRapper, maxYear, maxSource
         );

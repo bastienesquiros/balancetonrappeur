@@ -17,6 +17,7 @@ spring.mail.properties.mail.smtp.starttls.enable=false
 
 # Digest
 btr.mail.from=dev@balancetonrappeur.fr
+btr.mail.noreply=dev@balancetonrappeur.fr
 btr.mail.digest-to=dev@balancetonrappeur.fr
 
 # Admin dashboard

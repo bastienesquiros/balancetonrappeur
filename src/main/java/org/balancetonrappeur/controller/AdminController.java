@@ -67,8 +67,10 @@ public class AdminController {
     }
 
     @PostMapping("/submissions/{id}/reject")
-    public String rejectSubmission(@PathVariable Long id, RedirectAttributes ra) {
-        adminService.rejectSubmission(id);
+    public String rejectSubmission(@PathVariable Long id,
+                                   @RequestParam(required = false) String reason,
+                                   RedirectAttributes ra) {
+        adminService.rejectSubmission(id, reason);
         ra.addFlashAttribute("success", "Submission #" + id + " rejetée.");
         return "redirect:/admin";
     }
@@ -76,11 +78,12 @@ public class AdminController {
     // Withdrawals
 
     @PostMapping("/withdrawals/{id}/accept")
-    public String acceptWithdrawal(@PathVariable Long id, RedirectAttributes ra) {
+    public String acceptWithdrawal(@PathVariable Long id,
+                                   @RequestParam(required = false) String comment,
+                                   RedirectAttributes ra) {
         try {
-            var mailReminder = adminService.acceptWithdrawal(id);
+            adminService.acceptWithdrawal(id, comment);
             ra.addFlashAttribute("success", "Demande #" + id + " acceptée — accusation supprimée.");
-            mailReminder.ifPresent(m -> ra.addFlashAttribute("mailReminder", m));
         } catch (Exception e) {
             ra.addFlashAttribute("error", "Erreur : " + e.getMessage());
         }
@@ -88,10 +91,15 @@ public class AdminController {
     }
 
     @PostMapping("/withdrawals/{id}/reject")
-    public String rejectWithdrawal(@PathVariable Long id, RedirectAttributes ra) {
-        var mailReminder = adminService.rejectWithdrawal(id);
-        ra.addFlashAttribute("success", "Demande #" + id + " rejetée.");
-        mailReminder.ifPresent(m -> ra.addFlashAttribute("mailReminder", m));
+    public String rejectWithdrawal(@PathVariable Long id,
+                                   @RequestParam(required = false) String reason,
+                                   RedirectAttributes ra) {
+        try {
+            adminService.rejectWithdrawal(id, reason);
+            ra.addFlashAttribute("success", "Demande #" + id + " rejetée.");
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", "Erreur : " + e.getMessage());
+        }
         return "redirect:/admin";
     }
 

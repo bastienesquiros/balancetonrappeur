@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Demande de retrait acceptée — Balance Ton Rappeur</title>
+</head>
+<body style="font-family:system-ui,-apple-system,sans-serif;background:#09090b;color:#e4e4e7;padding:0;margin:0;">
+
+<div style="max-width:580px;margin:0 auto;padding:40px 24px;">
+
+    <!-- Header -->
+    <div style="margin-bottom:32px;">
+        <p style="margin:0 0 2px;font-size:18px;font-weight:700;color:#fff;">Balance Ton Rappeur</p>
+        <p style="margin:0;font-size:13px;color:#71717a;">Demande de retrait acceptée</p>
+    </div>
+
+    <!-- Banner succès -->
+    <div style="background:#18181b;border:1px solid #27272a;border-left:3px solid #16a34a;border-radius:12px;padding:20px 24px;margin-bottom:20px;">
+        <p style="margin:0 0 6px;font-size:15px;font-weight:600;color:#fff;">
+            Votre demande de retrait a été acceptée.
+        </p>
+        <p style="margin:0;font-size:13px;color:#71717a;line-height:1.6;">
+            L'affaire concernant <strong style="color:#a1a1aa;" th:text="${rapperName}">le rappeur</strong> a été supprimée de notre base de données.
+        </p>
+    </div>
+
+    <!-- Commentaire de l'admin -->
+    <div th:if="${comment != null and !#strings.isEmpty(comment)}"
+         style="background:#18181b;border:1px solid #27272a;border-radius:12px;padding:16px 20px;margin-bottom:20px;">
+        <p style="margin:0 0 8px;font-size:11px;color:#52525b;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">Message de l'équipe</p>
+        <p style="margin:0;font-size:13px;color:#e4e4e7;line-height:1.6;" th:text="${comment}">commentaire</p>
+    </div>
+
+    <!-- Récapitulatif -->
+    <div style="background:#18181b;border:1px solid #27272a;border-radius:12px;padding:16px 20px;margin-bottom:28px;">
+        <p style="margin:0 0 10px;font-size:11px;color:#52525b;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">Récapitulatif</p>
+        <table style="width:100%;border-collapse:collapse;">
+            <tr>
+                <td style="padding:3px 0;font-size:13px;color:#71717a;width:120px;">Rappeur</td>
+                <td style="padding:3px 0;font-size:13px;color:#e4e4e7;" th:text="${rapperName}">rappeur</td>
+            </tr>
+            <tr>
+                <td style="padding:3px 0;font-size:13px;color:#71717a;">Affaire</td>
+                <td style="padding:3px 0;font-size:13px;color:#e4e4e7;" th:text="${accusationTitle}">titre</td>
+            </tr>
+            <tr>
+                <td style="padding:3px 0;font-size:13px;color:#71717a;">Motif</td>
+                <td style="padding:3px 0;font-size:13px;color:#e4e4e7;" th:text="${withdrawal.reason.label()}">motif</td>
+            </tr>
+            <tr>
+                <td style="padding:3px 0;font-size:13px;color:#71717a;">Date</td>
+                <td style="padding:3px 0;font-size:13px;color:#e4e4e7;"
+                    th:text="${#temporals.format(withdrawal.createdAt, 'dd/MM/yyyy à HH:mm')}">date</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Footer légal -->
+    <div style="border-top:1px solid #27272a;padding-top:20px;">
+        <p style="margin:0 0 8px;font-size:12px;color:#52525b;line-height:1.6;">
+            Ce site compile des informations issues de sources publiques. Il ne constitue ni une accusation, ni un jugement.
+            Seules les décisions de justice définitives font foi.
+        </p>
+        <p style="margin:0;font-size:11px;color:#3f3f46;">
+            Balance Ton Rappeur · Votre adresse e-mail est utilisée uniquement pour répondre à cette demande.
+        </p>
+    </div>
+
+</div>
+</body>
+</html>
+

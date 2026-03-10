@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,6 +38,7 @@ public class Submission {
     // Accusation ciblée (EDIT uniquement)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "accusation_id")
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private Accusation accusation;
 
     @Enumerated(EnumType.STRING)
@@ -56,6 +59,12 @@ public class Submission {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private SubmissionStatus submissionStatus = SubmissionStatus.PENDING;
+
+    @Column(name = "submitter_email", length = 255)
+    private String submitterEmail;
+
+    @Column(name = "rejection_reason", columnDefinition = "TEXT")
+    private String rejectionReason;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

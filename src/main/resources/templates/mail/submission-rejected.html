@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Contribution non publiée — Balance Ton Rappeur</title>
+</head>
+<body style="font-family:system-ui,-apple-system,sans-serif;background:#09090b;color:#e4e4e7;padding:0;margin:0;">
+
+<div style="max-width:580px;margin:0 auto;padding:40px 24px;">
+
+    <!-- Header -->
+    <div style="margin-bottom:32px;">
+        <p style="margin:0 0 2px;font-size:18px;font-weight:700;color:#fff;">Balance Ton Rappeur</p>
+        <p style="margin:0;font-size:13px;color:#71717a;">Contribution non publiée</p>
+    </div>
+
+    <!-- Banner refus -->
+    <div style="background:#18181b;border:1px solid #27272a;border-left:3px solid #dc2626;border-radius:12px;padding:20px 24px;margin-bottom:20px;">
+        <p style="margin:0 0 6px;font-size:15px;font-weight:600;color:#fff;">
+            Votre contribution n'a pas pu être publiée.
+        </p>
+        <p style="margin:0;font-size:13px;color:#71717a;line-height:1.6;">
+            Elle concerne <strong style="color:#a1a1aa;" th:text="${rapperName}">le rappeur</strong>.
+            Elle a été examinée par notre équipe et ne correspond pas à nos critères de publication.
+        </p>
+    </div>
+
+    <!-- Motif de refus -->
+    <div th:if="${reason != null and !#strings.isEmpty(reason)}"
+         style="background:#18181b;border:1px solid #27272a;border-radius:12px;padding:16px 20px;margin-bottom:20px;">
+        <p style="margin:0 0 8px;font-size:11px;color:#52525b;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">Motif</p>
+        <p style="margin:0;font-size:13px;color:#e4e4e7;line-height:1.6;" th:text="${reason}">motif</p>
+    </div>
+
+    <!-- Récapitulatif -->
+    <div style="background:#18181b;border:1px solid #27272a;border-radius:12px;padding:16px 20px;margin-bottom:28px;">
+        <p style="margin:0 0 10px;font-size:11px;color:#52525b;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">Récapitulatif</p>
+        <table style="width:100%;border-collapse:collapse;">
+            <tr>
+                <td style="padding:3px 0;font-size:13px;color:#71717a;width:100px;">Type</td>
+                <td style="padding:3px 0;font-size:13px;color:#e4e4e7;">
+                    <th:block th:if="${submission.type.name() == 'ADD_ACCUSATION'}">Ajout d'affaire</th:block>
+                    <th:block th:unless="${submission.type.name() == 'ADD_ACCUSATION'}">Modification d'affaire</th:block>
+                </td>
+            </tr>
+            <tr th:if="${submission.title != null and !#strings.isEmpty(submission.title)}">
+                <td style="padding:3px 0;font-size:13px;color:#71717a;">Affaire</td>
+                <td style="padding:3px 0;font-size:13px;color:#e4e4e7;" th:text="${submission.title}">titre</td>
+            </tr>
+            <tr>
+                <td style="padding:3px 0;font-size:13px;color:#71717a;">Date</td>
+                <td style="padding:3px 0;font-size:13px;color:#e4e4e7;"
+                    th:text="${#temporals.format(submission.createdAt, 'dd/MM/yyyy à HH:mm')}">date</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Suggestion -->
+    <p style="font-size:13px;color:#71717a;line-height:1.6;margin-bottom:24px;">
+        Si vous pensez que cette décision est une erreur ou souhaitez soumettre une nouvelle contribution
+        avec des sources complémentaires, vous pouvez utiliser le formulaire disponible sur le site.
+    </p>
+
+    <!-- Footer légal -->
+    <div style="border-top:1px solid #27272a;padding-top:20px;">
+        <p style="margin:0 0 8px;font-size:12px;color:#52525b;line-height:1.6;">
+            Ce site compile des informations issues de sources publiques. Il ne constitue ni une accusation, ni un jugement.
+            Seules les décisions de justice définitives font foi.
+        </p>
+        <p style="margin:0;font-size:11px;color:#3f3f46;">
+            Balance Ton Rappeur · Votre adresse e-mail est utilisée uniquement pour répondre à cette demande.
+        </p>
+    </div>
+
+</div>
+</body>
+</html>

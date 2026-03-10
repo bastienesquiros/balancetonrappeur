@@ -111,27 +111,7 @@
         </div>
 
         <!-- Pagination -->
-        <nav th:if="${totalPages != null and totalPages > 1}"
-             class="flex items-center justify-center gap-1 mt-10">
-            <th:block th:with="baseParams=${#strings.replace(#httpServletRequest.queryString != null ? #httpServletRequest.queryString : '', '&amp;page=' + currentPage, '')}">
-                <a th:if="${currentPage > 0}"
-                   th:href="@{/accusations(page=${currentPage - 1})}?[[${baseParams}]]"
-                   class="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 border border-zinc-800 text-xs transition-colors">
-                    ← Précédent
-                </a>
-                <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-                    <a th:href="@{/accusations(page=${i})}?[[${baseParams}]]"
-                       th:text="${i + 1}"
-                       th:class="${i == currentPage} ? 'px-3 py-1.5 rounded-lg bg-zinc-800 text-white border border-zinc-700 text-xs' : 'px-3 py-1.5 rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-800/50 border border-zinc-800 text-xs transition-colors'">
-                    </a>
-                </th:block>
-                <a th:if="${currentPage < totalPages - 1}"
-                   th:href="@{/accusations(page=${currentPage + 1})}?[[${baseParams}]]"
-                   class="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 border border-zinc-800 text-xs transition-colors">
-                    Suivant →
-                </a>
-            </th:block>
-        </nav>
+        <div th:replace="~{fragments :: pagination('/accusations', ${currentPage}, ${totalPages}, ${filterParams})}"></div>
 
     </div>
 </main>

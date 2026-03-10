@@ -75,6 +75,7 @@
 
                 <!-- Dropdown résultats -->
                 <div x-show="results.length > 0"
+                     x-cloak
                      x-transition:enter="transition ease-out duration-100"
                      x-transition:enter-start="opacity-0 scale-98"
                      x-transition:enter-end="opacity-100 scale-100"
@@ -106,6 +107,7 @@
 
                 <!-- Dropdown pas trouvé -->
                 <div x-show="noResults && query.length >= 2"
+                     x-cloak
                      x-transition:enter="transition ease-out duration-100"
                      x-transition:enter-start="opacity-0 scale-98"
                      x-transition:enter-end="opacity-100 scale-100"
@@ -218,7 +220,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </button>
-                    <div x-show="open" x-transition class="px-5 pb-5 text-zinc-500 text-sm leading-relaxed">
+                    <div x-show="open" x-cloak x-transition class="px-5 pb-5 text-zinc-500 text-sm leading-relaxed">
                         <span th:if="${stat.index == 0}">En tant que fan de rap, il est difficile de trouver une source centralisée, neutre et sourcée sur les affaires impliquant des artistes. Ce site ne cherche pas à détruire des carrières — il documente des faits publics déjà relayés par la presse, les réseaux ou la justice.</span>
                         <span th:if="${stat.index == 1}">Vous pouvez soumettre une affaire via le formulaire de contribution. Chaque soumission est vérifiée avant publication. Une source vérifiable est obligatoire.</span>
                         <span th:if="${stat.index == 2}">Utilisez le formulaire de <a href="/legal#retrait"
