@@ -87,11 +87,18 @@
                         <!-- ADD_ACCUSATION -->
                         <div th:if="${s.type.name() == 'ADD_ACCUSATION'}">
                             <p class="text-zinc-400 text-xs mb-1">
-                                Rappeur : <span class="text-white font-medium"
-                                      th:text="${s.rapper != null ? s.rapper.name : s.unknownRapperName + ' (nouveau)'}"></span>
+                                Rappeur :
+                                <span class="text-white font-medium" th:if="${s.rapper != null}" th:text="${s.rapper.name}"></span>
+                                <span th:if="${s.rapper == null}">
+                                    <span class="text-white font-medium" th:text="${s.unknownRapperName}"></span>
+                                    <span th:if="${!dashboard.knownRapperNames().contains(s.unknownRapperName.toLowerCase())}"
+                                          class="ml-1 text-xs text-amber-400 font-normal">(nouveau)</span>
+                                    <span th:if="${dashboard.knownRapperNames().contains(s.unknownRapperName.toLowerCase())}"
+                                          class="ml-1 text-xs text-zinc-500 font-normal">(déjà en base)</span>
+                                </span>
                             </p>
                             <p class="text-white text-sm font-medium leading-snug mb-2" th:text="${s.title ?: '(sans titre)'}"></p>
-                            <div class="flex flex-wrap gap-2 mb-3">
+                            <div class="flex flex-wrap items-center gap-2 mb-3">
                                 <span th:if="${s.category != null}"
                                       class="text-xs px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700"
                                       th:text="${s.category.label()}"></span>
@@ -171,7 +178,7 @@
                     </div>
 
                     <!-- Actions -->
-                    <div class="flex flex-col gap-2 flex-shrink-0 w-[100px]">
+                    <div class="flex-shrink-0 w-44 space-y-2">
                         <form th:action="@{/admin/submissions/{id}/accept(id=${s.id})}" method="post">
                             <button class="w-full text-xs px-3 py-2 rounded-lg bg-green-950 text-green-400
                                            border border-green-900 hover:bg-green-900 transition-colors font-medium">
@@ -182,15 +189,15 @@
                         <!-- Rejeter : bouton → expand motif -->
                         <div x-data="{ open: false }">
                             <button type="button" @click="open = !open"
-                                    class="w-full text-xs px-3 py-2 rounded-lg bg-zinc-800 text-zinc-400
-                                           border border-zinc-700 hover:bg-red-950 hover:text-red-400 transition-colors"
+                                    :class="open ? 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:bg-zinc-700' : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:bg-red-950 hover:text-red-400'"
+                                    class="w-full text-xs px-3 py-2 rounded-lg border transition-colors"
                                     x-text="open ? 'Annuler' : 'Rejeter'">
                             </button>
-                            <div x-show="open" x-transition:enter="transition ease-out duration-150"
+                            <div x-show="open" x-cloak x-transition:enter="transition ease-out duration-150"
                                  x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
                                  class="mt-2">
                                 <form th:action="@{/admin/submissions/{id}/reject(id=${s.id})}" method="post" class="space-y-1.5">
-                                    <textarea name="reason" rows="3" placeholder="Motif (optionnel)"
+                                    <textarea name="reason" rows="2" placeholder="Motif (optionnel)"
                                               class="w-full text-xs px-2 py-1.5 rounded-lg bg-zinc-900 text-zinc-300
                                                      border border-zinc-700 resize-none focus:outline-none focus:border-red-800
                                                      placeholder-zinc-600 transition-colors"></textarea>
@@ -204,7 +211,7 @@
 
                         <a th:if="${s.rapper != null}"
                            th:href="@{/rappers/{id}(id=${s.rapper.id})}" target="_blank"
-                           class="text-xs px-3 py-2 rounded-lg bg-zinc-800 text-zinc-500
+                           class="block text-xs px-3 py-2 rounded-lg bg-zinc-800 text-zinc-500
                                   border border-zinc-700 hover:text-white transition-colors text-center">
                             Voir
                         </a>
@@ -247,25 +254,25 @@
                             Contact : <span class="text-zinc-400" th:text="${w.email}"></span>
                         </p>
                     </div>
-                    <div class="flex flex-col gap-2 flex-shrink-0 min-w-[100px]">
-                        <!-- Accepter (supprimer) avec commentaire optionnel -->
+                    <div class="flex-shrink-0 w-44 space-y-2">
+                        <!-- Supprimer (accorder la demande de retrait) -->
                         <div x-data="{ open: false }">
                             <button type="button" @click="open = !open"
-                                    class="w-full text-xs px-4 py-2 rounded-lg bg-red-950 text-red-400
-                                           border border-red-900 hover:bg-red-900 transition-colors font-medium"
-                                    x-text="open ? 'Annuler' : 'Supprimer'">
+                                    :class="open ? 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:bg-zinc-700' : 'bg-green-950 text-green-400 border-green-900 hover:bg-green-900'"
+                                    class="w-full text-xs px-3 py-2 rounded-lg border transition-colors font-medium"
+                                    x-text="open ? 'Annuler' : 'Accorder'">
                             </button>
-                            <div x-show="open" x-transition:enter="transition ease-out duration-150"
+                            <div x-show="open" x-cloak x-transition:enter="transition ease-out duration-150"
                                  x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
                                  class="mt-2">
                                 <form th:action="@{/admin/withdrawals/{id}/accept(id=${w.id})}" method="post" class="space-y-1.5">
-                                    <textarea name="comment" rows="3" placeholder="Message d'accompagnement (optionnel)"
+                                    <textarea name="comment" rows="2" placeholder="Message (optionnel)"
                                               class="w-full text-xs px-2 py-1.5 rounded-lg bg-zinc-900 text-zinc-300
-                                                     border border-zinc-700 resize-none focus:outline-none focus:border-red-800
+                                                     border border-zinc-700 resize-none focus:outline-none focus:border-green-800
                                                      placeholder-zinc-600 transition-colors"></textarea>
-                                    <button class="w-full text-xs px-3 py-2 rounded-lg bg-red-950 text-red-400
-                                                   border border-red-900 hover:bg-red-900 transition-colors font-medium">
-                                        Confirmer la suppression
+                                    <button class="w-full text-xs px-3 py-2 rounded-lg bg-green-950 text-green-400
+                                                   border border-green-900 hover:bg-green-900 transition-colors font-medium">
+                                        Confirmer
                                     </button>
                                 </form>
                             </div>
@@ -274,21 +281,21 @@
                         <!-- Rejeter avec motif optionnel -->
                         <div x-data="{ open: false }">
                             <button type="button" @click="open = !open"
-                                    class="w-full text-xs px-4 py-2 rounded-lg bg-zinc-800 text-zinc-400
-                                           border border-zinc-700 hover:bg-zinc-700 transition-colors"
+                                    :class="open ? 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:bg-zinc-700' : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:bg-red-950 hover:text-red-400'"
+                                    class="w-full text-xs px-3 py-2 rounded-lg border transition-colors"
                                     x-text="open ? 'Annuler' : 'Rejeter'">
                             </button>
-                            <div x-show="open" x-transition:enter="transition ease-out duration-150"
+                            <div x-show="open" x-cloak x-transition:enter="transition ease-out duration-150"
                                  x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
                                  class="mt-2">
                                 <form th:action="@{/admin/withdrawals/{id}/reject(id=${w.id})}" method="post" class="space-y-1.5">
-                                    <textarea name="reason" rows="3" placeholder="Motif du refus (optionnel)"
+                                    <textarea name="reason" rows="2" placeholder="Motif (optionnel)"
                                               class="w-full text-xs px-2 py-1.5 rounded-lg bg-zinc-900 text-zinc-300
-                                                     border border-zinc-700 resize-none focus:outline-none focus:border-zinc-600
+                                                     border border-zinc-700 resize-none focus:outline-none focus:border-red-800
                                                      placeholder-zinc-600 transition-colors"></textarea>
-                                    <button class="w-full text-xs px-3 py-2 rounded-lg bg-zinc-800 text-zinc-400
-                                                   border border-zinc-700 hover:bg-zinc-700 transition-colors font-medium">
-                                        Confirmer le refus
+                                    <button class="w-full text-xs px-3 py-2 rounded-lg bg-red-950 text-red-400
+                                                   border border-red-900 hover:bg-red-900 transition-colors font-medium">
+                                        Confirmer
                                     </button>
                                 </form>
                             </div>
@@ -296,7 +303,7 @@
 
                         <a th:if="${w.accusation != null}"
                            th:href="@{/accusations/{id}(id=${w.accusation.id})}" target="_blank"
-                           class="text-xs px-4 py-2 rounded-lg bg-zinc-800 text-zinc-500
+                           class="block text-xs px-3 py-2 rounded-lg bg-zinc-800 text-zinc-500
                                   border border-zinc-700 hover:text-white transition-colors text-center">
                             Voir
                         </a>

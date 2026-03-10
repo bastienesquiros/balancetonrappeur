@@ -11,4 +11,6 @@ public interface WithdrawalRequestRepository extends JpaRepository<WithdrawalReq
     long countByStatus(WithdrawalStatus status);
 
     List<WithdrawalRequest> findByStatusOrderByCreatedAtAsc(WithdrawalStatus status);
+
+    List<WithdrawalRequest> findByAccusationId(Long accusationId);
 }

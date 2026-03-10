@@ -8,6 +8,9 @@ import org.balancetonrappeur.entity.WithdrawalReason;
 @Data
 public class WithdrawalForm {
 
+    private Long rapperId;
+
+    @NotNull(message = "Veuillez sélectionner une affaire concernée.")
     private Long accusationId;
     private String accusationTitle;
 

@@ -29,15 +29,15 @@ public interface AccusationRepository extends JpaRepository<Accusation, Long> {
     List<Accusation> findAllForTimeline();
 
 
-    @Query(value = "SELECT a FROM Accusation a JOIN FETCH a.rapper ORDER BY a.factDate DESC NULLS LAST",
+    @Query(value = "SELECT a FROM Accusation a JOIN FETCH a.rapper ORDER BY a.createdAt DESC",
             countQuery = "SELECT COUNT(a) FROM Accusation a")
     Page<Accusation> findAllWithRapper(Pageable pageable);
 
-    @Query(value = "SELECT a FROM Accusation a JOIN FETCH a.rapper WHERE a.category IN :categories ORDER BY a.factDate DESC NULLS LAST",
+    @Query(value = "SELECT a FROM Accusation a JOIN FETCH a.rapper WHERE a.category IN :categories ORDER BY a.createdAt DESC",
             countQuery = "SELECT COUNT(a) FROM Accusation a WHERE a.category IN :categories")
     Page<Accusation> findByCategoryInWithRapper(@Param("categories") List<AccusationCategory> categories, Pageable pageable);
 
-    @Query(value = "SELECT a FROM Accusation a JOIN FETCH a.rapper WHERE a.status IN :statuses ORDER BY a.factDate DESC NULLS LAST",
+    @Query(value = "SELECT a FROM Accusation a JOIN FETCH a.rapper WHERE a.status IN :statuses ORDER BY a.createdAt DESC",
             countQuery = "SELECT COUNT(a) FROM Accusation a WHERE a.status IN :statuses")
     Page<Accusation> findByStatusInWithRapper(@Param("statuses") List<AccusationStatus> statuses, Pageable pageable);
 

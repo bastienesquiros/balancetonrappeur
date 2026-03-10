@@ -36,7 +36,11 @@ public class LegalController {
                 form.setRapperName(a.getRapper().getName());
             });
         } else if (rapperId != null) {
-            if (rapperName != null) form.setRapperName(rapperName);
+            form.setRapperId(rapperId);
+            if (rapperName != null) {
+                form.setRapperName(rapperName);
+                model.addAttribute("prefillRapperName", rapperName);
+            }
             model.addAttribute("prefillRapperId", rapperId);
         } else if (rapperName != null) {
             form.setRapperName(rapperName);
@@ -57,6 +61,9 @@ public class LegalController {
         if (binding.hasErrors()) {
             model.addAttribute("reasons", WithdrawalReason.values());
             model.addAttribute("formHasErrors", true);
+            if (form.getRapperId() != null) {
+                model.addAttribute("prefillRapperId", form.getRapperId());
+            }
             return "legal";
         }
 

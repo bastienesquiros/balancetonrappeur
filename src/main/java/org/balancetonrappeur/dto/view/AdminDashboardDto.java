@@ -5,6 +5,7 @@ import org.balancetonrappeur.entity.Submission;
 import org.balancetonrappeur.entity.WithdrawalRequest;
 
 import java.util.List;
+import java.util.Set;
 
 public record AdminDashboardDto(
     long nbRappers,
@@ -14,6 +15,7 @@ public record AdminDashboardDto(
     long nbNoSpotify,
     List<Submission> pendingSubmissions,
     List<WithdrawalRequest> pendingWithdrawals,
-    List<Rapper> rappersWithoutSpotify
+    List<Rapper> rappersWithoutSpotify,
+    Set<String> knownRapperNames
 ) {}
 

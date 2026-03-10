@@ -70,7 +70,7 @@ public class RapperService {
     public List<Rapper> findSimilar(Long excludeId, RapperStatus status) {
         return rapperRepository.findByStatus(status).stream()
                 .filter(r -> !r.getId().equals(excludeId))
-                .limit(6)
+                .limit(4)
                 .toList();
     }
 

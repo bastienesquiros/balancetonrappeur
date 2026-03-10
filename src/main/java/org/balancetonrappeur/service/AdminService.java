@@ -8,6 +8,8 @@ import org.balancetonrappeur.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.stream.Collectors;
+
 
 
 @Slf4j
@@ -25,6 +27,10 @@ public class AdminService {
     // Dashboard
 
     public AdminDashboardDto getDashboard() {
+        var knownNames = rapperRepository.findAll().stream()
+                .map(r -> r.getName().toLowerCase())
+                .collect(Collectors.toSet());
+
         return new AdminDashboardDto(
             rapperRepository.count(),
             accusationRepository.count(),
@@ -33,7 +39,8 @@ public class AdminService {
             rapperRepository.countBySpotifyImageUrlIsNull(),
             submissionRepository.findBySubmissionStatusOrderByCreatedAtAsc(SubmissionStatus.PENDING),
             withdrawalRequestRepository.findByStatusOrderByCreatedAtAsc(WithdrawalStatus.PENDING),
-            rapperRepository.findBySpotifyImageUrlIsNull()
+            rapperRepository.findBySpotifyImageUrlIsNull(),
+            knownNames
         );
     }
 
@@ -56,11 +63,19 @@ public class AdminService {
         if (submission.getRapper() != null) {
             rapper = submission.getRapper();
         } else {
-            rapper = new Rapper();
-            rapper.setName(submission.getUnknownRapperName());
-            rapper.setStatus(deriveRapperStatus(submission.getStatus()));
-            rapperRepository.save(rapper);
-            log.info("[Admin] Rappeur créé : {} ({})", rapper.getName(), rapper.getStatus());
+            // Vérifier si un rappeur du même nom a déjà été créé entre-temps (doublon de submissions)
+            var existing = rapperRepository.findByNameIgnoreCase(submission.getUnknownRapperName());
+            if (existing.isPresent()) {
+                rapper = existing.get();
+                log.info("[Admin] Rappeur existant réutilisé pour la submission #{} : {} ({})",
+                        submission.getId(), rapper.getName(), rapper.getStatus());
+            } else {
+                rapper = new Rapper();
+                rapper.setName(submission.getUnknownRapperName());
+                rapper.setStatus(deriveRapperStatus(submission.getStatus()));
+                rapperRepository.save(rapper);
+                log.info("[Admin] Rappeur créé : {} ({})", rapper.getName(), rapper.getStatus());
+            }
         }
 
         var accusation = new Accusation();
@@ -144,8 +159,29 @@ public class AdminService {
         if (accusation == null)
             throw new IllegalStateException("Withdrawal #" + withdrawalId + " sans accusation liée");
 
+        var rapper = accusation.getRapper();
         long accusationId = accusation.getId();
+
+        // Nullifier la référence sur TOUS les withdrawals liés à cette accusation
+        // avant de la supprimer (sinon Hibernate tente un UPDATE avec un accusation_id inexistant)
+        var linkedWithdrawals = withdrawalRequestRepository.findByAccusationId(accusationId);
+        for (var linked : linkedWithdrawals) {
+            linked.setAccusation(null);
+        }
+        withdrawalRequestRepository.saveAll(linkedWithdrawals);
+
         accusationRepository.deleteById(accusationId);
+        accusationRepository.flush();
+
+        // Vérifier si le rappeur a encore des affaires
+        var remaining = accusationRepository.findByRapperId(rapper.getId());
+        if (remaining.isEmpty()) {
+            log.info("[Admin] Rappeur {} n'a plus d'affaires — suppression", rapper.getName());
+            rapperRepository.deleteById(rapper.getId());
+        } else {
+            recalculateRapperStatus(rapper);
+        }
+
         wr.setStatus(WithdrawalStatus.PROCESSED);
         withdrawalRequestRepository.save(wr);
         log.info("[Admin] Withdrawal #{} accepté — accusation #{} supprimée", withdrawalId, accusationId);

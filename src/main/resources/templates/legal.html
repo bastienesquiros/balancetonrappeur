@@ -78,14 +78,37 @@
                 </div>
 
                 <div class="px-6 py-5 space-y-5"
+                     th:attr="data-prefill-rapper-id=${prefillRapperId != null ? prefillRapperId : (withdrawalForm.rapperId != null ? withdrawalForm.rapperId : '')},data-prefill-rapper-name=${withdrawalForm.rapperName},data-has-errors=${formHasErrors != null and formHasErrors}"
                      x-data="{
                          rapperId: null,
-                         rapperQuery: /*[[${withdrawalForm.rapperName != null ? '\'' + withdrawalForm.rapperName + '\'' : '\'\''}]]*/ '',
+                         rapperQuery: '',
                          rapperResults: [],
                          accusations: [],
                          selectedAccusationId: null,
                          selectedAccusationTitle: '',
                          submitted: false,
+                         loadingAccusations: false,
+                         async init() {
+                             const el = this.$el;
+                             const prefillId = el.dataset.prefillRapperId;
+                             const prefillName = el.dataset.prefillRapperName;
+                             const hasErrors = el.dataset.hasErrors === 'true';
+                             if (prefillName && prefillName !== 'null') {
+                                 this.rapperQuery = prefillName;
+                             }
+                             if (prefillId && prefillId !== 'null' && prefillId !== '') {
+                                 this.rapperId = parseInt(prefillId);
+                                 this.loadingAccusations = true;
+                                 try {
+                                     const res = await fetch('/api/rappers/' + this.rapperId + '/accusations');
+                                     this.accusations = await res.json();
+                                 } catch(e) {}
+                                 this.loadingAccusations = false;
+                             }
+                             if (hasErrors) {
+                                 this.submitted = true;
+                             }
+                         },
                          async searchRapper() {
                              if (this.rapperQuery.length < 2) { this.rapperResults = []; return; }
                              const res = await fetch('/api/rappers/search?q=' + encodeURIComponent(this.rapperQuery));
@@ -97,8 +120,10 @@
                              this.rapperResults = [];
                              this.selectedAccusationId = null;
                              this.selectedAccusationTitle = '';
+                             this.loadingAccusations = true;
                              const res = await fetch('/api/rappers/' + id + '/accusations');
                              this.accusations = await res.json();
+                             this.loadingAccusations = false;
                          },
                          selectAccusation(id, title) {
                              this.selectedAccusationId = id;
@@ -110,9 +135,11 @@
                          },
                          trySubmit(event) {
                              this.submitted = true;
+                             if (!this.selectedAccusationId && this.accusations.length > 0) {
+                                 event.preventDefault();
+                             }
                          }
-                     }"
-                     th:attr="x-init=${formHasErrors != null and formHasErrors ? 'submitted = true' : 'null'}">
+                     }">
 
 
                     <th:block th:if="${withdrawalForm.accusationId != null}">
@@ -142,32 +169,8 @@
 
                     <th:block th:unless="${withdrawalForm.accusationId != null}">
 
-                        <!-- Rappeur locké (vient d'une fiche rappeur) -->
-                        <div th:if="${withdrawalForm.rapperName != null and !#strings.isEmpty(withdrawalForm.rapperName) and prefillRapperId != null}"
-                             th:attr="x-init='selectRapper([[${prefillRapperId}]], [[${withdrawalForm.rapperName}]])'">
-                            <label class="block text-zinc-400 text-xs font-medium mb-1.5 uppercase tracking-wide">Rappeur concerné</label>
-                            <div class="bg-zinc-800/50 border border-zinc-700 rounded-lg px-3 py-2.5 flex items-center gap-2">
-                                <span class="text-zinc-300 text-sm" th:text="*{rapperName}">Rappeur</span>
-                                <span class="ml-auto text-zinc-600 text-xs">Verrouillé</span>
-                            </div>
-                            <input type="hidden" th:field="*{rapperName}"/>
-                        </div>
-
-                        <!-- Rappeur retourné après erreur (sélectionné précédemment via autocomplete) -->
-                        <div th:if="${withdrawalForm.rapperName != null and !#strings.isEmpty(withdrawalForm.rapperName) and prefillRapperId == null}">
-                            <label class="block text-zinc-400 text-xs font-medium mb-1.5 uppercase tracking-wide">
-                                Rappeur concerné <span class="text-red-400">*</span>
-                            </label>
-                            <div class="bg-zinc-800/50 border border-zinc-700 rounded-lg px-3 py-2.5 flex items-center justify-between">
-                                <span class="text-zinc-300 text-sm" th:text="*{rapperName}">Rappeur</span>
-                                <a th:href="@{/legal#retrait}" class="text-zinc-500 text-xs hover:text-white transition-colors">Changer</a>
-                            </div>
-                            <input type="hidden" name="rapperName" th:value="*{rapperName}"/>
-                        </div>
-
-                        <!-- Rappeur autocomplete (cas sans contexte) -->
-                        <div th:unless="${withdrawalForm.rapperName != null and !#strings.isEmpty(withdrawalForm.rapperName)}"
-                             class="relative">
+                        <!-- Rappeur autocomplete (toujours éditable, prérempli si vient d'une fiche) -->
+                        <div class="relative">
                             <label class="block text-zinc-400 text-xs font-medium mb-1.5 uppercase tracking-wide">
                                 Rappeur concerné <span class="text-red-400">*</span>
                             </label>
@@ -201,8 +204,9 @@
                                x-cloak
                                th:if="${not (formHasErrors != null and formHasErrors and (withdrawalForm.rapperName == null or #strings.isEmpty(withdrawalForm.rapperName)))}"
                                class="text-red-400 text-xs mt-1">Veuillez sélectionner un rappeur dans la liste.</p>
-                            <!-- Hidden input -->
+                            <!-- Hidden inputs -->
                             <input type="hidden" name="rapperName" id="rapperName" :value="rapperId ? rapperQuery : ''"/>
+                            <input type="hidden" name="rapperId" :value="rapperId || ''"/>
                             <!-- Dropdown rappeurs -->
                             <div x-show="rapperResults.length > 0"
                                  x-cloak
@@ -227,27 +231,36 @@
                         <!-- Affaire — dropdown après sélection rappeur -->
                         <div>
                             <label class="block text-zinc-400 text-xs font-medium mb-1.5 uppercase tracking-wide">
-                                Affaire concernée
+                                Affaire concernée <span class="text-red-400">*</span>
                             </label>
 
-                            <!-- Aucun rappeur sélectionné encore -->
-                            <div x-show="!rapperId && accusations.length === 0"
+                            <!-- Chargement en cours -->
+                            <div x-show="loadingAccusations"
                                  x-cloak
-                                 class="bg-zinc-800/40 border border-zinc-800 rounded-lg px-3 py-2.5 text-zinc-600 text-sm italic">
+                                 class="bg-zinc-800/40 border border-zinc-800 rounded-lg px-3 py-2.5 text-zinc-500 text-sm italic">
+                                Chargement des affaires…
+                            </div>
+
+                            <!-- Aucun rappeur sélectionné encore -->
+                            <div x-show="!loadingAccusations && !rapperId && accusations.length === 0"
+                                 x-cloak
+                                 :class="submitted && !rapperId ? 'border-red-500' : 'border-zinc-800'"
+                                 class="bg-zinc-800/40 border rounded-lg px-3 py-2.5 text-zinc-600 text-sm italic">
                                 Sélectionnez d'abord un rappeur ci-dessus
                             </div>
 
                             <!-- Rappeur sélectionné, aucune affaire indexée -->
-                            <div x-show="rapperId && accusations.length === 0"
+                            <div x-show="!loadingAccusations && rapperId && accusations.length === 0"
                                  x-cloak
                                  class="bg-zinc-800/40 border border-zinc-800 rounded-lg px-3 py-2.5 text-zinc-500 text-sm">
                                 Aucune affaire indexée pour ce rappeur
                             </div>
 
                             <!-- Dropdown accusations -->
-                            <div x-show="accusations.length > 0 && !selectedAccusationId"
+                            <div x-show="!loadingAccusations && accusations.length > 0 && !selectedAccusationId"
                                  x-cloak
-                                 class="bg-zinc-800 border border-zinc-700 rounded-lg overflow-hidden">
+                                 :class="submitted && !selectedAccusationId ? 'border-red-500' : 'border-zinc-700'"
+                                 class="bg-zinc-800 border rounded-lg overflow-hidden">
                                 <template x-for="acc in accusations" :key="acc.id">
                                     <button type="button"
                                             @click="selectAccusation(acc.id, acc.title)"
@@ -270,6 +283,21 @@
                                     Changer
                                 </button>
                             </div>
+
+                            <!-- Erreur Alpine client-side -->
+                            <p x-show="submitted && !selectedAccusationId && accusations.length > 0"
+                               x-cloak
+                               class="text-red-400 text-xs mt-1 flex items-center gap-1.5">
+                                <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                                Veuillez sélectionner une affaire concernée.
+                            </p>
+                            <!-- Erreur Thymeleaf server-side (retour validation) — masquée dès qu'Alpine a chargé les affaires -->
+                            <p th:if="${formHasErrors != null and formHasErrors and withdrawalForm.accusationId == null}"
+                               x-show="accusations.length === 0"
+                               class="text-red-400 text-xs mt-1 flex items-center gap-1.5">
+                                <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                                Veuillez sélectionner une affaire concernée.
+                            </p>
 
                             <!-- Champs cachés accusation (dynamique Alpine — pas de th:field ici) -->
                             <input type="hidden" name="accusationId" :value="selectedAccusationId || ''"/>
