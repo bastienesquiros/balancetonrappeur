@@ -179,6 +179,7 @@
                 <div class="w-9 h-9 rounded-xl mb-3 flex-shrink-0 overflow-hidden bg-zinc-800 group-hover:bg-zinc-700 transition-colors flex items-center justify-center">
                     <img th:if="${rapper.spotifyImageUrl != null}"
                          th:src="${rapper.spotifyImageUrl}" th:alt="${rapper.name}"
+                         loading="lazy" decoding="async"
                          class="w-full h-full object-cover"/>
                     <svg th:if="${rapper.spotifyImageUrl == null}"
                          class="w-4 h-4 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">

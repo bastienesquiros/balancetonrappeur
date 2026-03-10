@@ -42,7 +42,10 @@ public class SpotifyClient {
     private record TokenResponse(@JsonProperty("access_token") String accessToken) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    private record ImageRaw(@JsonProperty("url") String url) {}
+    private record ImageRaw(
+            @JsonProperty("url")    String url,
+            @JsonProperty("width")  Integer width
+    ) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     private record ArtistRaw(
@@ -121,9 +124,15 @@ public class SpotifyClient {
             }
 
             return match.map(a -> {
-                String imageUrl = (a.images() != null && !a.images().isEmpty())
-                        ? a.images().getFirst().url()
-                        : null;
+                // Pick the smallest image >= 120px (typically 300px) — avoids downloading 640px for ~120px display
+                String imageUrl = null;
+                if (a.images() != null && !a.images().isEmpty()) {
+                    imageUrl = a.images().stream()
+                            .filter(img -> img.width() != null && img.width() >= 120)
+                            .min((i1, i2) -> Integer.compare(i1.width(), i2.width()))
+                            .map(ImageRaw::url)
+                            .orElse(a.images().getFirst().url()); // fallback to largest
+                }
                 return new SpotifyArtistDto(a.id(), imageUrl);
             });
         } catch (Exception e) {

@@ -45,7 +45,7 @@
                class="group bg-zinc-900 border border-zinc-800 rounded-xl p-4 hover:border-zinc-700 hover:bg-zinc-800/50 transition-all flex flex-col">
                 <!-- Avatar -->
                 <div class="mb-3">
-                    <th:block th:replace="~{fragments :: rapperAvatar(${rapper}, 'w-10 h-10')}"/>
+                    <th:block th:replace="~{fragments :: rapperAvatar(${rapper}, 'w-10 h-10', null)}"/>
                 </div>
                 <!-- Nom -->
                 <p class="font-semibold text-white text-sm truncate mb-auto" th:text="${rapper.name}">Artiste</p>

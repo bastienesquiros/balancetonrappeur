@@ -52,12 +52,14 @@
     </span>
 </th:block>
 
-<!-- AVATAR RAPPEUR — size = classes Tailwind ex: "w-10 h-10" -->
-<th:block th:fragment="rapperAvatar(rapper, size)">
+<!-- AVATAR RAPPEUR — size = Tailwind classes e.g. "w-10 h-10", eager = true for above-fold hero images -->
+<th:block th:fragment="rapperAvatar(rapper, size, eager)">
     <div th:class="${size} + ' rounded-xl overflow-hidden bg-zinc-800 flex-shrink-0 flex items-center justify-center'">
         <img th:if="${rapper.spotifyImageUrl != null}"
              th:src="${rapper.spotifyImageUrl}"
              th:alt="${rapper.name}"
+             th:attr="loading=${eager != null and eager ? 'eager' : 'lazy'}, fetchpriority=${eager != null and eager ? 'high' : 'auto'}"
+             decoding="async"
              class="w-full h-full object-cover"/>
         <svg th:if="${rapper.spotifyImageUrl == null}" class="w-4 h-4 text-zinc-600 select-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z"/>

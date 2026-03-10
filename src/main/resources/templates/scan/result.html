@@ -82,6 +82,7 @@
                         <img th:if="${result.rapperImageUrl != null}"
                              th:src="${result.rapperImageUrl}"
                              th:alt="${result.rapperName}"
+                             loading="lazy" decoding="async"
                              class="w-full h-full object-cover"/>
                         <span th:if="${result.rapperImageUrl == null}"
                               class="w-full h-full flex items-center justify-center text-zinc-600">

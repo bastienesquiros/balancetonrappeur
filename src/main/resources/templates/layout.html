@@ -22,16 +22,30 @@
 
     <link rel="icon" type="image/x-icon" href="/favicon.ico"/>
 
+    <!-- Preconnect to external origins for faster resource loading -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+    <link rel="preconnect" href="https://i.scdn.co" crossorigin="anonymous"/>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net"/>
+
+    <!-- Tailwind CDN — must be synchronous (parses HTML classes) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: { extend: { fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] } } }
         }
     </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <style>[x-cloak] { display: none !important; }</style>
+    <!-- Fonts — non-blocking load, swap to avoid FOIT -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/></noscript>
+    <!-- Alpine pinned to exact version — jsDelivr caches pinned versions for 1 year -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
+    <style>
+        [x-cloak] { display: none !important; }
+        /* Fallback font until Inter loads */
+        body { font-family: Inter, system-ui, -apple-system, sans-serif; }
+    </style>
 </head>
 <body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col antialiased">
 
