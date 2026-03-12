@@ -202,7 +202,7 @@
             <h2 class="text-base font-bold text-white mb-6">Questions fréquentes</h2>
             <div class="space-y-2">
 
-                <div th:each="faq,stat : ${ {'Pourquoi ce site existe ?','Comment contribuer ?','Une information est incorrecte, que faire ?','Ce site est-il légal ?'} }"
+                <div th:each="faq,stat : ${ {'Pourquoi ce site existe ?','La base semble incomplète — comment contribuer ?','Une information est incorrecte, que faire ?','Ce site est-il légal ?','Que signifient les termes utilisés ?'} }"
                      class="border border-zinc-800 rounded-xl overflow-hidden"
                      x-data="{ open: false }">
                     <button @click="open = !open"
@@ -216,10 +216,11 @@
                     </button>
                     <div x-show="open" x-cloak x-transition class="px-5 pb-5 text-zinc-500 text-sm leading-relaxed">
                         <span th:if="${stat.index == 0}">En tant que fan de rap, il est difficile de trouver une source centralisée, neutre et sourcée sur les affaires impliquant des artistes. Ce site ne cherche pas à détruire des carrières — il documente des faits publics déjà relayés par la presse, les réseaux ou la justice.</span>
-                        <span th:if="${stat.index == 1}">Vous pouvez soumettre une affaire via le formulaire de contribution. Chaque soumission est vérifiée avant publication. Une source vérifiable est obligatoire.</span>
+                        <span th:if="${stat.index == 1}">C'est une limitation assumée : ce site est collaboratif et ne prétend pas à l'exhaustivité. Si un rappeur manque ou si une affaire n'est pas encore référencée, vous pouvez la soumettre via <a href="/rappers/suggest" class="text-zinc-300 underline underline-offset-2 hover:text-white">le formulaire de contribution</a>. Chaque soumission est vérifiée avant publication et une source vérifiable est obligatoire — chaque contribution améliore la base.</span>
                         <span th:if="${stat.index == 2}">Utilisez le formulaire de <a href="/legal#retrait"
                                                                                       class="text-zinc-300 underline underline-offset-2 hover:text-white">demande de correction ou retrait</a>. Nous traitons toutes les demandes sous 72h.</span>
                         <span th:if="${stat.index == 3}">Oui. Ce site compile uniquement des informations issues de sources publiques. Chaque affaire est sourcée. Nous utilisons des formulations neutres (<em>accusé de</em>, <em>condamné pour</em>) et ne portons aucun jugement personnel.</span>
+                        <span th:if="${stat.index == 4}">Chaque statut et chaque catégorie d'affaire a une définition précise, consultable dans notre <a href="/legal#glossaire" class="text-zinc-300 underline underline-offset-2 hover:text-white">glossaire</a>. Une polémique médiatique, une procédure en cours et une condamnation définitive sont trois réalités très différentes — le site les distingue clairement.</span>
                     </div>
                 </div>
 

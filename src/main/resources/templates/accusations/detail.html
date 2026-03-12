@@ -133,12 +133,18 @@
             <svg class="w-4 h-4 text-zinc-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
-            <p class="text-zinc-500 text-xs leading-relaxed">
-                Les informations présentées sont issues de sources publiques (presse, décisions de justice).
-                Elles ne constituent ni une accusation, ni un jugement personnel.
-                Seules les décisions de justice définitives font foi.
-                <a th:href="@{/legal#retrait(accusationId=${accusation.id})}" class="text-zinc-400 underline underline-offset-2 hover:text-zinc-200 transition-colors">Demander une correction ou un retrait</a>.
-            </p>
+            <div class="text-zinc-500 text-xs leading-relaxed space-y-1.5">
+                <p>
+                    Les informations présentées sont issues de sources publiques (presse, décisions de justice).
+                    Elles ne constituent ni une accusation, ni un jugement personnel.
+                    Seules les décisions de justice définitives font foi.
+                </p>
+                <div class="flex flex-wrap gap-x-3 gap-y-1">
+                    <a href="/legal#glossaire" class="text-zinc-400 underline underline-offset-2 hover:text-zinc-200 transition-colors">Comprendre les termes</a>
+                    <a href="/legal#ressources" class="text-zinc-400 underline underline-offset-2 hover:text-zinc-200 transition-colors">Ressources d'aide</a>
+                    <a th:href="@{/legal#retrait(accusationId=${accusation.id})}" class="text-zinc-400 underline underline-offset-2 hover:text-zinc-200 transition-colors">Demander une correction ou un retrait</a>
+                </div>
+            </div>
         </div>
 
     </div>

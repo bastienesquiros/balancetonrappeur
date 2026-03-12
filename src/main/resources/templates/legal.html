@@ -8,9 +8,19 @@
 <main class="flex-1">
     <div class="max-w-3xl mx-auto px-4 py-12">
 
+        <!-- Quick nav -->
+        <div class="flex flex-wrap gap-2 mb-10">
+            <a href="#mentions" class="text-xs px-3 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-600 transition-colors">Mentions légales</a>
+            <a href="#glossaire" class="text-xs px-3 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-600 transition-colors">Glossaire</a>
+            <a href="#ressources" class="text-xs px-3 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-600 transition-colors">Ressources</a>
+            <a href="#cgu" class="text-xs px-3 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-600 transition-colors">CGU</a>
+            <a href="#retrait" class="text-xs px-3 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-600 transition-colors">Demande de retrait</a>
+        </div>
+
         <!-- ═══════════════════════════════════════
              MENTIONS LÉGALES
         ════════════════════════════════════════ -->
+        <div id="mentions" class="scroll-mt-20">
         <h1 class="text-2xl font-bold text-white mb-8">Mentions légales</h1>
 
         <div class="space-y-6 text-zinc-400 text-sm leading-relaxed">
@@ -145,6 +155,232 @@
                 </div>
             </div>
 
+        </div><!-- /space-y-6 mentions -->
+        </div><!-- /mentions -->
+
+        <!-- ═══════════════════════════════════════
+             GLOSSAIRE
+        ════════════════════════════════════════ -->
+        <div id="glossaire" class="mt-14 scroll-mt-20">
+            <h2 class="text-xl font-bold text-white mb-2">Glossaire</h2>
+            <p class="text-zinc-500 text-sm mb-6">Définition des termes utilisés sur ce site pour éviter toute confusion.</p>
+
+            <div class="space-y-4 text-sm text-zinc-400 leading-relaxed">
+
+                <!-- Statuts rappeurs -->
+                <div class="bg-zinc-900 border border-zinc-800 rounded-xl px-6 py-5">
+                    <h3 class="text-white font-semibold mb-4">Statuts des rappeurs</h3>
+                    <div class="divide-y divide-zinc-800">
+                        <div class="flex gap-4 py-3 first:pt-0 last:pb-0">
+                            <div class="w-36 flex-shrink-0 pt-0.5">
+                                <span class="inline-flex text-xs px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700">Mis en cause</span>
+                            </div>
+                            <p class="text-sm">Personne citée dans au moins une affaire publique (médiatique ou judiciaire) <strong class="text-zinc-300">sans qu'aucune procédure judiciaire ne soit en cours ou aboutie</strong>. Ce statut ne préjuge d'aucune culpabilité.</p>
+                        </div>
+                        <div class="flex gap-4 py-3 first:pt-0 last:pb-0">
+                            <div class="w-36 flex-shrink-0 pt-0.5">
+                                <span class="inline-flex text-xs px-2 py-0.5 rounded-full bg-amber-950 text-amber-400 border border-amber-900 whitespace-nowrap">Procédure en cours</span>
+                            </div>
+                            <p class="text-sm">Une enquête, une plainte ou un procès est <strong class="text-zinc-300">en cours</strong>. Aucun jugement définitif n'a été rendu. <strong class="text-zinc-300">La présomption d'innocence s'applique pleinement.</strong></p>
+                        </div>
+                        <div class="flex gap-4 py-3 first:pt-0 last:pb-0">
+                            <div class="w-36 flex-shrink-0 pt-0.5">
+                                <span class="inline-flex text-xs px-2 py-0.5 rounded-full bg-slate-900 text-slate-400 border border-slate-700">Hors de cause</span>
+                            </div>
+                            <p class="text-sm">La procédure judiciaire s'est terminée en faveur de la personne : <strong class="text-zinc-300">acquittement, relaxe, classement sans suite, non-lieu</strong>. Attention : un classement sans suite ne signifie pas nécessairement que les faits n'ont pas eu lieu — il peut résulter d'un manque de preuves, d'une prescription, ou d'une décision d'opportunité des poursuites.</p>
+                        </div>
+                        <div class="flex gap-4 py-3 first:pt-0 last:pb-0">
+                            <div class="w-36 flex-shrink-0 pt-0.5">
+                                <span class="inline-flex text-xs px-2 py-0.5 rounded-full bg-red-950 text-red-400 border border-red-900">Condamné</span>
+                            </div>
+                            <p class="text-sm">Une <strong class="text-zinc-300">décision de justice définitive et publique</strong> a reconnu la culpabilité de la personne pour les faits concernés.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statuts des affaires -->
+                <div class="bg-zinc-900 border border-zinc-800 rounded-xl px-6 py-5">
+                    <h3 class="text-white font-semibold mb-4">Statuts des affaires</h3>
+                    <div class="divide-y divide-zinc-800">
+                        <div class="flex gap-4 py-3 first:pt-0 last:pb-0">
+                            <div class="w-36 flex-shrink-0 pt-0.5">
+                                <span class="inline-flex text-xs px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700">Sans procédure</span>
+                            </div>
+                            <p class="text-sm">Affaire <strong class="text-zinc-300">médiatique ou publique</strong> sans procédure judiciaire connue : dénonciation publique, déclarations controversées, bad buzz documenté par la presse ou les réseaux sociaux. Aucune plainte ni enquête n'est mentionnée dans les sources.</p>
+                        </div>
+                        <div class="flex gap-4 py-3 first:pt-0 last:pb-0">
+                            <div class="w-36 flex-shrink-0 pt-0.5">
+                                <span class="inline-flex text-xs px-2 py-0.5 rounded-full bg-amber-950 text-amber-400 border border-amber-900">En cours</span>
+                            </div>
+                            <p class="text-sm">Une <strong class="text-zinc-300">procédure judiciaire est en cours</strong> : plainte déposée, garde à vue, mise en examen, ou procès ouvert. <strong class="text-zinc-300">Aucun jugement définitif n'a été rendu.</strong></p>
+                        </div>
+                        <div class="flex gap-4 py-3 first:pt-0 last:pb-0">
+                            <div class="w-36 flex-shrink-0 pt-0.5">
+                                <span class="inline-flex text-xs px-2 py-0.5 rounded-full bg-slate-900 text-slate-400 border border-slate-700">Hors de cause</span>
+                            </div>
+                            <p class="text-sm">La procédure judiciaire est terminée sans condamnation. Cela peut signifier un <strong class="text-zinc-300">acquittement ou une relaxe</strong> (jugement favorable sur le fond), un <strong class="text-zinc-300">classement sans suite</strong> (décision du parquet de ne pas poursuivre), ou un <strong class="text-zinc-300">non-lieu</strong>.</p>
+                        </div>
+                        <div class="flex gap-4 py-3 first:pt-0 last:pb-0">
+                            <div class="w-36 flex-shrink-0 pt-0.5">
+                                <span class="inline-flex text-xs px-2 py-0.5 rounded-full bg-red-950 text-red-400 border border-red-900">Condamné</span>
+                            </div>
+                            <p class="text-sm">Un <strong class="text-zinc-300">tribunal a rendu une décision de condamnation définitive et publique</strong> pour cette affaire précise.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Catégories -->
+                <div class="bg-zinc-900 border border-zinc-800 rounded-xl px-6 py-5">
+                    <h3 class="text-white font-semibold mb-4">Catégories d'affaires</h3>
+                    <p class="text-zinc-500 text-xs mb-4">Les catégories reflètent la nature des faits tels que décrits dans les sources publiques, pas une qualification juridique définitive.</p>
+                    <div class="grid sm:grid-cols-2 gap-3">
+                        <div class="bg-zinc-800/50 rounded-lg px-3 py-3">
+                            <p class="text-red-400 text-xs font-semibold mb-1">Agression sexuelle</p>
+                            <p class="text-zinc-500 text-xs">Faits qualifiés d'agression sexuelle dans les sources (hors viol).</p>
+                        </div>
+                        <div class="bg-zinc-800/50 rounded-lg px-3 py-3">
+                            <p class="text-red-400 text-xs font-semibold mb-1">Viol</p>
+                            <p class="text-zinc-500 text-xs">Faits qualifiés de viol dans les sources ou dans les actes judiciaires.</p>
+                        </div>
+                        <div class="bg-zinc-800/50 rounded-lg px-3 py-3">
+                            <p class="text-orange-400 text-xs font-semibold mb-1">Violences physiques</p>
+                            <p class="text-zinc-500 text-xs">Coups, blessures, voies de fait documentés par une source publique.</p>
+                        </div>
+                        <div class="bg-zinc-800/50 rounded-lg px-3 py-3">
+                            <p class="text-orange-400 text-xs font-semibold mb-1">Violences conjugales</p>
+                            <p class="text-zinc-500 text-xs">Violences exercées dans le cadre d'une relation intime ou conjugale.</p>
+                        </div>
+                        <div class="bg-zinc-800/50 rounded-lg px-3 py-3">
+                            <p class="text-red-400 text-xs font-semibold mb-1">Homicide</p>
+                            <p class="text-zinc-500 text-xs">Faits liés à la mort d'une personne impliquant la personne citée.</p>
+                        </div>
+                        <div class="bg-zinc-800/50 rounded-lg px-3 py-3">
+                            <p class="text-purple-400 text-xs font-semibold mb-1">Incitation à la haine</p>
+                            <p class="text-zinc-500 text-xs">Propos publics poursuivis ou condamnés pour incitation à la haine, racisme, homophobie, antisémitisme ou misogynie.</p>
+                        </div>
+                        <div class="bg-zinc-800/50 rounded-lg px-3 py-3">
+                            <p class="text-yellow-400 text-xs font-semibold mb-1">Polémique</p>
+                            <p class="text-zinc-500 text-xs">Affaire médiatique sans qualification pénale claire : bad buzz, clash, déclarations controversées sans procédure judiciaire.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════
+             RESSOURCES
+        ════════════════════════════════════════ -->
+        <div id="ressources" class="mt-14 scroll-mt-20">
+            <h2 class="text-xl font-bold text-white mb-2">Ressources &amp; aide aux victimes</h2>
+            <p class="text-zinc-500 text-sm mb-6">
+                Ce site documente des faits. Si vous êtes concerné·e par l'une de ces situations,
+                des professionnels peuvent vous aider.
+            </p>
+
+            <div class="space-y-4 text-sm text-zinc-400 leading-relaxed">
+
+                <!-- Violences sexuelles -->
+                <div class="bg-zinc-900 border border-zinc-800 rounded-xl px-6 py-5">
+                    <h3 class="text-white font-semibold mb-4">Violences sexuelles</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-start gap-3">
+                            <div class="flex-1">
+                                <p class="text-zinc-300 font-medium text-xs">Centre de crise et de référence (CCAS)</p>
+                                <p class="text-zinc-500 text-xs mt-0.5">Accueil médicopsychologique et judiciaire des victimes de violences sexuelles dans les hôpitaux.</p>
+                                <a href="https://www.arretonslesviolences.gouv.fr" target="_blank" rel="noopener noreferrer"
+                                   class="text-zinc-300 text-xs underline underline-offset-2 hover:text-white transition-colors mt-1 inline-block">
+                                    arretonslesviolences.gouv.fr →
+                                </a>
+                            </div>
+                        </div>
+                        <div class="border-t border-zinc-800 pt-3 flex items-start gap-3">
+                            <div class="flex-1">
+                                <p class="text-zinc-300 font-medium text-xs">
+                                    <span class="text-white font-bold text-sm">3114</span>
+                                    — Numéro national de prévention du suicide
+                                </p>
+                                <p class="text-zinc-500 text-xs mt-0.5">Disponible 24h/24, 7j/7. Aussi pour les victimes en situation de détresse.</p>
+                            </div>
+                        </div>
+                        <div class="border-t border-zinc-800 pt-3 flex items-start gap-3">
+                            <div class="flex-1">
+                                <p class="text-zinc-300 font-medium text-xs">
+                                    <span class="text-white font-bold text-sm">0800 05 95 95</span>
+                                    — Stop Violences Femmes (FNSF)
+                                </p>
+                                <p class="text-zinc-500 text-xs mt-0.5">Numéro gratuit, confidentiel, disponible 7j/7. Écoute, orientation, accompagnement.</p>
+                                <a href="https://www.solidaritefemmes.org" target="_blank" rel="noopener noreferrer"
+                                   class="text-zinc-300 text-xs underline underline-offset-2 hover:text-white transition-colors mt-1 inline-block">
+                                    solidaritefemmes.org →
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Violences conjugales -->
+                <div class="bg-zinc-900 border border-zinc-800 rounded-xl px-6 py-5">
+                    <h3 class="text-white font-semibold mb-4">Violences conjugales &amp; intrafamiliales</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-start gap-3">
+                            <div class="flex-1">
+                                <p class="text-zinc-300 font-medium text-xs">
+                                    <span class="text-white font-bold text-sm">3919</span>
+                                    — Violences Femmes Info
+                                </p>
+                                <p class="text-zinc-500 text-xs mt-0.5">Numéro national d'information et d'orientation. Gratuit, 24h/24. Anonyme.</p>
+                            </div>
+                        </div>
+                        <div class="border-t border-zinc-800 pt-3 flex items-start gap-3">
+                            <div class="flex-1">
+                                <p class="text-zinc-300 font-medium text-xs">En danger immédiat</p>
+                                <p class="text-zinc-500 text-xs mt-0.5">Appelez le <strong class="text-white">17</strong> (Police) ou le <strong class="text-white">15</strong> (SAMU). Vous pouvez aussi envoyer un SMS au <strong class="text-white">114</strong> si vous ne pouvez pas parler.</p>
+                            </div>
+                        </div>
+                        <div class="border-t border-zinc-800 pt-3 flex items-start gap-3">
+                            <div class="flex-1">
+                                <p class="text-zinc-300 font-medium text-xs">Association France Victimes</p>
+                                <p class="text-zinc-500 text-xs mt-0.5">Réseau national d'associations d'aide aux victimes de toutes infractions pénales.</p>
+                                <a href="https://www.france-victimes.fr" target="_blank" rel="noopener noreferrer"
+                                   class="text-zinc-300 text-xs underline underline-offset-2 hover:text-white transition-colors mt-1 inline-block">
+                                    france-victimes.fr →
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Discriminations & harcèlement -->
+                <div class="bg-zinc-900 border border-zinc-800 rounded-xl px-6 py-5">
+                    <h3 class="text-white font-semibold mb-4">Discriminations &amp; propos haineux</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-start gap-3">
+                            <div class="flex-1">
+                                <p class="text-zinc-300 font-medium text-xs">
+                                    <span class="text-white font-bold text-sm">3928</span>
+                                    — Anti-discrimination (Défenseur des droits)
+                                </p>
+                                <p class="text-zinc-500 text-xs mt-0.5">Signalement de discriminations (racisme, homophobie, sexisme…). Gratuit, du lundi au vendredi.</p>
+                                <a href="https://www.defenseurdesdroits.fr" target="_blank" rel="noopener noreferrer"
+                                   class="text-zinc-300 text-xs underline underline-offset-2 hover:text-white transition-colors mt-1 inline-block">
+                                    defenseurdesdroits.fr →
+                                </a>
+                            </div>
+                        </div>
+                        <div class="border-t border-zinc-800 pt-3 flex items-start gap-3">
+                            <div class="flex-1">
+                                <p class="text-zinc-300 font-medium text-xs">Signaler un contenu haineux en ligne</p>
+                                <a href="https://www.pharos.fr" target="_blank" rel="noopener noreferrer"
+                                   class="text-zinc-300 text-xs underline underline-offset-2 hover:text-white transition-colors mt-1 inline-block">
+                                    pharos.fr (Plateforme officielle) →
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
 
         <!-- ═══════════════════════════════════════
