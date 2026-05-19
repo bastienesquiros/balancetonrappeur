@@ -19,7 +19,7 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./letsencrypt:/letsencrypt"
     networks:
-      - proxy
+      - btr_proxy
 
   app:
     build: .
@@ -44,8 +44,8 @@ services:
       db:
         condition: service_healthy
     networks:
-      - internal
-      - proxy
+      - btr_internal
+      - btr_proxy
     labels:
       - traefik.enable=true
       - traefik.docker.network=btr_proxy
@@ -74,15 +74,15 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - internal
+      - btr_internal
 
 volumes:
   btr_pgdata:
 
 networks:
-  internal:
+  btr_internal:
     name: btr_internal
     internal: true
-  proxy:
+  btr_proxy:
     name: btr_proxy
     driver: bridge
